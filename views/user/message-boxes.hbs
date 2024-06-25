@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Message Boxes</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    background-color: #f7f7f7;
+    padding: 20px;
+}
+
+.message-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-radius: 5px;
+    margin: 10px 0;
+    position: relative;
+    font-size: 16px;
+    color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.5s ease-out;
+}
+
+.message-box .icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.message-box .message {
+    flex-grow: 1;
+}
+
+.message-box .close {
+    cursor: pointer;
+    font-size: 20px;
+    color: inherit;
+    transition: color 0.2s ease-in-out;
+}
+
+.message-box .close:hover {
+    color: #000;
+}
+
+.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 6px solid #28a745;
+}
+
+.success .icon, .success .close {
+    color: #155724;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 6px solid #dc3545;
+}
+
+.error .icon, .error .close {
+    color: #721c24;
+}
+
+.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left: 6px solid #17a2b8;
+}
+
+.info .icon, .info .close {
+    color: #0c5460;
+}
+
+.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 6px solid #ffc107;
+}
+
+.warning .icon, .warning .close {
+    color: #856404;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+    </style>
+</head>
+<body>
+    <div class="message-box success">
+        <span class="icon">✔</span>
+        <span class="message">Success Message</span>
+        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
+    </div>
+
+    <div class="message-box error">
+        <span class="icon">✖</span>
+        <span class="message">Error Message</span>
+        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
+    </div>
+
+    <div class="message-box info">
+        <span class="icon">ℹ</span>
+        <span class="message">Informational Message</span>
+        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
+    </div>
+
+    <div class="message-box warning">
+        <span class="icon">⚠</span>
+        <span class="message">Warning Message</span>
+        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
+    </div>
+</body>
+</html>

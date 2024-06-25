@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+
+<!-- belle/shop-listview.html   11 Nov 2019 12:41:02 GMT -->
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta http-equiv="x-ua-compatible" content="ie=edge">
+<title>Women &ndash; Belle Multipurpose Bootstrap 4 Template</title>
+<meta name="description" content="description">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- Favicon -->
+<link rel="shortcut icon" href="assets/images/favicon.png" />
+<!-- Plugins CSS -->
+<link rel="stylesheet" href="assets/css/plugins.css">
+<!-- Bootstap CSS -->
+<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+<!-- Main Style CSS -->
+<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/css/responsive.css">
+
+ <style>
+     
+
+      
+
+     
+
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+
+        .popup {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            padding: 30px;
+            width: 400px;
+            max-width: 90%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation: popupFadeIn 0.3s ease-out;
+        }
+
+        @keyframes popupFadeIn {
+            from { opacity: 0; transform: translate(-50%, -60%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        .popup h2 {
+            margin-top: 0;
+            color: #333;
+            font-size: 24px;
+        }
+
+        .popup p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .popup select, .popup textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-family: inherit;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .popup textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .popup-btns {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .popup-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .cancel-btn {
+            background-color: #f1f1f1;
+            color: #333;
+            margin-right: 10px;
+        }
+
+        .cancel-btn:hover {
+            background-color: #e1e1e1;
+        }
+
+        .submit-btn {
+            background-color: #3a3a3a;
+            color: white;
+        }
+
+        .submit-btn:hover {
+            background-color: #010101;
+        }
+    </style>
+</head>
+{{>header}}
+   
+    
+    <!--Body Content-->
+    <div id="page-content">
+    	<!--Collection Banner-->
+    	<div class="collection-header">
+			<div class="collection-hero">
+        		<div class="collection-hero__image"><img data-src="assets/images/cat-women3.jpg" src="assets/images/cat-women3.jpg" alt="Women" title="Women" /></div>
+        		<div class="collection-hero__title-wrapper"><h1 class="collection-hero__title page-width">Your Orders</h1></div>
+      		</div>
+		</div>
+        <!--End Collection Banner-->
+        
+        <div class="container">
+        	<div class="row">
+            	
+
+{{!-- ******************************single product return popup************************************************** --}}
+<div class="popup-overlay" id="popupOverlay" style="display: none;">
+    <div class="popup">
+        <h2>Return Item</h2>
+        <p>Please select the quantity and provide the reason for returning this product:</p>
+        <select id="returnQuantity"></select>
+        <select id="singleReturnReason">
+            <option value="">Select a reason</option>
+            <option value="Damaged">Damaged</option>
+            <option value="Wrong item">Wrong item</option>
+            <option value="Wrong size">Wrong size</option>
+            <option value="No longer needed">No longer needed</option>
+            <option value="Other">Other</option>
+            <!-- Add more options as needed -->
+        </select>
+        <div class="popup-btns">
+            <button class="popup-btn cancel-btn" onclick="hidePopup()">Cancel</button>
+            <button class="popup-btn submit-btn" onclick="submitReturn()">Submit</button>
+        </div>
+    </div>
+</div>
+
+{{!-- ******************************entire order return popup************************************************* --}}
+<div class="popup-overlay" id="returnPopup" style="display: none;">
+    <div class="popup">
+        <h2>Return Entire Order</h2>
+        <select id="entireReturnReason">
+            <option value="">Select a reason</option>
+            <option value="Damaged">Damaged</option>
+            <option value="Wrong item">Wrong item</option>
+            <option value="Wrong size">Wrong size</option>
+            <option value="No longer needed">No longer needed</option>
+            <option value="Other">Other</option>
+            <!-- Add more options as needed -->
+        </select>
+        <div class="popup-btns">
+            <button class="popup-btn cancel-btn" onclick="hidePopupReturn()">Cancel</button>
+            <button class="popup-btn submit-btn" onclick="submitReturnReturn()">Submit</button>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+                <!--End Sidebar-->
+                <!--Main Content-->
+                <div class="col-12 col-sm-12 col-md-6 col-lg-12 main-col">
+                	{{!-- <div class="category-description">
+                    	<h3 style="margin-top: 15px;">Order Action</h3>
+                        <button class="btn btn--small" style="margin-top: 10px;" type="button">Select Options</button>
+                    </div> --}}
+                    <hr>
+                	<div class="productList">
+                    	<!--Toolbar-->
+                       
+                        <!--End Toolbar-->
+                        {{#if (eq order.orderStatus 'delivered')}}
+                        <div class="list-view-items grid--view-items">
+                            {{#each order.items}}
+                        	<!--ListView Item-->
+                            <div class="list-product list-view-item">
+                                <div class="list-view-item__image-column">
+                                    <div class="list-view-item__image-wrapper">
+                                        <!-- Image -->
+                                        <a href="product?id={{this.product.id}}"><img class="list-view-item__image blur-up lazyload" data-src="/{{this.product.productImage.[2]}}" src="/{{this.product.productImage.[3]}}" alt="image" title="product"></a>
+                                        <!-- End Image -->
+                                    </div>
+                                </div>
+                                <div class="list-view-item__title-column">
+                                    <div class="h4 grid-view-item__title"><a href="product?id={{this.product.id}}">{{this.product.name}} </a></div>
+                                    <!-- Product Review -->
+                                    <p class="product-review"><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i></p>
+                                    <!-- End Product Review -->
+                                    <!-- Sort Description -->
+                                    <p>{{this.product.description}}</p>
+                                    <!-- End Sort Description -->
+                                    <!-- Price -->
+                                    <p class="product-price grid-view-item__meta">
+                                     <span class="product-price__price"><span class="money">${{this.product.price}}</span></span><br>
+                                     <b><span class="product-price__quantity">x{{this.quantity}}</span></b>
+                                    </p>
+                                    <!-- End Price -->
+                                   {{#if this.maxQuantityReached}}
+    <form class="variants" action="#">
+        <button class="btn btn--small" type="button" disabled>Returned</button>
+    </form>
+{{else}}
+    <form class="variants" action="#">
+        <button class="btn btn--small" onclick="showPopup('{{this.product._id}}', {{this.quantity}}, '{{../orderId}}')" type="button">Return Item</button>
+    </form>
+{{/if}}
+
+
+                                    {{!-- <form class="variants" action="#">
+    <button class="btn btn--small" onclick="showPopup('{{this.product._id}}', {{this.quantity}}, '{{../orderId}}')" type="button">Return Item</button>
+</form> --}}
+                                </div>
+                            </div>
+                            <!--End ListView Item-->
+                            {{/each}}
+                           
+                           
+                        </div>
+                        {{else}}
+                        <div class="list-view-items grid--view-items">
+                            {{#each order.items}}
+                        	<!--ListView Item-->
+                            <div class="list-product list-view-item">
+                                <div class="list-view-item__image-column">
+                                    <div class="list-view-item__image-wrapper">
+                                        <!-- Image -->
+                                        <a href="product-layout-2.html"><img class="list-view-item__image blur-up lazyload" data-src="/{{this.product.productImage.[2]}}" src="/{{this.product.productImage.[3]}}" alt="image" title="product"></a>
+                                        <!-- End Image -->
+                                    </div>
+                                </div>
+                                <div class="list-view-item__title-column">
+                                    <div class="h4 grid-view-item__title"><a href="product-layout-2.html">{{this.product.name}} </a></div>
+                                    <!-- Product Review -->
+                                    <p class="product-review"><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i></p>
+                                    <!-- End Product Review -->
+                                    <!-- Sort Description -->
+                                    <p>{{this.product.description}}</p>
+                                    <!-- End Sort Description -->
+                                    <!-- Price -->
+                                    <p class="product-price grid-view-item__meta">
+                                     <span class="product-price__price"><span class="money">${{this.product.price}}</span></span><br>
+                                     <b><span class="product-price__quantity">x{{this.quantity}}</span></b>
+                                    </p>
+                                    <!-- End Price -->
+                                    {{!-- <form class="variants" action="#">
+                                    	<button class="btn btn--small" type="button">Select Options</button>
+	                                </form> --}}
+                                </div>
+                            </div>
+                            <!--End ListView Item-->
+                            {{/each}}
+                           {{/if}}
+                           
+                        </div>
+                    </div>
+                    <div class="infinitpaginOuter">
+                        <div class="infinitpagin">	
+                            {{!-- <a href="/return-entire-order?id={{order._id}}" class="btn loadMore"></a> --}}
+                                {{!-- <a href="/return-entire-order?id={{order._id}}">Return Entire Order</a> --}}
+                                {{#if order.completeOrderReturn}}
+        <button class="btn btn--small" onclick="showPopupReturn('{{order._id}}')" type="button" disabled>Order Returned</button>
+    {{else}}                                 
+<form class="variants" action="#">
+    <button class="btn btn--small" onclick="showPopupReturn('{{order._id}}')" type="button">Return Entire Order</button>
+</form>
+{{/if}}
+
+                        </div>
+                    </div>
+                </div>
+                <!--End Main Content-->
+            </div>
+        </div>
+        
+    </div>
+    <!--End Body Content-->
+    
+    <!--Footer-->
+    <footer id="footer">
+        <div class="newsletter-section">
+            <div class="container">
+                <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-7 w-100 d-flex justify-content-start align-items-center">
+                            <div class="display-table">
+                                <div class="display-table-cell footer-newsletter">
+                                    <div class="section-header text-center">
+                                        <label class="h2"><span>sign up for </span>newsletter</label>
+                                    </div>
+                                    <form action="#" method="post">
+                                        <div class="input-group">
+                                            <input type="email" class="input-group__field newsletter__input" name="EMAIL" value="" placeholder="Email address" required="">
+                                            <span class="input-group__btn">
+                                                <button type="submit" class="btn newsletter__submit" name="commit" id="Subscribe"><span class="newsletter__submit-text--large">Subscribe</span></button>
+                                            </span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-5 d-flex justify-content-end align-items-center">
+                            <div class="footer-social">
+                                <ul class="list--inline site-footer__social-icons social-icons">
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Facebook"><i class="icon icon-facebook"></i></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Twitter"><i class="icon icon-twitter"></i> <span class="icon__fallback-text">Twitter</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Pinterest"><i class="icon icon-pinterest"></i> <span class="icon__fallback-text">Pinterest</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Instagram"><i class="icon icon-instagram"></i> <span class="icon__fallback-text">Instagram</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Tumblr"><i class="icon icon-tumblr-alt"></i> <span class="icon__fallback-text">Tumblr</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on YouTube"><i class="icon icon-youtube"></i> <span class="icon__fallback-text">YouTube</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Vimeo"><i class="icon icon-vimeo-alt"></i> <span class="icon__fallback-text">Vimeo</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+            </div>    
+        </div>
+        <div class="site-footer">
+        	<div class="container">
+     			<!--Footer Links-->
+            	<div class="footer-top">
+                	<div class="row">
+                    	<div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
+                        	<h4 class="h4">Quick Shop</h4>
+                            <ul>
+                            	<li><a href="#">Women</a></li>
+                                <li><a href="#">Men</a></li>
+                                <li><a href="#">Kids</a></li>
+                                <li><a href="#">Sportswear</a></li>
+                                <li><a href="#">Sale</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
+                        	<h4 class="h4">Informations</h4>
+                            <ul>
+                            	<li><a href="#">About us</a></li>
+                                <li><a href="#">Careers</a></li>
+                                <li><a href="#">Privacy policy</a></li>
+                                <li><a href="#">Terms &amp; condition</a></li>
+                                <li><a href="#">My Account</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
+                        	<h4 class="h4">Customer Services</h4>
+                            <ul>
+                            	<li><a href="#">Request Personal Data</a></li>
+                                <li><a href="#">FAQ's</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                                <li><a href="#">Orders and Returns</a></li>
+                                <li><a href="#">Support Center</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3 contact-box">
+                        	<h4 class="h4">Contact Us</h4>
+                            <ul class="addressFooter">
+                            	<li><i class="icon anm anm-map-marker-al"></i><p>55 Gallaxy Enque,<br>2568 steet, 23568 NY</p></li>
+                                <li class="phone"><i class="icon anm anm-phone-s"></i><p>(440) 000 000 0000</p></li>
+                                <li class="email"><i class="icon anm anm-envelope-l"></i><p>sales@yousite.com</p></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!--End Footer Links-->
+                <hr>
+                <div class="footer-bottom">
+                	<div class="row">
+                    	<!--Footer Copyright-->
+	                	<div class="col-12 col-sm-12 col-md-6 col-lg-6 order-1 order-md-0 order-lg-0 order-sm-1 copyright text-sm-center text-md-left text-lg-left"><span></span> <a href="templateshub.net">Templates Hub</a></div>
+                        <!--End Footer Copyright-->
+                        <!--Footer Payment Icon-->
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-6 order-0 order-md-1 order-lg-1 order-sm-0 payment-icons text-right text-md-center">
+                        	<ul class="payment-icons list--inline">
+                        		<li><i class="icon fa fa-cc-visa" aria-hidden="true"></i></li>
+                                <li><i class="icon fa fa-cc-mastercard" aria-hidden="true"></i></li>
+                                <li><i class="icon fa fa-cc-discover" aria-hidden="true"></i></li>
+                                <li><i class="icon fa fa-cc-paypal" aria-hidden="true"></i></li>
+                                <li><i class="icon fa fa-cc-amex" aria-hidden="true"></i></li>
+                                <li><i class="icon fa fa-credit-card" aria-hidden="true"></i></li>
+                            </ul>
+                        </div>
+                        <!--End Footer Payment Icon-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!--End Footer-->
+    <!--Scoll Top-->
+    <span id="site-scroll"><i class="icon anm anm-angle-up-r"></i></span>
+    <!--End Scoll Top-->
+    
+     <!-- Including Jquery -->
+     <script src="assets/js/vendor/jquery-3.3.1.min.js"></script>
+     <script src="assets/js/vendor/jquery.cookie.js"></script>
+     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
+     <script src="assets/js/vendor/wow.min.js"></script>
+     <!-- Including Javascript -->
+     <script src="assets/js/bootstrap.min.js"></script>
+     <script src="assets/js/plugins.js"></script>
+     <script src="assets/js/popper.min.js"></script>
+     <script src="assets/js/lazysizes.js"></script>
+     <script src="assets/js/main.js"></script>
+
+{{!-- -----------------------single product return script--------------------------- --}}
+<script>
+    let currentProductId = '';
+    let currentQuantity = 0;
+    let currentOrderId = '';
+
+    function showPopup(productId, quantity, orderId) {
+        currentProductId = productId;
+        currentQuantity = quantity;
+        currentOrderId = orderId;
+        console.log('orderid', currentOrderId);
+        document.getElementById('popupOverlay').style.display = 'block';
+
+        const quantitySelect = document.getElementById('returnQuantity');
+        quantitySelect.innerHTML = '';  // Clear existing options
+        for (let i = 1; i <= quantity; i++) {
+            const option = document.createElement('option');
+            option.value = i;
+            option.textContent = i;
+            quantitySelect.appendChild(option);
+        }
+    }
+
+    function hidePopup() {
+        document.getElementById('popupOverlay').style.display = 'none';
+        document.getElementById('singleReturnReason').value = '';
+        document.getElementById('returnQuantity').innerHTML = '';  // Clear dropdown
+    }
+
+    function submitReturn() {
+        const quantity = document.getElementById('returnQuantity').value;
+        const reason = document.getElementById('singleReturnReason').value;
+        if (reason.trim() === '') {
+            alert('Please provide a reason for the return.');
+            return;
+        }
+        alert(`Return submitted for ${quantity} ${currentProductId}(s).\nReason: ${reason}`);
+
+        window.location.href = '/return-items?productId=' + currentProductId + '&quantity=' + quantity + '&orderId=' + currentOrderId + '&reason=' + encodeURIComponent(reason);
+        hidePopup();
+    }
+
+    function showPopupReturn(orderId) {
+        currentOrderId = orderId;
+        console.log('orderid', currentOrderId);
+        document.getElementById('returnPopup').style.display = 'block';
+    }
+
+    function hidePopupReturn() {
+        document.getElementById('returnPopup').style.display = 'none';
+        document.getElementById('entireReturnReason').value = '';
+    }
+
+    function submitReturnReturn() {
+        const reason = document.getElementById('entireReturnReason').value;
+        if (reason.trim() === '') {
+            alert('Please provide a reason for the return.');
+            return;
+        }
+        alert(`Reason: ${reason}`);
+
+        window.location.href = '/return-entire-order?id=' + currentOrderId + '&reason=' + encodeURIComponent(reason);
+        hidePopupReturn();
+    }
+</script>
+</div>
+</body>
+
+<!-- belle/shop-listview.html   11 Nov 2019 12:41:09 GMT -->
+</html>

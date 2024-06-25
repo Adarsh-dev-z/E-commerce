@@ -1,0 +1,414 @@
+ 
+   <!-- Include SweetAlert CSS and JS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
+<!-- Include SweetAlert2 CSS -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+ 
+ <style>
+       
+        .wishlist-popup {
+    display: none;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #1a1a1a;
+    color: #fff;
+    padding: 15px 25px;
+    border-radius: 0px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    animation: slideUp 0.5s ease-in-out;
+}
+
+.popup-content {
+    position: relative;
+}
+
+.wishlist-popup a {
+    color: #0fc4a5;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.wishlist-popup a:hover {
+    text-decoration: underline;
+}
+
+.wishlist-popup p {
+    margin: 0;
+    display: inline-block;
+    font-size: 16px;
+}
+
+@keyframes slideUp {
+    from {
+        bottom: 10px;
+        opacity: 0;
+    }
+    to {
+        bottom: 20px;
+        opacity: 1;
+    }
+}
+
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Additional Styles */
+.wishlist-popup {
+    /* Add your additional styles here */
+    /* For example, you can adjust the font size, padding, and background color */
+    font-size: 18px;
+    padding: 20px 30px;
+    background-color: #333;
+}
+
+.wishlist-popup a {
+    /* Add your additional styles here */
+    /* For example, you can adjust the font size and color */
+    font-size: 16px;
+    color: #0fc4a5;
+}
+
+.wishlist-popup p {
+    /* Add your additional styles here */
+    /* For example, you can adjust the font size and color */
+    font-size: 20px;
+    color: #fff;
+}
+
+.loader {
+    /* Add your additional styles here */
+    /* For example, you can adjust the size and color */
+    width: 30px;
+    height: 30px;
+    border-top-color: #0fc4a5;
+}
+
+
+/* Loader Styles */
+.loader {
+ position: relative;
+ width: 200px;
+ height: 4px;
+ background-color: #f3f3f3;
+ overflow: hidden;
+}
+
+.loader::before {
+ content: "";
+ position: absolute;
+ left: 0;
+ top: 0;
+ width: 0;
+ height: 100%;
+ background-color: #07cd88;
+ animation: lineAnimation 2.2s linear infinite;
+}
+
+@keyframes lineAnimation {
+ 0% {
+   width: 0;
+ }
+ 100% {
+   width: 100%;
+ }
+}
+    </style>
+ {{>header}}
+	<!--End Mobile Menu-->
+    
+    <!--Body Content-->
+    <div id="page-content">
+    	<!--Page Title-->
+    	<div class="page section-header text-center">
+			<div class="page-title">
+        		<div class="wrapper"><h1 class="page-width">Wish List</h1></div>
+      		</div>
+		</div>
+        <!--End Page Title-->
+
+        <!--- *************************************Popup Notification****************************************************** -->
+<div id="popup-container"></div>
+<div id="wishlist-popup" class="wishlist-popup">
+    <div class="popup-content">
+        <p>Item added to wishlist!</p>
+        <a href="/wishlist">Go to Wishlist</a>
+        <div class="loader"></div>
+    </div>
+</div>
+
+<div id="cart-popup" class="wishlist-popup">
+    <div class="popup-content">
+        <p>Item added to Cart!</p>
+        <a href="/cart">Go to Cart</a>
+        <div class="loader"></div>
+    </div>
+</div>
+<!--- *************************************Popup Notification****************************************************** -->
+        
+        <div class="container">
+        	<div class="row">
+                <div class="col-12 col-sm-12 col-md-12 col-lg-12 main-col">
+                	{{!-- <form action="#"> --}}
+                        <div class="wishlist-table table-content table-responsive">
+                            <table class="table table-bordered">
+                                <thead class="wishlistItems">
+                                    {{#if wishlist.length}}
+                                    <tr>
+                                    	<th class="product-name text-center alt-font">Remove</th>
+                                        <th class="product-price text-center alt-font">Images</th>
+                                        <th class="product-name alt-font">Product</th>
+                                        <th class="product-price text-center alt-font">Unit Price</th>
+                                        <th class="stock-status text-center alt-font">Stock Status</th>
+                                        <th class="product-subtotal text-center alt-font">Add to Cart</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {{#each wishlist}}
+                                    <tr class="wishlist__row" data-id="{{this._id}}">
+                                    	<td class="product-remove text-center" valign="middle"><a href="javascript:void(0);" class="remove-wishlist-item"><i class="icon icon anm anm-times-l"></i></a></td>
+                                        <td class="product-thumbnail text-center">
+                                            <a href="javascript:void(0);"><img src="/{{this.productImage.[1]}}" alt="" title="" /></a>
+                                        </td>
+                                        <td class="product-name"><h4 class="no-margin"><a href="#">{{this.name}}</a></h4></td>
+                                        <td class="product-price text-center"><span class="amount">₹{{this.price}}</span></td>
+                                        <td class="stock text-center">
+                                            <span class="in-stock">in stock</span>
+                                        </td>
+                                        <td class="product-subtotal text-center">
+<form action="/add-to-cart/{{this._id}}" method="POST" style="display: inline;" class="addto-cart-form">
+                <button type="submit" class="btn btn-small">Add To Cart</button>
+            </form>                                            </td>
+                                        
+                                    </tr>
+                                    {{/each}}
+                                </tbody>
+                            </table>
+      {{else}}
+      <div id="cartEmptyMessage" class="text-center cart-empty-message">
+        <p>Your wishlist is empty</p>
+        <a href="http://annimexweb.com/" class="btn btn-secondary btn--small cart-continue">Continue shopping</a>
+    </div>
+    {{/if}}                      
+                        </div>
+                    </form>                   
+               	</div>
+            </div>
+        </div>
+        
+    </div>
+    <!--End Body Content-->
+    
+    <!--Footer-->
+    <footer id="footer">
+        <div class="newsletter-section">
+            <div class="container">
+                <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-7 w-100 d-flex justify-content-start align-items-center">
+                            <div class="display-table">
+                                <div class="display-table-cell footer-newsletter">
+                                    <div class="section-header text-center">
+                                        <label class="h2"><span>sign up for </span>newsletter</label>
+                                    </div>
+                                    <form action="#" method="post">
+                                        <div class="input-group">
+                                            <input type="email" class="input-group__field newsletter__input" name="EMAIL" value="" placeholder="Email address" required="">
+                                            <span class="input-group__btn">
+                                                <button type="submit" class="btn newsletter__submit" name="commit" id="Subscribe"><span class="newsletter__submit-text--large">Subscribe</span></button>
+                                            </span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-5 d-flex justify-content-end align-items-center">
+                            <div class="footer-social">
+                                <ul class="list--inline site-footer__social-icons social-icons">
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Facebook"><i class="icon icon-facebook"></i></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Twitter"><i class="icon icon-twitter"></i> <span class="icon__fallback-text">Twitter</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Pinterest"><i class="icon icon-pinterest"></i> <span class="icon__fallback-text">Pinterest</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Instagram"><i class="icon icon-instagram"></i> <span class="icon__fallback-text">Instagram</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Tumblr"><i class="icon icon-tumblr-alt"></i> <span class="icon__fallback-text">Tumblr</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on YouTube"><i class="icon icon-youtube"></i> <span class="icon__fallback-text">YouTube</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Vimeo"><i class="icon icon-vimeo-alt"></i> <span class="icon__fallback-text">Vimeo</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+            </div>    
+        </div>
+        <div class="site-footer">
+        	<div class="container">
+     			<!--Footer Links-->
+            	<div class="footer-top">
+                	<div class="row">
+                    	<div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
+                        	<h4 class="h4">Quick Shop</h4>
+                            <ul>
+                            	<li><a href="#">Women</a></li>
+                                <li><a href="#">Men</a></li>
+                                <li><a href="#">Kids</a></li>
+                                <li><a href="#">Sportswear</a></li>
+                                <li><a href="#">Sale</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
+                        	<h4 class="h4">Informations</h4>
+                            <ul>
+                            	<li><a href="#">About us</a></li>
+                                <li><a href="#">Careers</a></li>
+                                <li><a href="#">Privacy policy</a></li>
+                                <li><a href="#">Terms &amp; condition</a></li>
+                                <li><a href="#">My Account</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
+                        	<h4 class="h4">Customer Services</h4>
+                            <ul>
+                            	<li><a href="#">Request Personal Data</a></li>
+                                <li><a href="#">FAQ's</a></li>
+                                <li><a href="#">Contact Us</a></li>
+                                <li><a href="#">Orders and Returns</a></li>
+                                <li><a href="#">Support Center</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3 contact-box">
+                        	<h4 class="h4">Contact Us</h4>
+                            <ul class="addressFooter">
+                            	<li><i class="icon anm anm-map-marker-al"></i><p>55 Gallaxy Enque,<br>2568 steet, 23568 NY</p></li>
+                                <li class="phone"><i class="icon anm anm-phone-s"></i><p>(440) 000 000 0000</p></li>
+                                <li class="email"><i class="icon anm anm-envelope-l"></i><p>sales@yousite.com</p></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!--End Footer Links-->
+                <hr>
+                <div class="footer-bottom">
+                	<div class="row">
+                    	<!--Footer Copyright-->
+	                	<div class="col-12 col-sm-12 col-md-6 col-lg-6 order-1 order-md-0 order-lg-0 order-sm-1 copyright text-sm-center text-md-left text-lg-left"><span></span> <a href="templateshub.net">Templates Hub</a></div>
+                        <!--End Footer Copyright-->
+                        <!--Footer Payment Icon-->
+                        <div class="col-12 col-sm-12 col-md-6 col-lg-6 order-0 order-md-1 order-lg-1 order-sm-0 payment-icons text-right text-md-center">
+                        	<ul class="payment-icons list--inline">
+                        		<li><i class="icon fa fa-cc-visa" aria-hidden="true"></i></li>
+                                <li><i class="icon fa fa-cc-mastercard" aria-hidden="true"></i></li>
+                                <li><i class="icon fa fa-cc-discover" aria-hidden="true"></i></li>
+                                <li><i class="icon fa fa-cc-paypal" aria-hidden="true"></i></li>
+                                <li><i class="icon fa fa-cc-amex" aria-hidden="true"></i></li>
+                                <li><i class="icon fa fa-credit-card" aria-hidden="true"></i></li>
+                            </ul>
+                        </div>
+                        <!--End Footer Payment Icon-->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!--End Footer-->
+    <!--Scoll Top-->
+    <span id="site-scroll"><i class="icon anm anm-angle-up-r"></i></span>
+    <!--End Scoll Top-->
+    
+     <!-- Including Jquery -->
+     <script src="assets/js/vendor/jquery-3.3.1.min.js"></script>
+     <script src="assets/js/vendor/jquery.cookie.js"></script>
+     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
+     <script src="assets/js/vendor/wow.min.js"></script>
+     <!-- Including Javascript -->
+     <script src="assets/js/bootstrap.min.js"></script>
+     <script src="assets/js/plugins.js"></script>
+     <script src="assets/js/popper.min.js"></script>
+     <script src="assets/js/lazysizes.js"></script>
+     <script src="assets/js/main.js"></script>
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function(){
+    $('.remove-wishlist-item').on('click', function(event){
+        event.preventDefault(); // Prevent the default link behavior
+
+        var $row = $(this).closest('tr');
+        var productId = $row.data('id');
+
+        $.ajax({
+            url: '/remove-wishlist',
+            type: 'GET',
+            data: { id: productId },
+            success: function(response) {
+                if (response.success) {
+                    if($('#wishlistItems .wishlist__row').length===0){
+                    $row.remove(); 
+                        location.reload();
+                    }
+                    Swal.fire({
+          icon: 'success',
+          title: 'Removed',
+          text: 'Product removed from cart',
+          showConfirmButton: false,
+          timer: 1500,
+          timerProgressBar: true,
+          background: '#f9f9f9',
+          iconColor: '#28a745',
+          customClass: {
+            popup: 'swal2-custom-popup'
+          }
+        })
+
+                } else {
+                    alert('Error removing item');
+                }
+            },
+            error: function() {
+                
+                alert('Internal server error');
+            }
+        });
+    });
+});
+</script>
+
+<script>
+$(document).ready(function(){
+    $('.addto-cart-form').on('submit',function(event){
+        event.preventDefault();
+        const form = $(this);
+        const url =form.attr('action');
+        const productId =url.split('/').pop();
+        $.ajax({
+            url:'/add-to-cart/'+productId,
+            type:'POST',
+            dataType:'json',
+            success: function(data){
+
+                if(data.success){
+                   
+                    $('#cart-popup').fadeIn();
+                    setTimeout(()=>{
+                        $('#cart-popup').fadeOut();
+                    },2000)
+                    console.log('product added to cart');
+
+                }else{
+                    console.loge('error adding product to cart');
+                }
+            }, error: function(err){
+                console.log('error:', err)
+            }
+        })
+    })
+})
+</script>
+
+</div>
+</body>
+
+<!-- belle/wishlist.html   11 Nov 2019 12:22:27 GMT -->
+</html>

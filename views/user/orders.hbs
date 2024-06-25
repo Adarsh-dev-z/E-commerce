@@ -1,0 +1,311 @@
+
+<!DOCTYPE html>
+<html class="no-js" lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <meta name="description" content="description">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <!-- Title Of Site -->
+        <title>Order success - Hema Multipurpose eCommerce Bootstrap 5 Html Template</title>
+        <!-- Favicon -->
+        <link rel="shortcut icon" href="assets/images/favicon.png" />
+        <!-- Plugins CSS -->
+        <link rel="stylesheet" href="assets/order-success-css/plugins.css">
+        <!-- Main Style CSS -->
+        <link rel="stylesheet" href="assets/order-success-css/style-min.css">
+        <link rel="stylesheet" href="assets/order-success-css/responsive.css">
+    </head>
+
+{{>header}}
+            <!-- Body Container -->
+            <div id="page-content">
+                <!--Page Header-->
+                <div class="page-header text-center">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 d-flex justify-content-between align-items-center">
+                                <div class="page-title"><h1>Order success</h1></div>
+                                <!--Breadcrumbs-->
+                                <div class="breadcrumbs"><a href="index.html" title="Back to the home page">Home</a><span class="main-title"><i class="icon anm anm-angle-right-l"></i>Order success</span></div>
+                                <!--End Breadcrumbs-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!--End Page Header-->
+
+                <!--Main Content-->
+                <div class="container">   
+                    <!--Order success-->
+                    <div class="success-text checkout-card text-center mb-4 mb-md-5">
+                        <i class="icon anm anm-shield-check"></i>
+                        <h2>Thank you for your order!</h2>
+                        <p class="mb-1">Payment is successfully processsed and your order is on the way</p>
+                        <p class="mb-1">You will receive an order confirmation email with details of your order and a link to track its progress.</p>                                       
+                        <p class="text-order badge bg-success mt-3">Order ID: {{order.orderID}}</p>
+                    </div>
+                    <!--End Order success-->
+
+                    <div class="row checkout-form">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-6">   
+                            <!--Order Summary-->
+                            <div class="block order-summary">
+                                <div class="block-content">
+                                    <h3 class="title mb-3">Order Summary</h3>
+                                    <div class="table-responsive-sm table-bottom-brd order-table"> 
+                                        <table class="table table-hover align-middle mb-0">
+                                            <thead>
+                                                <tr>
+                                                    <th class="text-start">Image</th>
+                                                    <th class="text-start proName">Product</th>
+                                                    <th class="text-center">Qty</th>
+                                                    <th class="text-center">Price</th>
+                                                    {{!-- <th class="text-center">Subtotal</th> --}}
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {{#each order.items}}
+                                                <tr>
+                                                    <td class="text-start"><a href="product-layout1.html" class="thumb"><img data-src="/{{this.product.productImage.[1]}}" src="/{{this.product.productImage.[2]}}" alt="product" title="product" width="120" height="170"></a></td>
+                                                    <td class="text-start proName">
+                                                        <div class="list-view-item-title">
+                                                            <a href="product-layout1.html">{{this.product.name}}</a>
+                                                        </div>
+                                                        <div class="cart-meta-text">
+                                                            Brand: {{this.product.brand}}<br>Size: Small
+                                                        </div>
+                                                    </td>
+                                                    <td class="text-center">{{this.quantity}}</td>
+                                                    <td class="text-center">${{this.price}}</td>
+                                                    {{!-- <td class="text-center"><strong>$198.0</strong></td> --}}
+                                                </tr>
+                                                {{/each}}
+                                                
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--End Order Summary-->
+
+                            <!--Cart Summary-->
+                            <div class="cart-info mt-4 mb-4 mb-lg-0">
+                                <div class="cart-order-detail cart-col">
+                                    <div class="row g-0 border-bottom pb-2">
+                                        <span class="col-6 col-sm-6 cart-subtotal-title"><strong>Subtotal</strong></span>
+                                        <span class="col-6 col-sm-6 cart-subtotal-title cart-subtotal text-end"><span class="money">${{subtotal}}</span></span>
+                                    </div>
+                                    <div class="row g-0 border-bottom py-2">
+                                        <span class="col-6 col-sm-6 cart-subtotal-title"><strong>Coupon Discount</strong></span>
+                                        <span class="col-6 col-sm-6 cart-subtotal-title cart-subtotal text-end"><span class="money">-${{discountAmount}}</span></span>
+                                    </div>
+                                    {{!-- <div class="row g-0 border-bottom py-2">
+                                        <span class="col-6 col-sm-6 cart-subtotal-title"><strong>Tax</strong></span>
+                                        <span class="col-6 col-sm-6 cart-subtotal-title cart-subtotal text-end"><span class="money">$10.00</span></span>
+                                    </div> --}}
+                                    <div class="row g-0 border-bottom py-2">
+                                        <span class="col-6 col-sm-6 cart-subtotal-title"><strong>Shipping</strong></span>
+                                        <span class="col-6 col-sm-6 cart-subtotal-title cart-subtotal text-end"><span class="money">Free shipping</span></span>
+                                    </div>
+                                    <div class="row g-0 pt-2">
+                                        <span class="col-6 col-sm-6 cart-subtotal-title fs-6"><strong>Total</strong></span>
+                                        <span class="col-6 col-sm-6 cart-subtotal-title fs-5 cart-subtotal text-end text-primary"><b class="money">${{order.totalPrice}}</b></span>
+                                    </div>
+                                </div>                               
+                            </div>
+                            <!--Cart Summary-->                           
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-6">
+                            <!--Order Address-->
+                            <div class="block">
+                                <div class="block-content">  
+                                    <div class="row g-0">
+                                        {{!-- <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+                                            <div class="shipping-details mb-4 mb-sm-0">
+                                                <h3 class="title mb-3">Shipping Address</h3>
+                                                <p>No 40 Gallaxy Enque Street 133/2,</p>
+                                                <p>New York,</p>
+                                                <p>USA</p>
+                                                <p>00004-1988</p>
+                                            </div>
+                                        </div> --}}
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+                                            <div class="billing-details">
+                                                <h3 class="title mb-3">Billing Address</h3>
+                                                <p>{{address.address}} {{address.city}} {{address.apartment}},</p>
+                                                <p>{{address.state}},</p>
+                                                <p>INDIA</p>
+                                                {{!-- <p>00004-1988</p> --}}
+                                                <p>PostCode: {{address.postCode}}</p>
+                                            </div>
+                                        </div>
+                                         <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+                                            <div class="shipping-details mb-4 mb-sm-0">
+                                                <h3 class="title mb-3"></h3>
+                                                <p>{{address.telephone}}</p>
+                                                <p>{{address.company}}</p>
+                                                <p>{{address.email}}</p>
+                                                {{!-- <p>00004-1988</p> --}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Order Address-->
+
+                            <!--Order Method-->
+                            <div class="block mt-4">
+                                <div class="block-content">  
+                                    <div class="row g-0">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+                                            <div class="shipping-details mb-4 mb-sm-0">
+                                                <h3 class="title mb-3">Shipping Method</h3>
+                                                <p>Flat Rate - Fixeds</p>
+                                                <p>Delivery Date: N/A</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+                                            <div class="billing-details">
+                                                <h3 class="title mb-3">Payment Method</h3>
+                                                <p>{{order.payment}}</p>
+                                                {{!-- <p>Cash on delivery</p> --}}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--Order Method-->
+
+                            <!--Order Details-->
+                            <div class="block mt-4">
+                                <div class="block-content">  
+                                    <div class="row g-0">
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+                                            <div class="shipping-details mb-4 mb-sm-0">
+                                                <h3 class="title mb-3">Order details</h3>
+                                                <p>Order ID: {{order.orderID}}</p>
+                                                <p>Order Date: {{order.datePlaced}}</p>
+                                                <p>Order Total: ${{total}}</p>
+                                            </div>
+                                        </div>
+                                        <div class="col-12 col-sm-6 col-md-6 col-lg-6">
+                                            <div class="billing-details">
+                                                <h3 class="title mb-3">Expected date of delivery</h3>
+                                                <p>Your order is on the way</p>
+                                                <p class="h5 my-2">{{deliveryExpectedDate}}</p>
+                                                <p><a href="#" class="btn-link">Wait 24 Hours To Track Your Order</a></p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!--End Order Details-->
+
+                            <!--Order Delivery-->
+                            <div class="d-flex-wrap w-100 mt-4 text-center">
+                                <a href="/shop" class="d-inline-flex align-items-center btn btn-outline-primary me-2 mb-2 me-sm-3"><i class="me-2 icon an an-angle-left-r"></i>Continue Shopping</a>
+                                {{!-- <button type="button" class="d-inline-flex align-items-center btn me-2 mb-2 me-sm-3"><i class="me-2 icon an an-print"></i>Print Order</button> --}}
+                                {{!-- <button type="button" class="d-inline-flex align-items-center btn me-2 mb-2 me-sm-3"><i class="me-2 icon an an-sync-ar"></i>Re-Order</button> --}}
+                            </div>
+                            <!--Order delivery-->
+                        </div>
+                    </div>
+                </div>
+                <!--End Main Content-->
+            </div>
+            <!-- End Body Container -->
+
+            <!--Footer-->
+    <footer id="footer">
+        <div class="newsletter-section">
+            <div class="container">
+                <div class="row">
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-7 w-100 d-flex justify-content-start align-items-center">
+                            <div class="display-table">
+                                <div class="display-table-cell footer-newsletter">
+                                    <div class="section-header text-center">
+                                        <label class="h2"><span>sign up for </span>newsletter</label>
+                                    </div>
+                                    <form action="#" method="post">
+                                        <div class="input-group">
+                                            <input type="email" class="input-group__field newsletter__input" name="EMAIL" value="" placeholder="Email address" required="">
+                                            <span class="input-group__btn">
+                                                <button type="submit" class="btn newsletter__submit" name="commit" id="Subscribe"><span class="newsletter__submit-text--large">Subscribe</span></button>
+                                            </span>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-12 col-lg-5 d-flex justify-content-end align-items-center">
+                            <div class="footer-social">
+                                <ul class="list--inline site-footer__social-icons social-icons">
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Facebook"><i class="icon icon-facebook"></i></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Twitter"><i class="icon icon-twitter"></i> <span class="icon__fallback-text">Twitter</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Pinterest"><i class="icon icon-pinterest"></i> <span class="icon__fallback-text">Pinterest</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Instagram"><i class="icon icon-instagram"></i> <span class="icon__fallback-text">Instagram</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Tumblr"><i class="icon icon-tumblr-alt"></i> <span class="icon__fallback-text">Tumblr</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on YouTube"><i class="icon icon-youtube"></i> <span class="icon__fallback-text">YouTube</span></a></li>
+                                    <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Vimeo"><i class="icon icon-vimeo-alt"></i> <span class="icon__fallback-text">Vimeo</span></a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+            </div>    
+        </div>
+        <div class="site-footer">
+        	<div class="container">
+     			<!--Footer Links-->
+            	<div class="footer-top">
+                	<div class="row">
+                    	<div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
+                        	<h4 class="h4">Quick Shop</h4>
+                            <ul>
+                            	<li><a href="#">Women</a></li>
+                                <li><a href="#">Men</a></li>
+                                <li><a href="#">Kids</a></li>
+                                <li><a href="#">Sportswear</a></li>
+                                <li><a href="#">Sale</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
+                        	<h4 class="h4">Informations</h4>
+                            <ul>
+                            	<li><a href="#">About us</a></li>
+                                <li><a href="#">Careers</a></li>
+                                <li><a href="#">Privacy policy</a></li>
+                                <li><a href="#">Terms &amp; condition</a></li>
+                                <li><a href="#">My Account</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
+                        	<h4 class="h4">Customer Services</h4>
+                            <ul>
+                            	<li><a href="#">Request Personal Data</a></li>
+                                <li><a href="#">FAQ's</a></li>
+                                <li><a href="/contact">Contact Us</a></li>
+                                <li><a href="#">Orders and Returns</a></li>
+                                <li><a href="#">Support Center</a></li>
+                            </ul>
+                        </div>
+                        <div class="col-12 col-sm-12 col-md-3 col-lg-3 contact-box">
+                        	<h4 class="h4">Contact Us</h4>
+                            <ul class="addressFooter">
+                            	<li><i class="icon anm anm-map-marker-al"></i><p>55 Gallaxy Enque,<br>2568 steet, 23568 NY</p></li>
+                                <li class="phone"><i class="icon anm anm-phone-s"></i><p>(440) 000 000 0000</p></li>
+                                <li class="email"><i class="icon anm anm-envelope-l"></i><p>sales@yousite.com</p></li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <!--End Footer Links-->
+                <hr>
+                
+            </div>
+        </div>
+    </footer>
+    <!--End Footer-->
+    <!--Scoll Top-->
+    <span id="site-scroll"><i class="icon anm anm-angle-up-r"></i></span>
+    <!--End Scoll Top-->

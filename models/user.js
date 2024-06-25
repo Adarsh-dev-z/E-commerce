@@ -37,6 +37,10 @@ const userSchema =mongoose.Schema({
         type:String,
         default:"active"
     },
+    walletAmount:{
+        type:Number,
+        default:0
+    },
     verificationToken:{
         type:String,
     },

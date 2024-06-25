@@ -1,3 +1,4 @@
+const { type } = require('jquery');
 const mongoose= require('mongoose');
 
 
@@ -21,16 +22,13 @@ const orderSchema= mongoose.Schema({
     },
     orderStatus:{
         type:String,
-        enum:['pending', 'processing', 'shipped','delivered', 'cancelled'],
+        enum:['pending', 'processing', 'shipped','delivered', 'canceled'],
         default:'pending',
     },
     stripeSessionId:{
         type:String
     },
     payment:{
-        type:String
-    },
-    couponDiscount:{
         type:String
     },
     items:[
@@ -50,13 +48,60 @@ const orderSchema= mongoose.Schema({
             }
         }
     ],
+    returnItems:[
+        {
+            product:{
+                type:mongoose.Schema.Types.ObjectId,
+                ref:'Product',
+                required:true,
+            },
+            quantity:{
+                type:Number,
+                required:true,
+            },
+            returnAmount:{
+                type:Number,
+                required:true,
+            },
+            success:{
+                type:Boolean,
+                default:false
+            },
+            reason:{
+                type:String,
+                
+            },
+            status:{
+                type:String,
+                enum:['pending', 'processing', 'refunded'],
+
+            },
+            orderID:{
+                type:String
+            }
+        }
+    ],
+    totalAmount:{
+        type:Number
+    },
     totalPrice:{
-        type:String
+        type:Number
     },
     discountAmount:{
         type:String,
     },
     stockUpdated:{
+        type:Boolean,
+        default:false
+    },
+    refund:{
+        type:Boolean,
+        default:false
+    },
+    deliveryExpectedDate:{
+        type:Date
+    },
+    completeOrderReturn:{
         type:Boolean,
         default:false
     }

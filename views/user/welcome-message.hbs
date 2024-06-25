@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Welcome Message</title>
+    <style>
+        #welcome-box {
+	position: fixed;
+	top: 20px;
+	right: 20px;
+	background-color: #333;
+	color: #fff;
+	padding: 10px 15px;
+	border-radius: 5px;
+	font-size: 14px;
+	opacity: 0;
+	transition: opacity 0.5s;
+	z-index: 9999;
+}
+    </style>
+</head>
+<body>
+	<div id="welcome-box">
+		<span id="username">John Doe</span>, welcome to our e-commerce website!
+	</div>
+
+	<script>
+        // Replace the placeholder username with the actual user's name
+var username = 'Jane Smith'; // Replace with the actual user's name
+document.getElementById('username').textContent = username;
+
+// Show the welcome box
+var welcomeBox = document.getElementById('welcome-box');
+welcomeBox.style.opacity = 1;
+
+// Hide the welcome box after 5 seconds
+setTimeout(function() {
+	welcomeBox.style.opacity = 0;
+}, 5000);
+    </script>
+</body>
+</html>
