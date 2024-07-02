@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+  <meta name="description" content="" />
+  <meta name="author" content="" />
+  <title>Dashtreme Admin - Free Dashboard for Bootstrap 4 by Codervent</title>
+  <!-- loader-->
+  <link href="adminAssets/css/pace.min.css" rel="stylesheet" />
+  <script src="adminAssets/js/pace.min.js"></script>
+  <!--favicon-->
+  <link rel="icon" href="adminAssets/images/favicon.ico" type="image/x-icon">
+  <!-- Vector CSS -->
+  <link href="adminAssets/plugins/vectormap/jquery-jvectormap-2.0.2.css" rel="stylesheet" />
+  <!-- simplebar CSS-->
+  <link href="adminAssets/plugins/simplebar/css/simplebar.css" rel="stylesheet" />
+  <!-- Bootstrap core CSS-->
+  <link href="adminAssets/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- animate CSS-->
+  <link href="adminAssets/css/animate.css" rel="stylesheet" type="text/css" />
+  <!-- Icons CSS-->
+  <link href="adminAssets/css/icons.css" rel="stylesheet" type="text/css" />
+  <!-- Sidebar CSS-->
+  <link href="adminAssets/css/sidebar-menu.css" rel="stylesheet" />
+  <!-- Custom Style-->
+  <link href="adminAssets/css/app-style.css" rel="stylesheet" />
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
+  <style>
+    .list-inline-item i {
+      margin-right: 5px;
+    }
+
+    .list-inline-item .text-white {
+      color: #ffffff;
+    }
+
+    .list-inline-item .text-light {
+      color: #b0c4de;
+    }
+
+    .chart-container-1 {
+      position: relative;
+      height: 40vh;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: auto !important;
+    }
+
+    card-body {
+      -ms-flex: 1 1 auto;
+      flex: 1 1 auto;
+      padding: 1.25rem;
+      margin-bottom: 40px;
+    }
+
+    .border-light-3 {
+      border-color: rgba(255, 255, 255, 0.12) !important;
+      padding-top: 111px;
+    }
+
+        table {
+      width: 100%;
+      margin-top: 20px;
+    }
+    th, td {
+      text-align: left;
+      padding: 8px;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    
+  </style>
+
+</head>
+
+<body class="bg-theme bg-theme1">
+
+  <!-- Start wrapper-->
+  <div id="wrapper">
+
+    <!--Start sidebar-wrapper-->
+     <div id="sidebar-wrapper" data-simplebar="" data-simplebar-auto-hide="true">
+     <div class="brand-logo">
+      <a href="/admin">
+       <img src="asset\images\profile-circle.1023x1024.png" class="logo-icon" alt="logo icon">
+       <h5 class="logo-text">OnlyShoes Admin</h5>
+     </a>
+   </div>
+   <ul class="sidebar-menu do-nicescrol">
+      <li class="sidebar-header">MAIN NAVIGATION</li>
+      <li>
+        <a href="/admin">
+          <i class="zmdi zmdi-view-dashboard"></i> <span>Dashboard</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/admin-users">
+          <i class="zmdi zmdi-accounts"></i> <span>Users</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin-orders">
+          <i class="zmdi zmdi-accounts"></i> <span>Orders</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/admin-products">
+          <i class="zmdi zmdi-shopping-cart"></i> <span>Products</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/admin-banner">
+          <i class="zmdi zmdi-view-module"></i> <span>Banners</span>
+        </a>
+      </li>
+
+      <li>
+        <a href="/admin-coupon">
+          <i class="zmdi zmdi-shopping-cart-plus"></i> <span>Coupons</span>
+          {{!-- <small class="badge float-right badge-light">New</small> --}}
+        </a>
+      </li>
+       <li>
+  <a href="/admin-return">
+    <i class="fas fa-undo"></i> <span>Returns</span>
+    {{!-- <small class="badge float-right badge-light">New</small> --}}
+  </a>
+</li>
+      <li>
+        <a href="/admin-profile">
+          <i class="zmdi zmdi-face"></i> <span>Profile</span>
+        </a>
+      </li>
+
+      {{!-- <li>
+        <a href="login.html" target="_blank">
+          <i class="zmdi zmdi-lock"></i> <span>Login</span>
+        </a>
+      </li>
+
+       <li>
+        <a href="register.html" target="_blank">
+          <i class="zmdi zmdi-account-circle"></i> <span>Registration</span>
+        </a>
+      </li>
+	  
+      <li class="sidebar-header">LABELS</li>
+      <li><a href="javaScript:void();"><i class="zmdi zmdi-coffee text-danger"></i> <span>Important</span></a></li>
+      <li><a href="javaScript:void();"><i class="zmdi zmdi-chart-donut text-success"></i> <span>Warning</span></a></li>
+      <li><a href="javaScript:void();"><i class="zmdi zmdi-share text-info"></i> <span>Information</span></a></li> --}}
+
+    </ul>
+   
+   </div>
+    <!--End sidebar-wrapper-->
+
+    <!--Start topbar header-->
+    <header class="topbar-nav">
+ <nav class="navbar navbar-expand fixed-top">
+  <ul class="navbar-nav mr-auto align-items-center">
+    <li class="nav-item">
+      <a class="nav-link toggle-menu" href="javascript:void();">
+       <i class="icon-menu menu-icon"></i>
+     </a>
+    </li>
+    <li class="nav-item">
+      <form class="search-bar">
+        <input type="text" class="form-control" placeholder="Enter keywords">
+         <a href="javascript:void();"><i class="icon-magnifier"></i></a>
+      </form>
+    </li>
+  </ul>
+     
+  <ul class="navbar-nav align-items-center right-nav-link">
+    {{!-- <li class="nav-item dropdown-lg">
+      <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown" href="javascript:void();">
+      <i class="fa fa-envelope-open-o"></i></a>
+    </li>
+    <li class="nav-item dropdown-lg">
+      <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown" href="javascript:void();">
+      <i class="fa fa-bell-o"></i></a>
+    </li> --}}
+    {{!-- <li class="nav-item language">
+      <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown" href="javascript:void();"><i class="fa fa-flag"></i></a>
+      <ul class="dropdown-menu dropdown-menu-right">
+          <li class="dropdown-item"> <i class="flag-icon flag-icon-gb mr-2"></i> English</li>
+          <li class="dropdown-item"> <i class="flag-icon flag-icon-fr mr-2"></i> French</li>
+          <li class="dropdown-item"> <i class="flag-icon flag-icon-cn mr-2"></i> Chinese</li>
+          <li class="dropdown-item"> <i class="flag-icon flag-icon-de mr-2"></i> German</li>
+        </ul>
+    </li> --}}
+    <li class="nav-item">
+      <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown" href="#">
+        <span class="user-profile"><img src="asset\images\profile-circle.1023x1024.png" class="img-circle" alt="user avatar"></span>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-right">
+       <li class="dropdown-item user-details">
+        <a href="javaScript:void();">
+           {{!-- <div class="media">
+             <div class="avatar"><img class="align-self-start mr-3" src="asset\images\profile-circle.1023x1024.png" alt="user avatar"></div>
+            <div class="media-body">
+            <h6 class="mt-2 user-title">Sarajhon Mccoy</h6>
+            <p class="user-subtitle">mccoy@example.com</p>
+            </div>
+           </div> --}}
+          </a>
+        </li>
+        {{!-- <li class="dropdown-divider"></li>
+        <li class="dropdown-item"><i class="icon-envelope mr-2"></i> Inbox</li>
+        <li class="dropdown-divider"></li>
+        <li class="dropdown-item"><i class="icon-wallet mr-2"></i> Account</li> --}}
+        <li class="dropdown-divider"></li>
+        <li class="dropdown-item"><a href="/admin-profile"><i class="icon-settings mr-2"></i> Setting</a></li>
+        <li class="dropdown-divider"></li>
+        <li class="dropdown-item"><a href="/admin-logout"><i class="icon-power mr-2"></i> Logout</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+</header>
+    <!--End topbar header-->
+
+    <div class="clearfix"></div>
+
+    <div class="content-wrapper">
+      <div class="container-fluid">
+
+        <!--Start Dashboard Content-->
+
+        
+
+       
+<!-- Filter Section -->
+<div class="form-group">
+    <label for="filterAmountMin">Min Amount</label>
+    <input type="number" id="filterAmountMin" name="filterAmountMin" class="form-control" placeholder="Enter minimum amount">
+
+    <label for="filterAmountMax">Max Amount</label>
+    <input type="number" id="filterAmountMax" name="filterAmountMax" class="form-control" placeholder="Enter maximum amount">
+<br>
+    <a href="#" type="button" id="filterButton" class="btn btn-light px-5" onclick="filterOrders()">Filter</a>
+    <button type="button" id="refreshButton" class="btn btn-light px-3"><i class="zmdi zmdi-refresh" onclick="refreshOrders()"></i></button>
+
+</div>
+
+
+        <div class="row">
+            {{!-- <div class="form-group">
+    <!-- Add Product and Delete Selected buttons -->
+    <a href="/add-product" class="btn btn-light px-5"> Add Product</a>
+    <button type="submit" id="deleteSelected" class="btn btn-light px-5"> Delete Selected</button>
+</div> --}}
+
+          <div class="col-12 col-lg-12">
+            <div class="card">
+              <div class="card-header">Recent Order Tables
+                <div class="card-action">
+                 <div class="form-group">
+  <label for="sortOrders">Sort by Date</label>
+  <select id="sortOrders" class="form-control" onchange="sortOrders()">
+    <option value="date_desc" {{#if (eq sortOption 'date_desc')}}selected{{/if}}>Newest First</option>
+    <option value="date_asc" {{#if (eq sortOption 'date_asc')}}selected{{/if}}>Oldest First</option>
+  </select>
+</div>
+                  
+                </div>
+              </div>
+              <div class="table-responsive">
+                <table class="table align-items-center table-flush table-borderless">
+                  <thead>
+
+                    <tr>
+                      <th>Order ID</th>
+                      <th>Address</th>
+                      <th>Payment</th>
+                      <th>Items</th>
+                      <th>Amount</th>
+                      <th>Delivery Date</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {{#if orders.length}}
+                   {{#each orders}}
+<tr>
+  <td>{{this.orderID}}</td>
+  <td>
+    {{this.address.firstName}} {{this.address.lastName}},
+    {{this.address.street}},
+    {{this.address.city}},
+    {{this.address.state}},
+    {{this.address.postCode}}
+  </td>
+  <td>{{this.payment}}</td>
+  <td>
+  <ul>
+  {{#each this.items}}
+    <li>{{this.product.name}} - Quantity: {{this.quantity}}</li>
+  {{/each}}
+</ul>
+  </td>
+  <td>{{this.totalPrice}}₹</td>
+<td>{{this.deliveryExpectedDate}}</td>
+{{!-- <td>
+  <select class="form-control order-status" data-order-id="{{this._id}}">
+    <option value="pending" {{#if (eq this.status 'pending')}}selected{{/if}}>Pending</option>
+    <option value="processing" {{#if (eq this.status 'processing')}}selected{{/if}}>Processing</option>
+    <option value="shipped" {{#if (eq this.status 'shipped')}}selected{{/if}}>Shipped</option>
+    <option value="delivered" {{#if (eq this.status 'delivered')}}selected{{/if}}>Delivered</option>
+    <option value="canceled" {{#if (eq this.status 'canceled')}}selected{{/if}}>Canceled</option>
+  </select>
+</td> --}}
+ <td>
+      <select class="form-control order-status" data-order-id="{{this._id}}" data-orderStatus="{{this.orderStatus}}">
+        <option value="pending" {{#if (eq this.orderStatus 'pending')}}selected{{/if}}>Pending</option>
+        <option value="processing" {{#if (eq this.orderStatus 'processing')}}selected{{/if}}>Processing</option>
+        <option value="shipped" {{#if (eq this.orderStatus 'shipped')}}selected{{/if}}>Shipped</option>
+        <option value="delivered" {{#if (eq this.orderStatus 'delivered')}}selected{{/if}}>Delivered</option>
+        <option value="canceled" {{#if (eq this.orderStatus 'canceled')}}selected{{/if}}>Canceled</option>
+      </select>
+    </td>
+
+
+</tr>
+{{/each}}
+{{else}}
+<tr>
+  <td colspan="7" class="text-center">
+    <h3 class="text">No orders found</h3>
+  </td>
+</tr>
+{{/if}}
+
+
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div><!--End Row-->
+
+        <!--End Dashboard Content-->
+
+        <!--start overlay-->
+        <div class="overlay toggle-menu"></div>
+        <!--end overlay-->
+
+      </div>
+      <!-- End container-fluid-->
+
+    </div><!--End content-wrapper-->
+    <!--Start Back To Top Button-->
+    <a href="javaScript:void();" class="back-to-top"><i class="fa fa-angle-double-up"></i> </a>
+    <!--End Back To Top Button-->
+
+    <!--Start footer-->
+    <footer class="footer">
+      <div class="container">
+        <div class="text-center">
+          Copyright © 2018 Dashtreme Admin
+        </div>
+      </div>
+    </footer>
+    <!--End footer-->
+
+    <!--start color switcher-->
+    <div class="right-sidebar">
+      <div class="switcher-icon">
+        <i class="zmdi zmdi-settings zmdi-hc-spin"></i>
+      </div>
+      <div class="right-sidebar-content">
+
+        <p class="mb-0">Gaussion Texture</p>
+        <hr>
+
+        <ul class="switcher">
+          <li id="theme1"></li>
+          <li id="theme2"></li>
+          <li id="theme3"></li>
+          <li id="theme4"></li>
+          <li id="theme5"></li>
+          <li id="theme6"></li>
+        </ul>
+
+        <p class="mb-0">Gradient Background</p>
+        <hr>
+
+        <ul class="switcher">
+          <li id="theme7"></li>
+          <li id="theme8"></li>
+          <li id="theme9"></li>
+          <li id="theme10"></li>
+          <li id="theme11"></li>
+          <li id="theme12"></li>
+          <li id="theme13"></li>
+          <li id="theme14"></li>
+          <li id="theme15"></li>
+        </ul>
+
+      </div>
+    </div>
+    <!--end color switcher-->
+
+  </div><!--End wrapper-->
+
+  <!-- Bootstrap core JavaScript-->
+  <script src="adminAssets/js/jquery.min.js"></script>
+  <script src="adminAssets/js/popper.min.js"></script>
+  <script src="adminAssets/js/bootstrap.min.js"></script>
+
+  <!-- simplebar js -->
+  <script src="adminAssets/plugins/simplebar/js/simplebar.js"></script>
+  <!-- sidebar-menu js -->
+  <script src="adminAssets/js/sidebar-menu.js"></script>
+  <!-- loader scripts -->
+  <script src="adminAssets/js/jquery.loading-indicator.js"></script>
+  <!-- Custom scripts -->
+  <script src="adminAssets/js/app-script.js"></script>
+  <!-- Chart js -->
+<script>
+    const ordersPerMonth = {{{ordersPerMonth}}}; // Use triple braces to avoid escaping
+    console.log(ordersPerMonth,'ordersPerMonth');
+</script>
+  {{!--
+  <script src="adminAssets/plugins/Chart.js/Chart.min.js"></script> --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <script src="adminAssets/js/chart-config.js"></script>
+
+
+  <!-- Index js -->
+  <script src="adminAssets/js/index.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.querySelectorAll('.order-status').forEach(select => {
+  select.addEventListener('change', function () {
+    const orderId = this.dataset.orderId;
+    const status = this.value;
+    const currentStatus = this.dataset.orderstatus;
+    changeStatus(orderId, status, this, currentStatus);
+  });
+});
+
+function changeStatus(orderId, status, dropdown, currentStatus) {
+  Swal.fire({
+    title: 'Are you sure?',
+    text: `Do you want to change the status to "${status}"?`,
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#3085d6',
+    cancelButtonColor: '#d33',
+    confirmButtonText: 'Yes, change it!'
+  }).then((result) => {
+    if (result.isConfirmed) {
+      if (status === 'canceled') {
+        Swal.fire({
+          title: 'Refund amount',
+          text: 'You need to refund the amount.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'Yes, refund it!'
+        }).then((refundResult) => {
+          if (refundResult.isConfirmed) {
+            updateOrderStatus(orderId, status);
+            fetchOrderStatus(orderId); // Fetch the updated order status
+          } else {
+            dropdown.value = currentStatus;
+          }
+        });
+      } else {
+        updateOrderStatus(orderId, status);
+        fetchOrderStatus(orderId); // Fetch the updated order status
+      }
+    } else {
+      dropdown.value = currentStatus;
+    }
+  });
+}
+
+function updateOrderStatus(orderId, status) {
+  $.ajax({
+    url: '/update-order-status',
+    type: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify({ orderId: orderId, status: status }),
+    success: function(response) {
+      console.log('response', response);
+      const orderRow = document.getElementById(`order-${orderId}`);
+      if (orderRow) {
+        if (status === 'canceled') {
+          orderRow.remove();
+          Swal.fire('Canceled', 'The order has been canceled and removed from the list.', 'info');
+        } else {
+          const statusText = orderRow.querySelector('.order-status-text');
+          const statusCircle = orderRow.querySelector('.tm-status-circle');
+          if (statusText && statusCircle) {
+            statusText.textContent = status;
+            statusCircle.className = `tm-status-circle ${status}`;
+          }
+        }
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error('Error updating order status:', error);
+      Swal.fire('Error', 'Failed to update order status.', 'error');
+    }
+  });
+}
+
+function fetchOrderStatus(orderId) {
+  $.ajax({
+    url: `/order-status/${orderId}`,
+    type: 'GET',
+    contentType: 'application/json',
+    success: function(response) {
+      const orderRow = document.getElementById(`order-${orderId}`);
+      if (orderRow) {
+        const statusText = orderRow.querySelector('.order-status-text');
+        const statusCircle = orderRow.querySelector('.tm-status-circle');
+        if (statusText && statusCircle) {
+          statusText.textContent = response.status;
+          statusCircle.className = `tm-status-circle ${response.status}`;
+        }
+      }
+    },
+    error: function(xhr, status, error) {
+      console.error('Error fetching order status:', error);
+    }
+  });
+}
+</script>
+
+
+
+
+
+
+
+
+
+
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    fetch('/admin/order-counts')
+      .then(response => response.json())
+      .then(data => {
+        const currentYearCounts = Array(7).fill(0);
+        const previousYearCounts = Array(7).fill(0);
+
+        data.currentYearCounts.forEach(day => {
+          currentYearCounts[day._id - 1] = day.count;
+        });
+
+        data.previousYearCounts.forEach(day => {
+          previousYearCounts[day._id - 1] = day.count;
+        });
+
+        const ctx = document.getElementById('lineChart').getContext('2d');
+        const myChart = new Chart(ctx, {
+          type: 'line',
+          data: {
+            labels: ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'],
+            datasets: [{
+              label: 'Current Year',
+              data: currentYearCounts,
+              backgroundColor: "rgb(255, 255, 255)",
+              borderColor: "transparent",
+              pointRadius: "0",
+              borderWidth: 1
+            }, {
+              label: 'Previous Year',
+              data: previousYearCounts,
+              backgroundColor: "rgba(255, 255, 255, 0.25)",
+              borderColor: "transparent",
+              pointRadius: "0",
+              borderWidth: 1
+            }]
+          },
+          options: {
+            legend: {
+              display: true,
+              labels: {
+                fontColor: '#ddd',
+                boxWidth: 40
+              }
+            },
+            tooltips: {
+              enabled: false
+            },
+            scales: {
+              xAxes: [{
+                ticks: {
+                  beginAtZero: true,
+                  fontColor: '#ddd'
+                },
+                gridLines: {
+                  display: true,
+                  color: "rgba(221, 221, 221, 0.08)"
+                },
+              }],
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true,
+                  fontColor: '#ddd'
+                },
+                gridLines: {
+                  display: true,
+                  color: "rgba(221, 221, 221, 0.08)"
+                },
+              }]
+            }
+          }
+        });
+      })
+      .catch(error => console.error('Error fetching order counts:', error));
+  });
+</script>
+
+<script>
+    function filterOrders() {
+        const minAmountInput = document.getElementById('filterAmountMin');
+        const maxAmountInput = document.getElementById('filterAmountMax');
+        if (!minAmountInput || !maxAmountInput) {
+            console.error('Missing filter amount inputs');
+            return;
+        }
+        const minAmount = parseFloat(minAmountInput.value.trim());
+        const maxAmount = parseFloat(maxAmountInput.value.trim());
+        if (isNaN(minAmount) || isNaN(maxAmount)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Please enter valid minimum and maximum amounts',
+            });
+            return;
+        }
+        
+        if (minAmount > maxAmount) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Minimum amount cannot be greater than maximum amount',
+            });
+            return;
+        }
+        const url = `/admin-filter-orders?Min=${minAmount}&Max=${maxAmount}`;
+        window.location.href = url;
+    }
+</script>
+
+
+<script>
+  function sortOrders() {
+    const sortOption = document.getElementById('sortOrders').value;
+    window.location.href = `/admin-orders?sort=${sortOption}`;
+  }
+</script>
+
+<script>
+  function refreshOrders(){
+    window.location.href = '/admin-orders';
+  }
+</script>
+</body>
+
+</html>

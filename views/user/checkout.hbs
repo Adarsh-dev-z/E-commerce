@@ -5,6 +5,8 @@
     <meta charset="UTF-8">
     <title>Checkout Page</title>
     <script src="https://js.stripe.com/v3/"></script>
+    <script src="https://cdn.jsdelivr.net/npm/clipboard-copy@2.0.8/dist/clipboard.min.js"></script>
+
    <style>
     .delete-address {
     padding: 2px;
@@ -18,6 +20,7 @@
 
 
    </style>
+   
 </head>
 
 {{>header}}
@@ -48,37 +51,42 @@
         <div id="customer-login" class="collapse customer-content">
             <div class="customer-info">
                 <p class="coupon-text">Please select your preferred shipping address from the options below.</p>
-                <form id="address-form">
-                    {{#if address.length}}
-                    {{#each address}}
-                    <div class="form-check">
-                        <input class="form-check-input" type="radio" name="address" id="address-{{@index}}" value="{{this._id}}" data-address="{{json this}}">
-                        <label class="form-check-label" for="address-{{@index}}">
-                            <strong>{{this.firstName}} {{this.lastName}}</strong><br>
-                            {{this.company}} 
-                            {{this.street}} 
-                            {{this.address}}, {{this.apartment}} 
-                            {{this.city}}, {{this.state}}, {{this.postCode}} 
-                            {{this.telephone}} 
-                            {{this.email}} 
-                            {{#if this.notes}}<em>Notes: {{this.notes}}</em>{{/if}}
-                        </label>
-                        <button type="button" class="btn btn-link delete-address" data-id="{{this._id}}" aria-label="Delete">
-        <i class="fa fa-times"></i>
-    </button>
+              <form id="address-form">
+    {{#if address.length}}
+    {{#each address}}
+    <div class="form-check address-container" data-id="{{this._id}}">
+        <input class="form-check-input" type="radio" name="address" id="address-{{@index}}" value="{{this._id}}" data-address="{{json this}}">
+        <label class="form-check-label" for="address-{{@index}}">
+            <strong>{{this.firstName}} {{this.lastName}}</strong><br>
+            {{this.company}} 
+            {{this.street}} 
+            {{this.address}}, {{this.apartment}} 
+            {{this.city}}, {{this.state}}, {{this.postCode}} 
+            {{this.telephone}} 
+            {{this.email}} 
+            {{#if this.notes}}<em>Notes: {{this.notes}}</em>{{/if}}
+        </label>
+        <a href="#" type="button" class="btn btn-link delete-address" data-id="{{this._id}}" aria-label="Delete">
+            <i class="fa fa-times"></i>
+        </a>
+    </div>
+    <hr>
+    {{/each}}
+    <div class="row">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-primary mt-3" id="use-selected-address">Use Selected Address</button>
+        </div>
+    </div>
+    {{else}}
+    <p>No address</p>
+    <div class="row">
+        <div class="col-md-12">
+            <button type="button" class="btn btn-dark mt-3" id="use-selected-address" disabled>No Address</button>
+        </div>
+    </div>
+    {{/if}}
+</form>
 
-                    </div>
-                    <hr>
-                    {{/each}}
-                    {{else}}
-                    <h3>empty</h3>
-                    {{/if}}
-                    <div class="row">
-                        <div class="col-md-12">
-                            <button type="button" class="btn btn-primary mt-3" id="use-selected-address">Use Selected Address</button>
-                        </div>
-                    </div>
-                </form>
             </div>
         </div>
     </div>
@@ -93,23 +101,26 @@
             <a href="#have-coupon" class="text-white text-decoration-underline" data-toggle="collapse">Click here to get code</a>
         </h3>
         <div id="have-coupon" class="collapse coupon-checkout-content">
-            <div class="discount-coupon">
-                <div id="coupon" class="coupon-dec tab-pane active">
-                    <p class="margin-10px-bottom">Your discount code: {{coupon.code}}</p>
-                    
-                    <label class="required get" for="coupon-code"><span class="required-f">*</span> Coupon</label>
-                    <input id="coupon-code" required="" type="text" class="mb-3">
-                    <button class="coupon-btn btn" onclick="applyCoupon()">Apply Coupon</button>
-                    <button class="coupon-remove-btn btn btn-danger" onclick="removeCoupon()">Remove Coupon</button>
-                    
-                    <!-- New Section to Display Coupon Code and Discount -->
-                    <div id="coupon-info" class="mt-3" style="display:none;">
-                        <p>Discount Applied: <span id="discount-amount"></span></p>
-                        <p>New Total: <span id="new-total"></span></p>
-                    </div>
-                </div>
+    <div class="discount-coupon">
+        <div id="coupon" class="coupon-dec tab-pane active">
+            <p class="margin-10px-bottom">Your discount code: <span id="coupon-code-text">{{coupon.code}}</span></p>
+            
+            <label class="required get" for="coupon-code"><span class="required-f">*</span> Coupon</label>
+            <input id="coupon-code" required="" type="text" class="mb-3">
+            <button class="coupon-btn btn" onclick="applyCoupon()">Apply Coupon</button>
+            <button class="coupon-remove-btn btn btn-danger" onclick="removeCoupon()">Remove Coupon</button>
+            
+            <!-- New Copy Button -->
+            <button class="copy-btn btn btn-secondary" onclick="copyCouponCode()">Copy Code</button>
+            
+            <!-- New Section to Display Coupon Code and Discount -->
+            <div id="coupon-info" class="mt-3" style="display:none;">
+                <p>Discount Applied: <span id="discount-amount"></span></p>
+                <p>New Total: <span id="new-total"></span></p>
             </div>
         </div>
+    </div>
+</div>
     </div>
 </div>
 {{else}}
@@ -192,11 +203,48 @@
                                 <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
                                     <label for="input-zone">Region / State <span class="required-f">*</span></label>
                                     <select name="state" id="input-zone">
-                                        <option value=""> --- Please Select --- </option>
+                                        {{!-- <option value=""> --- Please Select --- </option>
                                         <option value="Aberdeen">Aberdeen</option>
                                         <option value="Aberdeenshire">Aberdeenshire</option>
                                         <option value="Anglesey">Anglesey</option>
-                                        <option value="Angus">Angus</option>
+                                        <option value="Angus">Angus</option> --}}
+                                         <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                                                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                                                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                                                        <option value="Assam">Assam</option>
+                                                                        <option value="Bihar">Bihar</option>
+                                                                        <option value="Chandigarh">Chandigarh</option>
+                                                                        <option value="Chhattisgarh">Chhattisgarh</option>
+                                                                        <option value="Dadar and Nagar Haveli">Dadar and Nagar Haveli</option>
+                                                                        <option value="Daman and Diu">Daman and Diu</option>
+                                                                        <option value="Delhi">Delhi</option>
+                                                                        <option value="Goa">Goa</option>
+                                                                        <option value="Gujarat">Gujarat</option>
+                                                                        <option value="Haryana">Haryana</option>
+                                                                        <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                                                        <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                                                        <option value="Jharkhand">Jharkhand</option>
+                                                                        <option value="Karnataka">Karnataka</option>
+                                                                        <option value="Kerala">Kerala</option>
+                                                                        <option value="Ladakh">Ladakh</option>
+                                                                        <option value="Lakshadweep">Lakshadweep</option>
+                                                                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                                                        <option value="Maharashtra">Maharashtra</option>
+                                                                        <option value="Manipur">Manipur</option>
+                                                                        <option value="Meghalaya">Meghalaya</option>
+                                                                        <option value="Mizoram">Mizoram</option>
+                                                                        <option value="Nagaland">Nagaland</option>
+                                                                        <option value="Odisha">Odisha</option>
+                                                                        <option value="Puducherry">Puducherry</option>
+                                                                        <option value="Punjab">Punjab</option>
+                                                                        <option value="Rajasthan">Rajasthan</option>
+                                                                        <option value="Sikkim">Sikkim</option>
+                                                                        <option value="Tamil Nadu">Tamil Nadu</option>
+                                                                        <option value="Telangana">Telangana</option>
+                                                                        <option value="Tripura">Tripura</option>
+                                                                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                                                        <option value="Uttarakhand">Uttarakhand</option>
+                                                                        <option value="West Bengal">West Bengal</option>
                                     </select>
                                 </div>
 
@@ -274,12 +322,12 @@
                             <div class="container mt-5">
                                 <div class="payment-section">
                                     <form id="payment-form">
-                                        <div class="form-check">
+                                        {{!-- <div class="form-check">
                                             <input class="form-check-input" type="radio" name="payment"
                                                 id="cash on delivery" value="cash on delivery">
                                             <label class="form-check-label" for="cash on delivery">Cash On
                                                 Delivery</label>
-                                        </div>
+                                        </div> --}}
                                         <div id="bankTransferContent" class="payment-content">
                                             <p class="no-margin font-15"></p>
                                         </div>
@@ -386,29 +434,29 @@
                 <div class="footer-top">
                     <div class="row">
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
-                            <h4 class="h4">Quick Shop</h4>
+                        	<h4 class="h4">Quick Shop</h4>
                             <ul>
-                                <li><a href="#">Women</a></li>
-                                <li><a href="#">Men</a></li>
-                                <li><a href="#">Kids</a></li>
-                                <li><a href="#">Sportswear</a></li>
-                                <li><a href="#">Sale</a></li>
+                            	<li><a href="/shop">Women</a></li>
+                                <li><a href="/shop">Men</a></li>
+                                <li><a href="/shop">Charecter Edition</a></li>
+                                <li><a href="/shop">Sport</a></li>
+                                <li><a href="/shop">Sneakers</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
-                            <h4 class="h4">Informations</h4>
+                        	<h4 class="h4">Informations</h4>
                             <ul>
-                                <li><a href="#">About us</a></li>
+                            	<li><a href="#">About us</a></li>
                                 <li><a href="#">Careers</a></li>
                                 <li><a href="#">Privacy policy</a></li>
                                 <li><a href="#">Terms &amp; condition</a></li>
-                                <li><a href="#">My Account</a></li>
+                                <li><a href="/userprofile">My Account</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
-                            <h4 class="h4">Customer Services</h4>
+                        	<h4 class="h4">Customer Services</h4>
                             <ul>
-                                <li><a href="#">Request Personal Data</a></li>
+                            	<li><a href="#">Request Personal Data</a></li>
                                 <li><a href="#">FAQ's</a></li>
                                 <li><a href="#">Contact Us</a></li>
                                 <li><a href="#">Orders and Returns</a></li>
@@ -495,8 +543,12 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('input-postcode').value = addressData.postCode;
             document.getElementById('input-zone').value = addressData.state;
         } else {
-            alert('Please select an address.');
-        }
+Swal.fire({
+    title: 'Error',
+    text: 'Please select an address.',
+    icon: 'error',
+    confirmButtonText: 'Ok'
+});        }
     });
 });
 </script>
@@ -604,7 +656,14 @@ document.addEventListener('DOMContentLoaded', function() {
             requiredFields.forEach(field => {
                 if (!formData.get(field)?.trim()) {
                     valid = false;
-                    alert(`Please fill in your ${field}`);
+                    
+ Swal.fire({
+                    title: 'Error',
+                    text: `Please fill in your ${field}`,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+                return;                    
                 }
             });
 
@@ -613,8 +672,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
 
             if (!paymentMethod) {
-                alert('Please select a payment method');
-                return;
+ Swal.fire({
+                    title: 'Error',
+                    text: `Please select a payment method`,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+                return;             
             }
 
             const couponCodeElement = document.getElementById('coupon-discount');
@@ -649,7 +713,14 @@ document.addEventListener('DOMContentLoaded', function() {
             location.reload()
 
             if (data.error) {
-                alert(data.error.message);
+
+ Swal.fire({
+                    title: 'Error',
+                    text: data.error.message,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+                return;
             } else {
                 stripe.redirectToCheckout({ sessionId: data.id });
             }
@@ -679,7 +750,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const paymentMethod = formData.get('payment');
 
             if (!paymentMethod) {
-                alert('Please select a payment method');
+ Swal.fire({
+                    title: 'Error',
+                    text: `Please select a payment method`,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
                 return;
             }
 
@@ -719,7 +795,14 @@ document.addEventListener('DOMContentLoaded', function() {
             requiredFields.forEach(field => {
                 if (!formData.get(field)?.trim()) {
                     valid = false;
-                    alert(`Please fill in your ${field}`);
+
+                     Swal.fire({
+                    title: 'Error',
+                    text: `Please fill in your ${field}`,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+                return; 
                 }
             });
 
@@ -771,13 +854,29 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('coupon-discount').innerText = `-${result.discount}`;
                     document.getElementById('total-amount').innerText = `$${result.discountedTotal}`;
                     
-                    alert('Coupon applied successfully!');
+ Swal.fire({
+                        title: 'Success',
+                        text: 'Coupon applied successfully!',
+                        icon: 'success',
+                        confirmButtonText: 'Ok'
+                    });                    
                 } else {
-                    alert(result.message);
+
+Swal.fire({
+                        title: 'Error',
+                        text: result.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
                 }
             },
             error: function(xhr, status, error) {
-                alert('An error occurred while applying the coupon.');
+Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred while applying the coupon.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });                
             }
         });
     }
@@ -795,17 +894,109 @@ document.addEventListener('DOMContentLoaded', function() {
                     document.getElementById('coupon-row').style.display = 'none';
                     document.getElementById('total-amount').innerText = `$${result.newTotal}`;
                     
-                    alert('Coupon removed successfully!');
+ Swal.fire({
+                        title: 'Success',
+                        text: 'Coupon removed successfully!',
+                        icon: 'success',
+                        confirmButtonText: 'Ok'
+                    });                    
                 } else {
-                    alert(result.message);
+ Swal.fire({
+        title: 'Error',
+        text: result.message,
+        icon: 'error',
+        confirmButtonText: 'Ok'
+    });                    
                 }
             },
             error: function(xhr, status, error) {
-                alert('An error occurred while removing the coupon.');
+Swal.fire({
+        title: 'Error',
+        text: 'An error occurred while removing the coupon.',
+        icon: 'error',
+        confirmButtonText: 'Ok'
+    });                
             }
         });
     }
 </script>
+
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   <script>
+    $(document).ready(function () {
+        $('.delete-address').on('click', function (event) {
+            event.preventDefault();
+
+            var addressId = $(this).data('id');
+            var addressContainer = $(this).closest('.address-container');
+            var url = '/remove-address/' + addressId;
+
+            $.ajax({
+                type: 'GET', // Use POST for actions that change state on the server
+                url: url,
+                success: function (response) {
+                    if (response.success) {
+                        addressContainer.remove();
+Swal.fire({
+                        title: 'Success',
+                        text: 'Address removed successfully',
+                        icon: 'success',
+                        confirmButtonText: 'Ok'
+                    });                         
+                    } else {
+ Swal.fire({
+                        title: 'Error',
+                        text: response.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });                          
+                    }
+                },
+                error: function (xhr, status, error) {
+Swal.fire({
+                    title: 'Error',
+                    text: 'Error removing address: ' + xhr.responseText,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });                     
+                }
+            });
+        });
+    });
+</script>
+
+
+<script>
+function copyCouponCode() {
+    // Get the coupon code text
+    var couponCode = document.getElementById("coupon-code-text").innerText;
+    
+    // Create a temporary input element to hold the coupon code
+    var tempInput = document.createElement("input");
+    tempInput.value = couponCode;
+    document.body.appendChild(tempInput);
+    
+    // Select the text in the temporary input element
+    tempInput.select();
+    tempInput.setSelectionRange(0, 99999); // For mobile devices
+    
+    // Copy the text to the clipboard
+    document.execCommand("copy");
+    
+    // Remove the temporary input element
+    document.body.removeChild(tempInput);
+    
+    // Alert the user that the code has been copied
+Swal.fire({
+        title: 'Success',
+        text: 'Coupon code copied: ' + couponCode,
+        icon: 'success',
+        confirmButtonText: 'Ok'
+    });    
+}
+</script>
+
 </div>
 </body>
 

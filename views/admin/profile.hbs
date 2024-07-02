@@ -24,6 +24,9 @@
   <link href="adminAssets/css/sidebar-menu.css" rel="stylesheet"/>
   <!-- Custom Style-->
   <link href="adminAssets/css/app-style.css" rel="stylesheet"/>
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
   <style>
     .text-muted{
       color: #ffffff !important;
@@ -64,7 +67,11 @@
           <i class="zmdi zmdi-accounts"></i> <span>Users</span>
         </a>
       </li>
-
+      <li>
+        <a href="/admin-orders">
+          <i class="zmdi zmdi-accounts"></i> <span>Orders</span>
+        </a>
+      </li>
       <li>
         <a href="/admin-products">
           <i class="zmdi zmdi-shopping-cart"></i> <span>Products</span>
@@ -83,7 +90,12 @@
           {{!-- <small class="badge float-right badge-light">New</small> --}}
         </a>
       </li>
-
+      <li>
+  <a href="/admin-return">
+    <i class="fas fa-undo"></i> <span>Returns</span>
+    {{!-- <small class="badge float-right badge-light">New</small> --}}
+  </a>
+</li>
       <li>
         <a href="/admin-profile">
           <i class="zmdi zmdi-face"></i> <span>Profile</span>
@@ -154,13 +166,13 @@
       <ul class="dropdown-menu dropdown-menu-right">
        <li class="dropdown-item user-details">
         <a href="javaScript:void();">
-           <div class="media">
+           {{!-- <div class="media">
              <div class="avatar"><img class="align-self-start mr-3" src="asset\images\profile-circle.1023x1024.png" alt="user avatar"></div>
             <div class="media-body">
             <h6 class="mt-2 user-title">Sarajhon Mccoy</h6>
             <p class="user-subtitle">mccoy@example.com</p>
             </div>
-           </div>
+           </div> --}}
           </a>
         </li>
         {{!-- <li class="dropdown-divider"></li>
@@ -379,46 +391,46 @@
                   </div>
                 </div>
                <div class="tab-pane" id="edit">
-    <form action="/update-admin-profile" method="post" onsubmit="return validateForm()">
-        <div class="form-group row">
-            <label class="col-lg-3 col-form-label form-control-label">User name <span class="required-f">*</span></label>
-            <div class="col-lg-9">
-                <input class="form-control" type="text" name="username" placeholder="Length: 3-20 characters" required>
-                <small class="form-text text-muted">Length must be between 3 and 20 characters.</small>
+   <form name="adminForm" action="/update-admin-profile" method="post" onsubmit="return validateForm()">
+            <div class="form-group row">
+                <label class="col-lg-3 col-form-label form-control-label">User name <span class="required-f">*</span></label>
+                <div class="col-lg-9">
+                    <input class="form-control" type="text" name="username" placeholder="Length: 3-20 characters" required>
+                    <small class="form-text text-muted">Length must be between 3 and 20 characters.</small>
+                </div>
             </div>
-        </div>
-        
-        <div class="form-group row">
-            <label class="col-lg-3 col-form-label form-control-label">Email <span class="required-f">*</span></label>
-            <div class="col-lg-9">
-                <input class="form-control" type="email" name="email" placeholder="Must contain @gmail.com" required>
-                <small class="form-text text-muted">Email must contain @gmail.com.</small>
+            
+            <div class="form-group row">
+                <label class="col-lg-3 col-form-label form-control-label">Email <span class="required-f">*</span></label>
+                <div class="col-lg-9">
+                    <input class="form-control" type="email" name="email" placeholder="Must contain @gmail.com" required>
+                    <small class="form-text text-muted">Email must contain @gmail.com.</small>
+                </div>
             </div>
-        </div>
-        
-        <div class="form-group row">
-            <label class="col-lg-3 col-form-label form-control-label">Password <span class="required-f">*</span></label>
-            <div class="col-lg-9">
-                <input class="form-control" type="password" name="password" placeholder="1 uppercase, 1 lowercase, 1 symbol, 1 number" required>
-                <small class="form-text text-muted">Password should contain 1 uppercase letter, 1 lowercase letter, 1 symbol, and 1 number.</small>
+            
+            <div class="form-group row">
+                <label class="col-lg-3 col-form-label form-control-label">Password <span class="required-f">*</span></label>
+                <div class="col-lg-9">
+                    <input class="form-control" type="password" name="password" placeholder="1 uppercase, 1 lowercase, 1 symbol, 1 number" required>
+                    <small class="form-text text-muted">Password should contain 1 uppercase letter, 1 lowercase letter, 1 symbol, and 1 number.</small>
+                </div>
             </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-lg-3 col-form-label form-control-label">Confirm password <span class="required-f">*</span></label>
-            <div class="col-lg-9">
-                <input class="form-control" type="password" name="confirmpassword" placeholder="Re-enter your password" required>
-                <small class="form-text text-muted">Please re-enter your password.</small>
+            <div class="form-group row">
+                <label class="col-lg-3 col-form-label form-control-label">Confirm password <span class="required-f">*</span></label>
+                <div class="col-lg-9">
+                    <input class="form-control" type="password" name="confirmpassword" placeholder="Re-enter your password" required>
+                    <small class="form-text text-muted">Please re-enter your password.</small>
+                </div>
             </div>
-        </div>
-        <div class="form-group row">
-            <label class="col-lg-3 col-form-label form-control-label"></label>
-            <div class="col-lg-9">
-              <p class="text-danger">{{error}}</p>
-                <button type="reset" class="btn btn-secondary">Cancel</button>
-                <input type="submit" class="btn btn-primary" value="Save Changes">
+            <div class="form-group row">
+                <label class="col-lg-3 col-form-label form-control-label"></label>
+                <div class="col-lg-9">
+                  <p class="text-danger">{{error}}</p>
+                    <button type="reset" class="btn btn-secondary">Cancel</button>
+                    <input type="submit" class="btn btn-primary" value="Save Changes">
+                </div>
             </div>
-        </div>
-    </form>
+        </form>
 </div>
             </div>
         </div>
@@ -514,5 +526,47 @@
                             }
                         }
                     </script>
+
+   <script>
+        function validateForm() {
+            let username = document.forms["adminForm"]["username"].value;
+            let email = document.forms["adminForm"]["email"].value;
+            let password = document.forms["adminForm"]["password"].value;
+            let confirmPassword = document.forms["adminForm"]["confirmpassword"].value;
+
+            if (!username.trim()|| !email.trim() || !password.trim() || !confirmPassword.trim()) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Please fill all the fields.',
+                });
+                return false;
+            }
+            if (username.length < 3 || username.length > 20) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Username must be between 3 and 20 characters.',
+                });
+                return false;
+            }
+            let passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).+$/;
+            if (!passwordPattern.test(password)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Password should contain 1 uppercase letter, 1 lowercase letter, 1 symbol, and 1 number.',
+                });
+                return false;
+            }
+
+            if (password !== confirmPassword) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Passwords do not match.',
+                });
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </body>
 </html>

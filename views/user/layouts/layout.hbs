@@ -18,6 +18,172 @@
 <!-- Main Style CSS -->
 <link rel="stylesheet" href="/stylesheets/css/style.css">
 <link rel="stylesheet" href="/stylesheets/css/responsive.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<style>
+	.message-box {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 20px;
+    border-radius: 5px;
+    margin: 10px 0;
+    position: relative;
+    font-size: 16px;
+    color: #333;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.5s ease-out;
+}
+
+.message-box .icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.message-box .message {
+    flex-grow: 1;
+}
+
+.message-box .close {
+    cursor: pointer;
+    font-size: 20px;
+    color: inherit;
+    transition: color 0.2s ease-in-out;
+}
+
+.message-box .close:hover {
+    color: #000;
+}
+
+.success {
+    background-color: #d4edda;
+    color: #155724;
+    border-left: 6px solid #28a745;
+}
+
+.success .icon, .success .close {
+    color: #155724;
+}
+
+.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-left: 6px solid #dc3545;
+}
+
+.error .icon, .error .close {
+    color: #721c24;
+}
+
+.info {
+    background-color: #d1ecf1;
+    color: #0c5460;
+    border-left: 6px solid #17a2b8;
+}
+
+.info .icon, .info .close {
+    color: #0c5460;
+}
+
+.warning {
+    background-color: #fff3cd;
+    color: #856404;
+    border-left: 6px solid #ffc107;
+}
+
+.warning .icon, .warning .close {
+    color: #856404;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+
+ /* General Popup Styles */
+        .swal2-popup {
+            font-size: 0.9rem !important; /* Smaller font size */
+            background: linear-gradient(145deg, #f0f0f5, #d0d0d5); /* Subtle gradient background */
+            border-radius: 15px; /* More rounded corners */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2); /* Deeper shadow */
+            padding: 20px; /* More padding */
+            border: 1px solid #ddd; /* Light border */
+            transition: all 0.3s ease; /* Smooth transitions */
+        }
+
+        /* Title Styles */
+        .swal2-title {
+            color: #333; /* Darker title color */
+            font-family: 'Helvetica Neue', sans-serif; /* Professional font */
+            font-weight: 700; /* Bold title */
+            letter-spacing: 0.5px; /* Spaced letters */
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1); /* Light text shadow */
+        }
+
+        /* Content Styles */
+        .swal2-content {
+            color: #555; /* Medium gray content color */
+            font-family: 'Helvetica Neue', sans-serif; /* Professional font */
+            font-weight: 400; /* Normal weight */
+            line-height: 1.5; /* Line height for readability */
+            margin-top: 10px; /* Margin for spacing */
+        }
+
+        /* Confirm Button Styles */
+        .swal2-confirm {
+            background: linear-gradient(145deg, #007bff, #0056b3); /* Gradient blue button */
+            color: #fff; /* White text */
+            border: none; /* No border */
+            border-radius: 5px; /* Rounded button corners */
+            padding: 10px 20px; /* Padding for the button */
+            font-size: 0.9rem; /* Consistent font size */
+            font-family: 'Helvetica Neue', sans-serif; /* Professional font */
+            font-weight: 500; /* Medium weight */
+            text-transform: uppercase; /* Uppercase text */
+            letter-spacing: 0.5px; /* Spaced letters */
+            transition: background 0.3s ease; /* Smooth background transition */
+        }
+
+        .swal2-confirm:hover {
+            background: linear-gradient(145deg, #0056b3, #003a80); /* Darker gradient on hover */
+        }
+
+        /* Error Icon Styles */
+        .swal2-icon.swal2-error {
+            border-color: #dc3545; /* Red border for error icon */
+            color: #dc3545; /* Red color for error icon */
+        }
+
+        /* Error X-Mark Styles */
+        .swal2-icon.swal2-error [class^="swal2-x-mark-line"] {
+            background-color: #dc3545; /* Red color for X mark lines */
+        }
+</style>
+{{!-- <script>
+        window.history.forward();
+        function noBack() {
+            window.history.forward();
+        }
+
+        window.onpageshow = function(event) {
+            if (event.persisted) {
+                noBack();
+            }
+        };
+
+        window.onpopstate = function(event) {
+            noBack();
+        };
+    </script> --}}
+
+	
+
 </head>
 {{!-- <div id="pre-loader">
     <img src="assets/images/loader.gif" alt="Loading..." />

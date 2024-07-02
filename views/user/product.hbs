@@ -1,5 +1,5 @@
   
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 .wishlist-popup {
     display: none;
@@ -116,7 +116,34 @@
  }
 }
 
+ .star-rating {
+            display: flex;
+            direction: row-reverse;
+            font-size: 1.5em;
+        }
+        .star-rating input {
+            display: none;
+        }
+        .star-rating label {
+            color: #ccc;
+            cursor: pointer;
+        }
+        .star-rating input:checked ~ label {
+            color: #f5b301;
+        }
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: #f5b301;
+        }
+      
+
+.spr-review-header-starratings{
+        color: #f8ae00;
+    font-size: 20px;
+}
 </style>
+
+    
 
 {{>header}}
         <!--End Mobile Menu-->
@@ -128,7 +155,7 @@
                 <!--Breadcrumb-->
                 <div class="bredcrumbWrap">
                     <div class="container breadcrumbs" role="navigation" aria-label="breadcrumbs">
-                        <a href="index.html" title="Back to the home page">Home</a><span aria-hidden="true">›</span><span>Product with Rounded Square</span>
+                        <a href="/home" title="Back to the home page">Home</a><span aria-hidden="true">›</span><span>Product with Rounded Square</span>
                     </div>
                 </div>
                 <!--End Breadcrumb-->
@@ -164,7 +191,7 @@
                                             <img class="zoompro blur-up lazyload" data-zoom-image="/{{product.productImage.[0]}}" alt="" src="/{{product.productImage.[0]}}" />
                                         </div>
                                         <div class="product-buttons">
-                                            <a href="https://www.youtube.com/watch?v=93A2jOW5Mog" class="btn popup-video" title="View Video"><i class="icon anm anm-play-r" aria-hidden="true"></i></a>
+                                            <a href="assets\images\video.mp4" class="btn popup-video" title="View Video"><i class="icon anm anm-play-r" aria-hidden="true"></i></a>
                                             <a href="#" class="btn prlightbox" title="Zoom"><i class="icon anm anm-expand-l-arrows" aria-hidden="true"></i></a>
                                         </div>
                                     </div>
@@ -193,7 +220,7 @@
                                 <div class="product-single__meta">
                                     <h1 class="product-single__title">{{product.name}}</h1>
                                     <div class="product-nav clearfix">					
-                                        <a href="#" class="next" title="Next"><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+                                        {{!-- <a href="#" class="next" title="Next"><i class="fa fa-angle-right" aria-hidden="true"></i></a> --}}
                                     </div>
                                     <div class="prInfoRow">
                                         <div class="product-stock"> <span class="instock ">In Stock</span> <span class="outstock hide">Unavailable</span> </div>
@@ -271,7 +298,7 @@
                         <div class="tab-container">
                             <div id="tab1" class="tab-content">
                                 <div class="product-description rte">
-                                    <p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.</p>
+                                        <p>{{product.description}}</p>
                                     <ul>
                                       <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit</li>
                                       <li>Sed ut perspiciatis unde omnis iste natus error sit</li>
@@ -302,44 +329,44 @@
                                         </div>
                                         <div class="spr-content">
                                             <div class="spr-form clearfix">
-                                                <form method="post" action="#" id="new-review-form" class="new-review-form">
-                                                    <h3 class="spr-form-title">Write a review</h3>
-                                                    <fieldset class="spr-form-contact">
-                                                        <div class="spr-form-contact-name">
-                                                          <label class="spr-form-label" for="review_author_10508262282">Name</label>
-                                                          <input class="spr-form-input spr-form-input-text " id="review_author_10508262282" type="text" name="review[author]" value="" placeholder="Enter your name">
-                                                        </div>
-                                                        <div class="spr-form-contact-email">
-                                                          <label class="spr-form-label" for="review_email_10508262282">Email</label>
-                                                          <input class="spr-form-input spr-form-input-email " id="review_email_10508262282" type="email" name="review[email]" value="" placeholder="john.smith@example.com">
-                                                        </div>
-                                                    </fieldset>
-                                                    <fieldset class="spr-form-review">
-                                                      <div class="spr-form-review-rating">
-                                                        <label class="spr-form-label">Rating</label>
-                                                        <div class="spr-form-input spr-starrating">
-                                                          <div class="product-review"><a class="reviewLink" href="#"><i class="fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i></a></div>
-                                                        </div>
-                                                      </div>
-                                                
-                                                      <div class="spr-form-review-title">
-                                                        <label class="spr-form-label" for="review_title_10508262282">Review Title</label>
-                                                        <input class="spr-form-input spr-form-input-text " id="review_title_10508262282" type="text" name="review[title]" value="" placeholder="Give your review a title">
-                                                      </div>
-                                                
-                                                      <div class="spr-form-review-body">
-                                                        <label class="spr-form-label" for="review_body_10508262282">Body of Review <span class="spr-form-review-body-charactersremaining">(1500)</span></label>
-                                                        <div class="spr-form-input">
-                                                          <textarea class="spr-form-input spr-form-input-textarea " id="review_body_10508262282" data-product-id="10508262282" name="review[body]" rows="10" placeholder="Write your comments here"></textarea>
-                                                        </div>
-                                                      </div>
-                                                    </fieldset>
-                                                    <fieldset class="spr-form-actions">
-                                                        <input type="submit" class="spr-button spr-button-primary button button-primary btn btn-primary" value="Submit Review">
-                                                    </fieldset>
-                                                </form>
+                                                 <form id="review-form" data-id="{{product._id}}">
+            <h3>Write a review</h3>
+            <div class="spr-form-contact">
+                <label for="review_author" class="spr-form-label">Name</label>
+                <input type="text" id="review_author" class="spr-form-input" name="author" placeholder="Enter your name" required>
+            </div>
+            <div class="spr-form-contact">
+                <label for="review_email" class="spr-form-label">Email</label>
+                <input type="email" id="review_email" class="spr-form-input" name="email" placeholder="john.smith@example.com" required>
+            </div>
+            <div class="spr-form-review">
+                <label class="spr-form-label">Rating</label>
+                <div class="star-rating">
+                    <input type="radio" id="5-stars" name="rating" value="5" required /><label for="5-stars" class="fa fa-star"></label>
+                    <input type="radio" id="4-stars" name="rating" value="4" /><label for="4-stars" class="fa fa-star"></label>
+                    <input type="radio" id="3-stars" name="rating" value="3" /><label for="3-stars" class="fa fa-star"></label>
+                    <input type="radio" id="2-stars" name="rating" value="2" /><label for="2-stars" class="fa fa-star"></label>
+                    <input type="radio" id="1-star" name="rating" value="1" /><label for="1-star" class="fa fa-star"></label>
+                </div>
+            </div>
+            <div class="spr-form-review">
+                <label for="review_title" class="spr-form-label">Review Title</label>
+                <input type="text" id="review_title" class="spr-form-input" name="title" placeholder="Give your review a title" required>
+            </div>
+            <div class="spr-form-review">
+                <label for="review_body" class="spr-form-label">Body of Review</label>
+                <textarea id="review_body" class="spr-form-input spr-form-input-textarea" name="body" rows="5" placeholder="Write your comments here" required></textarea>
+            </div>
+            <div class="spr-form-actions">
+                <input type="submit" value="Submit Review">
+            </div>
+        </form>
+        <div class="review-container">
+        <h3>Customer Reviews</h3>
+        <div id="reviews-list"></div>
+    </div>
                                             </div>
-                                            <div class="spr-reviews">
+                                            {{!-- <div class="spr-reviews">
                                                 <div class="spr-review">
                                                     <div class="spr-review-header">
                                                         <span class="product-review spr-starratings spr-review-header-starratings"><span class="reviewLink"><i class="fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i></span></span>
@@ -374,7 +401,7 @@
                                                     <br>Lorem Ipsum is simply dummy text of the printing and typesetting industry.</p>
                                                   </div>
                                                 </div>
-                                            </div>
+                                            </div> --}}
                                         </div>
                                         </div>
                                     </div>
@@ -470,17 +497,17 @@
                         <div class="col-12 col-sm-12 col-md-12 col-lg-7 w-100 d-flex justify-content-start align-items-center">
                             <div class="display-table">
                                 <div class="display-table-cell footer-newsletter">
-                                    <div class="section-header text-center">
+                                    {{!-- <div class="section-header text-center">
                                         <label class="h2"><span>sign up for </span>newsletter</label>
-                                    </div>
-                                    <form action="#" method="post">
+                                    </div> --}}
+                                    {{!-- <form action="#" method="post">
                                         <div class="input-group">
                                             <input type="email" class="input-group__field newsletter__input" name="EMAIL" value="" placeholder="Email address" required="">
                                             <span class="input-group__btn">
                                                 <button type="submit" class="btn newsletter__submit" name="commit" id="Subscribe"><span class="newsletter__submit-text--large">Subscribe</span></button>
                                             </span>
                                         </div>
-                                    </form>
+                                    </form> --}}
                                 </div>
                             </div>
                         </div>
@@ -508,11 +535,11 @@
                     	<div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
                         	<h4 class="h4">Quick Shop</h4>
                             <ul>
-                            	<li><a href="#">Women</a></li>
-                                <li><a href="#">Men</a></li>
-                                <li><a href="#">Kids</a></li>
-                                <li><a href="#">Sportswear</a></li>
-                                <li><a href="#">Sale</a></li>
+                            	<li><a href="/shop">Women</a></li>
+                                <li><a href="/shop">Men</a></li>
+                                <li><a href="/shop">Charecter Edition</a></li>
+                                <li><a href="/shop">Sport</a></li>
+                                <li><a href="/shop">Sneakers</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
@@ -522,7 +549,7 @@
                                 <li><a href="#">Careers</a></li>
                                 <li><a href="#">Privacy policy</a></li>
                                 <li><a href="#">Terms &amp; condition</a></li>
-                                <li><a href="#">My Account</a></li>
+                                <li><a href="/userprofile">My Account</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
@@ -728,6 +755,99 @@
         });
     });
 });
+</script>
+
+
+
+
+
+
+
+
+
+  <script>
+        document.getElementById('review-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const productId = event.target.getAttribute('data-id');
+            const author = document.getElementById('review_author').value.trim();
+            const email = document.getElementById('review_email').value.trim();
+            const rating = document.querySelector('input[name="rating"]:checked').value.trim();
+            const title = document.getElementById('review_title').value.trim();
+            const body = document.getElementById('review_body').value.trim();
+            console.log(productId, author, email, rating, title, body,'datasss');
+            if(!author || !email || !rating || !title || !body) {
+                alert('Please fill in all fields');
+                return;
+            }else{
+            const response = await fetch('/reviews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ product: productId, user: email, rating, comment: body, title, author })
+            });
+
+            if (response.ok) {
+                alert('Review submitted successfully');
+                loadReviews(productId);  // Reload reviews after submission
+                
+            } else {
+                alert('Failed to submit review');
+            }
+                
+            }
+        });
+
+        async function loadReviews(productId) {
+            console.log(productId,'productId');
+            const response = await fetch(`/reviews/product/${productId}`);
+            const reviews = await response.json();
+            const reviewsList = document.getElementById('reviews-list');
+            console.log(reviews,'reviews', response, 'response', reviewsList, 'response',);
+            reviewsList.innerHTML = '';
+
+            reviews.forEach(review => {
+                const reviewItem = document.createElement('div');
+                reviewItem.classList.add('spr-review');
+
+                const starRating = '★'.repeat(review.rating) + '☆'.repeat(5 - review.rating);
+
+                reviewItem.innerHTML = `
+                    <div class="spr-review-header">
+                        <span class="product-review spr-starratings spr-review-header-starratings">
+                            ${starRating}
+                        </span>
+                        <h3 class="spr-review-header-title">${review.title}</h3>
+                        <span class="spr-review-header-byline"><strong>${review.author}</strong> on <strong>${new Date(review.createdAt).toLocaleDateString()}</strong></span>
+                    </div>
+                    <div class="spr-review-content">
+                        <p class="spr-review-content-body">${review.comment}</p>
+                    </div>
+                `;
+
+                reviewsList.appendChild(reviewItem);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const productId = document.getElementById('review-form').getAttribute('data-id');
+            loadReviews(productId);
+        });
+    </script>
+
+    <script>
+function validateForm() {
+    const author = document.getElementById('review_author').value.trim();
+    const title = document.getElementById('review_title').value.trim();
+    const body = document.getElementById('review_body').value.trim();
+
+    if (!author|| !title|| !body) {
+        alert("Please fill out all fields.");
+        return false;
+    }
+    return true;
+}
 </script>
     </div>
 

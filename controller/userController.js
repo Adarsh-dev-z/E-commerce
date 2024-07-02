@@ -20,6 +20,7 @@ const Razorpay = require('razorpay');
 const product = require('../models/product');
 const order = require('../models/order');
 const coupon = require('../models/coupon');
+const Reviews = require('../models/review');
 
 
 
@@ -36,6 +37,8 @@ const getLogin = function(req, res) {
     const productId =req.query.id;
     try {
       const product =await findProduct(productId);
+      const review = await Reviews.find({product:product._id}).populate('user');
+     console.log('review----------',review)
       const relatedProducts =await Product.find({category:product.category}).limit(5);
       console.log('related products:', relatedProducts)
       console.log(product);
@@ -46,22 +49,45 @@ const getLogin = function(req, res) {
     }
   };
 
-  const getShop = async function(req, res) {
+//   const getShop = async function(req, res) {
     
-let cart = {items: []};
-      const product = await Product.find().skip(44)
-      // console.log("the product:"+ product)
-      if(req.session.user){
-        cart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
-        console.log(cart);
-        const isLoggedIn=true
-       return res.render('user/shop',{ Product:product, user:isLoggedIn, cart});
+// let cart = {items: []};
+//       const product = await Product.find().skip(44)
+//       // console.log("the product:"+ product)
+//       if(req.session.user){
+//         cart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
+//         console.log(cart);
+//         const isLoggedIn=true
+//        return res.render('user/shop',{ Product:product, user:isLoggedIn, cart});
 
-      }else{
-       return res.render('user/shop',{ Product:product, cart});
-      }
+//       }else{
+//        return res.render('user/shop',{ Product:product, cart});
+//       }
 
-  };
+//   };
+
+const getShop = async function(req, res) {
+  try {
+    let cart = {items: []};
+    let product = [];
+    if(!req.query.category){
+      product = await Product.find().skip(44);
+    } else {
+      const category = req.query.category;
+      product = await Product.find({ category });
+    }
+
+    if(req.session.user){
+      cart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
+    }
+
+    const isLoggedIn = Boolean(req.session.user);
+    res.render('user/shop',{ Product:product, user:isLoggedIn, cart: cart || {items: []} });
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    res.status(500).send('Internal Server Error');
+  }
+};
 
   const getAbout = function(req, res) {
     res.render('user/about');
@@ -250,9 +276,10 @@ let cart = {items: []};
     const orderCount = await Order.countDocuments({user:userId})
     const user = await User.findById({_id:userId})
     const pendingOrders = await Order.countDocuments({user:userId, orderStatus:"pending"});
+    const canceledOrders = await Order.countDocuments({user:userId, orderStatus:"canceled"});
     const awaitingDeliveryOrders = await Order.countDocuments({
       user: userId,
-      orderStatus: { $nin: ["delivered", "cancelled"] }
+      orderStatus: { $nin: ["delivered", "canceled"] }
   });
 
   const returnOrderItems = await Order.find({user:userId}).populate('returnItems.product')
@@ -278,7 +305,8 @@ let cart = {items: []};
       address,
       wishlist,
       awaitingDeliveryOrders,
-      findReturnItems
+      findReturnItems,
+      canceledOrders
       
     })
   }catch(err){
@@ -358,69 +386,109 @@ let cart = {items: []};
   }
 
   
-async function userRegister(req, res, next) {
-  const username = req.body.username;
-  const phone = req.body.mobile;
-  const email = req.body.email;
-  const password = req.body.password;
+// async function userRegister(req, res, next) {
+//   // const username = req.body.username;
+//   // const phone = req.body.mobile;
+//   // const email = req.body.email;
+//   // const password = req.body.password;
+// const {username, mobile, email, password}=req.body
+//   if (username === "" || mobile === "" || email === "" || password === "") {
+//     return res.render("user/register", { errorMessage: "all fields are required" });
+//   }
 
-  if (username === "" || phone === "" || email === "" || password === "") {
+//   if (mobile.length < 8 || mobile.length > 12) {
+//     return res.render("user/register", { errorMessage: "phone number length should be between 8 to 12 digits" });
+//   }
+
+//   if (username.length <3 || username.length > 20){
+//     return res.render('user/register', {errorMessage: 'user name should be 3 to 20 long'})
+//   }
+
+//   const dbEmail = await User.findOne({ email: email });
+//   if (dbEmail === null) {
+//     const {token, expireTime} = generateToken();
+
+//     const verificationLink = `http://localhost:3001/verify?token=${token}`;
+//     transporter.sendMail({
+//       from: 'adarsh7013a@gmail.com',
+//       to: email,
+//       subject: 'Email Verification',
+//       html: `Hi, click <a href="${verificationLink}">here</a> to verify your email.`
+//     }, async (err) => {
+//       if (err) {
+//         console.error('Error sending email:', err);
+//         return res.status(500).send('Error sending email');
+//       } else {
+//         const hashedPass = await bcrypt.hash(password, 10);
+//         // user.password = hashedPass;
+//         const data = {
+//           username:username,
+//           email:email,
+//           phone:phone,
+//           password:hashedPass,
+//           verificationToken:token,
+//           tokenExpires: expireTime
+        
+//         }
+//         const user = await createUser(data)
+//         // Store token in the database
+//         // const newUser = new User({
+//         //   username,
+//         //   phone,
+//         //   email,
+//         //   password,
+//         //   verificationToken: token
+//         // });
+//         // await newUser.save();
+
+async function userRegister(req, res, next) {
+  const {username, mobile, email, password} = req.body || {};
+
+  if (!username.trim() || !mobile.trim() || !email.trim() || !password.trim()) {
     return res.render("user/register", { errorMessage: "all fields are required" });
   }
 
-  if (phone.length < 8 || phone.length > 12) {
+  if (mobile.length < 8 || mobile.length > 12) {
     return res.render("user/register", { errorMessage: "phone number length should be between 8 to 12 digits" });
   }
 
-  if (username.length <3 || username.length > 20){
-    return res.render('user/register', {errorMessage: 'user name should be 3 to 20 long'})
+  if (username.length < 3 || username.length > 20) {
+    return res.render('user/register', {errorMessage: 'user name should be 3 to 20 long'});
   }
 
-  const dbEmail = await User.findOne({ email: email });
-  if (dbEmail === null) {
+  try {
+    const dbEmail = await User.findOne({ email });
+    if (dbEmail) {
+      return res.render("user/register", { errorMessage: "user already exist, kindly login" });
+    }
+
     const {token, expireTime} = generateToken();
 
     const verificationLink = `http://localhost:3001/verify?token=${token}`;
-    transporter.sendMail({
+    await transporter.sendMail({
       from: 'adarsh7013a@gmail.com',
       to: email,
       subject: 'Email Verification',
-      html: `Hi, click <a href="${verificationLink}">here</a> to verify your email.`
-    }, async (err) => {
-      if (err) {
-        console.error('Error sending email:', err);
-        return res.status(500).send('Error sending email');
-      } else {
-        const hashedPass = await bcrypt.hash(password, 10);
-        // user.password = hashedPass;
-        const data = {
-          username:username,
-          email:email,
-          phone:phone,
-          password:hashedPass,
-          verificationToken:token,
-          tokenExpires: expireTime
-        
-        }
-        const user = await createUser(data)
-        // Store token in the database
-        // const newUser = new User({
-        //   username,
-        //   phone,
-        //   email,
-        //   password,
-        //   verificationToken: token
-        // });
-        // await newUser.save();
-
-        res.send('Verification email sent successfully!');
-      }
+      html: `Hi, click <a href="${verificationLink}">here</a> to verify your email for only shoes.`
     });
-  } else {
-    return res.render("user/register", { errorMessage: "user already exist, kindly login" });
+
+    const hashedPass = await bcrypt.hash(password, 10);
+    const data = {
+      username,
+      email,
+      phone: mobile,
+      password: hashedPass,
+      verificationToken: token,
+      tokenExpires: expireTime
+    };
+    const user = await createUser(data);
+
+    res.render('user/register',{ emailSent: true });
+  } catch (err) {
+    console.error('Error sending email:', err);
+    return res.status(500).send('Error sending email');
   }
 }
-
 
 
 //++++++++++++++++++++++++++++++++++
@@ -1094,7 +1162,8 @@ const createCheckoutSession = async (req, res) => {
           metadata:{
             userId:userId.toString(),
             addressId:useAddress._id.toString(),
-            couponDiscount:req.session.couponDiscount.toString()
+            ...(req.session.couponDiscount ? { couponDiscount: req.session.couponDiscount.toString() } : {})
+
           },
           success_url: `${req.headers.origin}/userOrder-success?session_id={CHECKOUT_SESSION_ID}`,
           cancel_url: `${req.headers.origin}/product-checkout`,
@@ -1247,9 +1316,9 @@ const postResetPassLink = async(req, res)=>{
 
   try{
       const userEmail = req.body.email;
-      const user = await Users.findOne({email:userEmail});
+      const user = await User.findOne({email:userEmail});
       if(!user){
-          return res.status(400).send('user not found')
+          return res.render('user/forgot-password', {emailNotFound:true})
       }
       const transporter = nodemailer.createTransport({
           service: 'gmail',
@@ -1274,7 +1343,7 @@ const postResetPassLink = async(req, res)=>{
           html: `Hi, click <a href="${verificationLink}">here</a> to verify your email.`
           })
 
-          res.send('Verification email sent successfully!');
+          res.render('user/forgot-password', {emailSent:true})
           async (err)=>{
               console.log(err)
               if(err){
@@ -1296,7 +1365,7 @@ const postResetPassLink = async(req, res)=>{
 const resetPassword = async function resetPassword(req, res) {
   const token = req.query.token;
   console.log(token)
-  const user = await Users.findOne({verificationToken:token});
+  const user = await User.findOne({verificationToken:token});
   console.log(user)
 
   if (!user) {
@@ -1326,17 +1395,34 @@ const getUpdatePass = (req, res)=>{
 
 
 const postUpdatePass = async(req, res)=>{
-  const {password, confirmpassword} = req.body;
-  if(password===confirmpassword){
+  try {
+    const {password, confirmpassword} = req.body;
+    if (!password.trim() || !confirmpassword.trim()) {
+      return res.render('user/update-password', {errorMessage:'All fields are required'});
+    }
 
-      const hashedPassword = await bcrypt.hash(password,10)
-      const email = req.session.email;
-      const user = await Users.findOneAndUpdate({email:email},{
-          password:hashedPassword
-      },{new:true});
-      console.log('user password reseted')
-      res.redirect('/login')
-      
+    if (password !== confirmpassword) {
+      return res.render('user/update-password', {errorMessage:'Passwords do not match'});
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const email = req.session.email;
+    if (!email) {
+      return res.render('user/update-password', {errorMessage:'Email not found in session'});
+    }
+
+    const user = await User.findOneAndUpdate({email:email}, {
+      password: hashedPassword
+    }, {new: true});
+    if (!user) {
+      return res.render('user/update-password', {errorMessage:'User not found'});
+    }
+
+    console.log('user password reseted')
+    res.redirect('/login')
+  } catch (err) {
+    console.log(err);
+    return res.render('user/update-password', {errorMessage:'Error resetting password'});
   }
 }
 
@@ -1347,57 +1433,139 @@ const getSearch = async(req, res)=>{
   res.render('user/shop',{Product:product})
 }
 
-const changeAccountDetails = async(req, res)=>{
+// const changeAccountDetails = async(req, res)=>{
 
-  console.log(req.body)
-  const {username, mobile, email, currentpassword, newpassword, confirmpassword } = req.body
-  if(!username.trim() || !mobile.trim() || !email.trim() || !currentpassword || !newpassword || !confirmpassword){
-      console.log('all fields are required')
-      // return res.render('user/userprofile', {errorMessage:'all fields are required'})
-      return res.json({success:false, message:'all fields are required'})
-  }
-  if(username.length<3 || username.length>20){
-  console.log('username must be between 3 and 20 characters');
-      // return res.render('user/userprofile', {errorMessage:"username must be between 3 and 20 characters"})
-      return res.json({success:false, message:"username must be between 3 and 20 characters"})
-  }
-  if(mobile.length<8|| mobile.length>12){
-  console.log('mobile number must be between 8 and 12 characters');
-      // return res.render('user/userprofile', {errorMessage:'mobile number must be between 8 and 12 characters'})
-      return res.json({success:false, message:'mobile number must be between 8 and 12 characters'})
-  }
-  if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(newpassword)){
-  console.log('password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number');
-      // return res.render('user/userprofile', {errorMessage:'password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number'})
-      return res.json({success:false, message:'password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number'})
-  }
-  const user = await Users.findOne({email:email})
-  if(!user){
-      console.log('user not found')
-      // return res.render('user/userprofile', {errorMessage:'user not found'});
-  }
-  const passwordMatch = await bcrypt.compare(currentpassword, user.password)
-  if(passwordMatch){
-      if(newpassword===confirmpassword){
-          const hashedPassword = await bcrypt.hash(newpassword,10)
-          const updatePassword = await Users.findOneAndUpdate({email:email},{
-              username:username,
-              email:email,
-              mobile:mobile,
-              password:hashedPassword
-          }, {new:true})
-          console.log('user details updated', 'password updated')
-          return res.json({success:true, message:'user details updated'})
-      }else{
-          console.log('newpassword not matching with confirmpassword')
-          res.json({success:false, message:'newpassword not matching with confirmpassword'})
-      }
-  }else{
-      console.log('current password not matching')
-      res.redirect('/userprofile')
-  }
-}
+//   console.log(req.body)
+//   const {username, mobile, email, currentpassword, newpassword, confirmpassword } = req.body
+//   if(!username.trim() || !mobile.trim() || !email.trim() || !currentpassword || !newpassword || !confirmpassword){
+//       console.log('all fields are required')
+//       // return res.render('user/userprofile', {errorMessage:'all fields are required'})
+//       return res.json({success:false, message:'all fields are required'})
+//   }
+//   if(username.length<3 || username.length>20){
+//   console.log('username must be between 3 and 20 characters');
+//       // return res.render('user/userprofile', {errorMessage:"username must be between 3 and 20 characters"})
+//       return res.json({success:false, message:"username must be between 3 and 20 characters"})
+//   }
+//   if(mobile.length<8|| mobile.length>12){
+//   console.log('mobile number must be between 8 and 12 characters');
+//       // return res.render('user/userprofile', {errorMessage:'mobile number must be between 8 and 12 characters'})
+//       return res.json({success:false, message:'mobile number must be between 8 and 12 characters'})
+//   }
+//   if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(newpassword)){
+//   console.log('password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number');
+//       // return res.render('user/userprofile', {errorMessage:'password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number'})
+//       return res.json({success:false, message:'password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number'})
+//   }
+//   const user = await User.findOne({email:email})
+//   if(!user){
+//       console.log('user not found')
+//       return res.json({success:false, message:'user not found'})
+//       // return res.render('user/userprofile', {errorMessage:'user not found'});
+//   }
+//   const passwordMatch = await bcrypt.compare(currentpassword, user.password)
+//   if(passwordMatch){
+//       if(newpassword===confirmpassword){
+//           const hashedPassword = await bcrypt.hash(newpassword,10)
+//           const updatePassword = await User.findOneAndUpdate({email:email},{
+//               username:username,
+//               email:email,
+//               mobile:mobile,
+//               password:hashedPassword
+//           }, {new:true})
+//           console.log('user details updated', 'password updated')
+//           return res.json({success:true, message:'user details updated'})
+//       }else{
+//           console.log('newpassword not matching with confirmpassword')
+//           res.json({success:false, message:'newpassword not matching with confirmpassword'})
+//       }
+//   }else{
+//       console.log('current password not matching')
+//       res.redirect('/userprofile')
+//   }
+// }
 
+
+
+const changeAccountDetails = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    if (!userId) {
+      throw new Error('User ID is missing');
+    }
+
+    const findUser = await User.findById(userId);
+    if (!findUser) {
+      throw new Error('User not found');
+    }
+
+    if (!req.body) {
+      throw new Error('Request body is missing');
+    }
+
+    const { username, mobile, email, currentpassword, newpassword, confirmpassword } = req.body;
+
+    if(findUser.email !== email){
+      throw new Error('wrong email')
+    }
+    if (!username || !mobile || !email || !currentpassword || !newpassword || !confirmpassword) {
+      throw new Error('All fields are required');
+    }
+
+    if (username.trim().length < 3 || username.trim().length > 20) {
+      throw new Error('Username must be between 3 and 20 characters');
+    }
+
+    if (mobile.trim().length < 8 || mobile.trim().length > 12) {
+      throw new Error('Mobile number must be between 8 and 12 characters');
+    }
+
+    if (!/^\d{8,12}$/.test(mobile.trim())) {
+      throw new Error('Mobile number must contain only digits and be between 8 and 12 characters');
+    }
+
+    if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
+      throw new Error('Invalid email format');
+    }
+
+    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(newpassword)) {
+      throw new Error('Password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number');
+    }
+
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      throw new Error('User with the specified email not found');
+    }
+
+    const passwordMatch = await bcrypt.compare(currentpassword, findUser.password);
+    if (!passwordMatch) {
+      throw new Error('Current password is incorrect');
+    }
+
+    if (newpassword !== confirmpassword) {
+      throw new Error('New password does not match confirm password');
+    }
+
+    const hashedPassword = await bcrypt.hash(newpassword, 10);
+
+    const updateData = {
+      username: username,
+      email: email,
+      mobile: mobile,
+      password: hashedPassword
+    };
+
+    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+    if (!updatedUser) {
+      throw new Error('Error updating user details');
+    }
+
+    return res.json({ success: true, message: 'User details updated' });
+  } catch (error) {
+    console.error(error);
+    return res.status(400).json({ success: false, message: error.message });
+  }
+};
 // ---------------------------RAZORPAY----------------------------------------------
 
 const razorpay = new Razorpay({
@@ -1588,7 +1756,6 @@ const handleRazorpaySuccess = async (req, res) => {
     const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
     console.log('paymentDetails:', paymentDetails);
 
-    // Calculate delivery date
     const deliveryDate = new Date();
     deliveryDate.setDate(deliveryDate.getDate() + 5);
     const formatedDate = deliveryDate.toLocaleDateString('en-US', {
@@ -1658,6 +1825,20 @@ const handleRazorpaySuccess = async (req, res) => {
 // ---------------------------RAZORPAY----------------------------------------------
 
 
+const getShopByCategory = async (req, res) => {
+  const category = req.query.category;
+  if (!category) {
+    return res.status(400).send('Category is required');
+  }
+  try {
+    const products = await Product.find({ category });
+    return res.render('user/shop', { Product: products });
+  } catch (error) {
+    console.error('Error fetching products:', error);
+    return res.status(500).send('Internal Server Error');
+  }
+};
+
 
 
 
@@ -1669,4 +1850,4 @@ const handleRazorpaySuccess = async (req, res) => {
        postLogin, updateCartQuantity, postAddToWishlist, GetRemoveWishlist, postAddToCart, postRemoveCart, getClearCart,
        getProductCheckout, getOrderSuccess, postApplyCoupon, postRemoveCoupon, createCheckoutSession, editAddress,
        postAddAddress, removeAddress, getForgotpassword, postResetPassLink, resetPassword, getUpdatePass, postUpdatePass,
-       getSearch, changeAccountDetails, miniCart, checkoutRazorpay, handleRazorpaySuccess  }
+       getSearch, changeAccountDetails, miniCart, checkoutRazorpay, handleRazorpaySuccess, getShopByCategory  }

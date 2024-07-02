@@ -386,11 +386,11 @@ body {
             <div class="widget-content">
                 <ul class="topbar_categories d-flex flex-wrap justify-content-between mt-2 mb-2">
                     <li class="level1 mr-2 mb-2"><a href="/shop">All</a></li>
-                    <li class="level1 mr-2 mb-2"><a href="/shop-trnding">Trending</a></li>
-                    <li class="level1 mr-2 mb-2"><a href="/mens">Mens</a></li>
-                    <li class="level1 mr-2 mb-2"><a href="/womens">Womens</a></li>
-                    <li class="level1 mr-2 mb-2"><a href="/character-edition">Character Editions</a></li>
-                    <li class="level1 mr-2 mb-2"><a href="/new-arrival">New Arrival</a></li>
+                    <li class="level1 mr-2 mb-2"><a href="/shop?category=Trending">Trending</a></li>
+                    <li class="level1 mr-2 mb-2"><a href="/shop?category=Men's Shoes">Mens</a></li>
+                    <li class="level1 mr-2 mb-2"><a href="/shop?category=Womens">Womens</a></li>
+                    <li class="level1 mr-2 mb-2"><a href="/shop?category=Charecter Edition">Character Editions</a></li>
+                    <li class="level1 mr-2 mb-2"><a href="/shop?category=New Arrival">New Arrival</a></li>
                     {{!-- <li class="level1 mr-2 mb-2"><a href="#">Most Popular</a></li> --}}
                 </ul>
             </div>
@@ -513,7 +513,8 @@ body {
                 <div class="row">
                        
                         <div class="col-12 col-sm-12 col-md-12 col-lg-5 d-flex justify-content-end align-items-center">
-                            <div class="footer-social">
+                            <p></p>
+                            {{!-- <div class="footer-social">
                                 <ul class="list--inline site-footer__social-icons social-icons">
                                     <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Facebook"><i class="icon icon-facebook"></i></a></li>
                                     <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Twitter"><i class="icon icon-twitter"></i> <span class="icon__fallback-text">Twitter</span></a></li>
@@ -523,7 +524,7 @@ body {
                                     <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on YouTube"><i class="icon icon-youtube"></i> <span class="icon__fallback-text">YouTube</span></a></li>
                                     <li><a class="social-icons__link" href="#" target="_blank" title="Belle Multipurpose Bootstrap 4 Template on Vimeo"><i class="icon icon-vimeo-alt"></i> <span class="icon__fallback-text">Vimeo</span></a></li>
                                 </ul>
-                            </div>
+                            </div> --}}
                         </div>
                     </div>
             </div>    
@@ -536,11 +537,11 @@ body {
                     	<div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
                         	<h4 class="h4">Quick Shop</h4>
                             <ul>
-                            	<li><a href="#">Women</a></li>
-                                <li><a href="#">Men</a></li>
-                                <li><a href="#">Kids</a></li>
-                                <li><a href="#">Sportswear</a></li>
-                                <li><a href="#">Sale</a></li>
+                            	<li><a href="/shop">Women</a></li>
+                                <li><a href="/shop">Men</a></li>
+                                <li><a href="/shop">Charecter Edition</a></li>
+                                <li><a href="/shop">Sport</a></li>
+                                <li><a href="/shop">Sneakers</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
@@ -550,7 +551,7 @@ body {
                                 <li><a href="#">Careers</a></li>
                                 <li><a href="#">Privacy policy</a></li>
                                 <li><a href="#">Terms &amp; condition</a></li>
-                                <li><a href="#">My Account</a></li>
+                                <li><a href="/userprofile">My Account</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">

@@ -25,7 +25,8 @@
   <!-- Custom Style-->
   <link href="adminAssets/css/app-style.css" rel="stylesheet"/>
   
-  
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+
 </head>
 
 <body class="bg-theme bg-theme1">
@@ -58,7 +59,11 @@
           <i class="zmdi zmdi-accounts"></i> <span>Users</span>
         </a>
       </li>
-
+    <li>
+        <a href="/admin-orders">
+          <i class="zmdi zmdi-accounts"></i> <span>Orders</span>
+        </a>
+      </li>
       <li>
         <a href="/admin-products">
           <i class="zmdi zmdi-shopping-cart"></i> <span>Products</span>
@@ -77,6 +82,12 @@
           {{!-- <small class="badge float-right badge-light">New</small> --}}
         </a>
       </li>
+       <li>
+  <a href="/admin-return">
+    <i class="fas fa-undo"></i> <span>Returns</span>
+    {{!-- <small class="badge float-right badge-light">New</small> --}}
+  </a>
+</li>
 
       <li>
         <a href="/admin-profile">
@@ -125,15 +136,15 @@
   </ul>
      
   <ul class="navbar-nav align-items-center right-nav-link">
-    <li class="nav-item dropdown-lg">
+    {{!-- <li class="nav-item dropdown-lg">
       <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown" href="javascript:void();">
       <i class="fa fa-envelope-open-o"></i></a>
     </li>
     <li class="nav-item dropdown-lg">
       <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown" href="javascript:void();">
       <i class="fa fa-bell-o"></i></a>
-    </li>
-    <li class="nav-item language">
+    </li> --}}
+    {{!-- <li class="nav-item language">
       <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown" href="javascript:void();"><i class="fa fa-flag"></i></a>
       <ul class="dropdown-menu dropdown-menu-right">
           <li class="dropdown-item"> <i class="flag-icon flag-icon-gb mr-2"></i> English</li>
@@ -141,31 +152,31 @@
           <li class="dropdown-item"> <i class="flag-icon flag-icon-cn mr-2"></i> Chinese</li>
           <li class="dropdown-item"> <i class="flag-icon flag-icon-de mr-2"></i> German</li>
         </ul>
-    </li>
+    </li> --}}
     <li class="nav-item">
       <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown" href="#">
-        <span class="user-profile"><img src="https://via.placeholder.com/110x110" class="img-circle" alt="user avatar"></span>
+        <span class="user-profile"><img src="asset\images\profile-circle.1023x1024.png" class="img-circle" alt="user avatar"></span>
       </a>
       <ul class="dropdown-menu dropdown-menu-right">
        <li class="dropdown-item user-details">
         <a href="javaScript:void();">
-           <div class="media">
-             <div class="avatar"><img class="align-self-start mr-3" src="https://via.placeholder.com/110x110" alt="user avatar"></div>
+           {{!-- <div class="media">
+             <div class="avatar"><img class="align-self-start mr-3" src="asset\images\profile-circle.1023x1024.png" alt="user avatar"></div>
             <div class="media-body">
             <h6 class="mt-2 user-title">Sarajhon Mccoy</h6>
             <p class="user-subtitle">mccoy@example.com</p>
             </div>
-           </div>
+           </div> --}}
           </a>
         </li>
-        <li class="dropdown-divider"></li>
+        {{!-- <li class="dropdown-divider"></li>
         <li class="dropdown-item"><i class="icon-envelope mr-2"></i> Inbox</li>
         <li class="dropdown-divider"></li>
-        <li class="dropdown-item"><i class="icon-wallet mr-2"></i> Account</li>
+        <li class="dropdown-item"><i class="icon-wallet mr-2"></i> Account</li> --}}
         <li class="dropdown-divider"></li>
-        <li class="dropdown-item"><i class="icon-settings mr-2"></i> Setting</li>
+        <li class="dropdown-item"><a href="/admin-profile"><i class="icon-settings mr-2"></i> Setting</a></li>
         <li class="dropdown-divider"></li>
-        <li class="dropdown-item"><i class="icon-power mr-2"></i> Logout</li>
+        <li class="dropdown-item"><a href="/admin-logout"><i class="icon-power mr-2"></i> Logout</a></li>
       </ul>
     </li>
   </ul>
@@ -183,56 +194,57 @@
                 <div class="card-body">
                     <div class="card-title">Add Product</div>
                     <hr>
-                    <form action="/add-product" method="post" enctype="multipart/form-data">
-                        <div class="form-group">
-                            <label for="input-1">Product Name</label>
-                            <input type="text" name="name" class="form-control" id="name" placeholder="Enter Product Name">
-                        </div>
-                        <div class="form-group">
-                            <label for="input-2">Brand</label>
-                            <input type="text" name="brand" class="form-control" id="brand" placeholder="Enter Product Brand">
-                        </div>
-                        <div class="form-group">
-                            <label for="input-3">Price</label>
-                            <input type="number" name="price" class="form-control" id="price" placeholder="Enter Pruduct Price">
-                        </div>
-                        <div class="form-group">
-                            <label for="input-5">Category</label>
-                            <select class="form-control" id="category" name="category">
-                                <option selected="selected" value="">Select Category</option>
-                                <option value="new arrival">New Arrival</option>
-                                <option value="trending">Trending</option>
-                                <option value="most popular">Most Popular</option>
-                                <option value="charecter addition">Character Addition</option>
-                                <option value="shows for men">Shoes for Men</option>
-                                <option value="shows for women">Shoes for Women</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                          <label for="input-3">Description</label>
-                          <input type="text" class="form-control" id="description" name="description" placeholder="Enter Product Description">
-                      </div>
-                      <div class="form-group">
-                        <label for="input-3">Stock</label>
-                        <input type="text" name="stock" class="form-control" id="stock" placeholder="Enter Product Stock">
-                    </div>
-                    <div class="form-group">
-                      <label for="input-7">Expiration Date</label>
-                      <input type="date" name="expireDate" class="form-control" id="expireDate" data-large-mode="true">
-                  </div>
-                        <div class="form-group">
-                            <label for="input-6">Product Image</label>
-                            <div class="input-group">
-                                <div class="custom-file">
-                                    <input type="file" name="productImage" class="custom-file-input" id="productImage" aria-describedby="input-6-addon" accept="image/*">
-                                    <label class="custom-file-label" for="input-6">Choose file</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <button type="submit" class="btn btn-light px-5"> Add Product</button>
-                        </div>
-                    </form>
+                    <form action="/add-product" method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
+    <div class="form-group">
+        <label for="input-1">Product Name</label>
+        <input type="text" name="name" class="form-control" id="name" placeholder="Enter Product Name">
+    </div>
+    <div class="form-group">
+        <label for="input-2">Brand</label>
+        <input type="text" name="brand" class="form-control" id="brand" placeholder="Enter Product Brand">
+    </div>
+    <div class="form-group">
+        <label for="input-3">Price</label>
+        <input type="number" name="price" class="form-control" id="price" placeholder="Enter Product Price">
+    </div>
+    <div class="form-group">
+        <label for="input-5">Category</label>
+        <select class="form-control" id="category" name="category">
+            <option selected="selected" value="">Select Category</option>
+            <option value="new arrival">New Arrival</option>
+            <option value="trending">Trending</option>
+            <option value="most popular">Most Popular</option>
+            <option value="character addition">Character Addition</option>
+            <option value="shoes for men">Shoes for Men</option>
+            <option value="shoes for women">Shoes for Women</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="input-3">Description</label>
+        <input type="text" class="form-control" id="description" name="description" placeholder="Enter Product Description">
+    </div>
+    <div class="form-group">
+        <label for="input-3">Stock</label>
+        <input type="number" name="stock" class="form-control" id="stock" placeholder="Enter Product Stock">
+    </div>
+    <div class="form-group">
+        <label for="input-7">Expiration Date</label>
+        <input type="date" name="expireDate" class="form-control" id="expireDate" data-large-mode="true">
+    </div>
+    <div class="form-group">
+        <label for="input-6">Product Image</label>
+        <div class="input-group">
+            <div class="custom-file">
+                <input type="file" name="productImage" class="custom-file-input" id="productImage" aria-describedby="input-6-addon" accept="image/*" multiple>
+                <label class="custom-file-label" for="input-6">Choose file</label>
+            </div>
+        </div>
+    </div>
+    <p class="text-danger">{{error}}</p>
+    <div class="form-group">
+        <button type="submit" class="btn btn-light px-5"> Add Product</button>
+    </div>
+</form>
                 </div>
             </div>
         </div>
@@ -313,6 +325,27 @@
   
   <!-- Custom scripts -->
   <script src="adminAssets/js/app-script.js"></script>
-	
+	<script>
+function validateForm() {
+    var name = document.getElementById("name").value;
+    var brand = document.getElementById("brand").value;
+    var price = document.getElementById("price").value;
+    var category = document.getElementById("category").value;
+    var description = document.getElementById("description").value;
+    var stock = document.getElementById("stock").value;
+    var expireDate = document.getElementById("expireDate").value;
+    var productImage = document.getElementById("productImage").value;
+
+    if (!name.trim() || !brand.trim() || !price.trim()|| !category.trim() || !description.trim() || !stock.trim() || !expireDate.trim() || !productImage.trim()) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Oops...',
+          text: 'All fields must be filled out',
+        });
+        return false;
+    }
+    return true;
+}
+</script>
 </body>
 </html>

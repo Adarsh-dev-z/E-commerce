@@ -3,6 +3,8 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.0.18/dist/sweetalert2.min.css">
 <!-- Include SweetAlert2 CSS -->
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
  
  <style>
        
@@ -177,7 +179,7 @@
                                         <td class="product-thumbnail text-center">
                                             <a href="javascript:void(0);"><img src="/{{this.productImage.[1]}}" alt="" title="" /></a>
                                         </td>
-                                        <td class="product-name"><h4 class="no-margin"><a href="#">{{this.name}}</a></h4></td>
+                                        <td class="product-name"><h4 class="no-margin"><a href="/product?id={{this._id}}">{{this.name}}</a></h4></td>
                                         <td class="product-price text-center"><span class="amount">₹{{this.price}}</span></td>
                                         <td class="stock text-center">
                                             <span class="in-stock">in stock</span>
@@ -194,7 +196,7 @@
       {{else}}
       <div id="cartEmptyMessage" class="text-center cart-empty-message">
         <p>Your wishlist is empty</p>
-        <a href="http://annimexweb.com/" class="btn btn-secondary btn--small cart-continue">Continue shopping</a>
+        <a href="/shop" class="btn btn-secondary btn--small cart-continue">Continue shopping</a>
     </div>
     {{/if}}                      
                         </div>
@@ -214,7 +216,7 @@
                         <div class="col-12 col-sm-12 col-md-12 col-lg-7 w-100 d-flex justify-content-start align-items-center">
                             <div class="display-table">
                                 <div class="display-table-cell footer-newsletter">
-                                    <div class="section-header text-center">
+                                    {{!-- <div class="section-header text-center">
                                         <label class="h2"><span>sign up for </span>newsletter</label>
                                     </div>
                                     <form action="#" method="post">
@@ -224,7 +226,7 @@
                                                 <button type="submit" class="btn newsletter__submit" name="commit" id="Subscribe"><span class="newsletter__submit-text--large">Subscribe</span></button>
                                             </span>
                                         </div>
-                                    </form>
+                                    </form> --}}
                                 </div>
                             </div>
                         </div>
@@ -252,11 +254,11 @@
                     	<div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
                         	<h4 class="h4">Quick Shop</h4>
                             <ul>
-                            	<li><a href="#">Women</a></li>
-                                <li><a href="#">Men</a></li>
-                                <li><a href="#">Kids</a></li>
-                                <li><a href="#">Sportswear</a></li>
-                                <li><a href="#">Sale</a></li>
+                            	<li><a href="/shop">Women</a></li>
+                                <li><a href="/shop">Men</a></li>
+                                <li><a href="/shop">Charecter Edition</a></li>
+                                <li><a href="/shop">Sport</a></li>
+                                <li><a href="/shop">Sneakers</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
@@ -266,7 +268,7 @@
                                 <li><a href="#">Careers</a></li>
                                 <li><a href="#">Privacy policy</a></li>
                                 <li><a href="#">Terms &amp; condition</a></li>
-                                <li><a href="#">My Account</a></li>
+                                <li><a href="/userprofile">My Account</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
@@ -294,7 +296,7 @@
                 <div class="footer-bottom">
                 	<div class="row">
                     	<!--Footer Copyright-->
-	                	<div class="col-12 col-sm-12 col-md-6 col-lg-6 order-1 order-md-0 order-lg-0 order-sm-1 copyright text-sm-center text-md-left text-lg-left"><span></span> <a href="templateshub.net">Templates Hub</a></div>
+	                	<div class="col-12 col-sm-12 col-md-6 col-lg-6 order-1 order-md-0 order-lg-0 order-sm-1 copyright text-sm-center text-md-left text-lg-left"><span></span> <a href="#">Only Shoes</a></div>
                         <!--End Footer Copyright-->
                         <!--Footer Payment Icon-->
                         <div class="col-12 col-sm-12 col-md-6 col-lg-6 order-0 order-md-1 order-lg-1 order-sm-0 payment-icons text-right text-md-center">
@@ -363,12 +365,20 @@ $(document).ready(function(){
         })
 
                 } else {
-                    alert('Error removing item');
+Swal.fire({
+    icon: 'error',
+    title: 'Error',
+    text: 'Error removing item'
+});                    
                 }
             },
             error: function() {
                 
-                alert('Internal server error');
+Swal.fire({
+    icon: 'error',
+    title: 'Server Error',
+    text: 'Internal server error'
+});                
             }
         });
     });

@@ -26,6 +26,27 @@ const storage = multer.diskStorage({
   const getAdmin = async (req, res) => {
     try {
 
+      const topCategory = await Order.aggregate([
+        { $unwind: '$items' },
+        {
+            $lookup: {
+                from: 'products',
+                localField: 'items.product',
+                foreignField: '_id',
+                as: 'productDetails'
+            }
+        },
+        { $unwind: '$productDetails' },
+        {
+            $group: {
+                _id: '$productDetails.category',
+                totalBought: { $sum: '$items.quantity' },
+            }
+        },
+        { $sort: { totalBought: -1 } }
+    ]);
+    
+    console.log(topCategory,'results')
       const currentYear = new Date().getFullYear();
       
       const chartOrders = await Order.find({
@@ -61,9 +82,9 @@ const storage = multer.diskStorage({
         .sort({ createdAt: -1 })
         .limit(10);
   
-      console.log('Orders:', orders);
-      console.log('Latest Updates:', latestUpdates);
-      console.log('Users:', users);
+      // console.log('Orders:', orders);
+      // console.log('Latest Updates:', latestUpdates);
+      // console.log('Users:', users);
   
       const totalOrders = await Order.countDocuments()
       const totalRevenue = await Order.aggregate([
@@ -76,9 +97,32 @@ const storage = multer.diskStorage({
       ]);
       const totalProducts = await product.countDocuments()
       const totalUsers = await Users.countDocuments()
-console.log('total revenue:',totalRevenue)
-console.log('total products', totalUsers)
-      res.render('admin/index', { orders, users, latestUpdates, totalOrders, totalRevenue, totalProducts, totalUsers, 
+
+      const topProducts = await Order.aggregate([
+        { $unwind: '$items' },
+        { $group: {
+            _id: '$items.product',
+            totalQuantity: { $sum: '$items.quantity' }
+        }},
+        { $sort: { totalQuantity: -1 } },
+        { $limit: 4 },
+        { $lookup: {
+            from: 'products',
+            localField: '_id',
+            foreignField: '_id',
+            as: 'productDetails'
+        }},
+        { $unwind: '$productDetails' },
+        { $project: {
+            _id: 0,
+            productName: '$productDetails.name',
+            totalQuantity: 1
+        }}
+    ]);
+    console.log(topProducts,'top products')
+// console.log('total revenue:',totalRevenue)
+// console.log('total products', totalUsers)
+      res.render('admin/index', { orders, users, latestUpdates, totalOrders, totalRevenue, totalProducts,topCategory,topProducts, totalUsers, 
                    ordersPerMonth: JSON.stringify(ordersPerMonth)
 
        });

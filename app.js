@@ -18,6 +18,7 @@ const port=process.env.PORT || 3000;
 const Handlebars = require('handlebars')
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 //****************************************
+const flash = require('connect-flash');
 
 const hbsHelpers = {
   eq: function (a, b) {
@@ -73,6 +74,17 @@ app.use(session({
   cookie: { maxAge: 600000*24 },
   store: new MongoDBStore({ mongooseConnection: db,})
 }));
+app.use(flash());
+
+app.use((req, res, next) => {
+  res.locals.success_msg = req.flash('success_msg');
+  res.locals.error_msg = req.flash('error_msg');
+  res.locals.error = req.flash('error');
+  next();
+});
+
+
+
 
 app.use(passport.initialize());
 app.use(passport.session());

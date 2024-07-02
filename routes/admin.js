@@ -95,7 +95,7 @@ router.get('/edit-product', adminAuthCheck, async (req, res) => {
     console.log(productId)
     const selectedProduct = await product.findById(productId);
     if (!selectedProduct) {
-      return res.status(404).send('Product not found');
+      return res.render('admin/edit-product',{errorMesage:'Product not found'});
     }
     res.render('admin/edit-product', { product: selectedProduct });
   } catch (err) {
@@ -146,6 +146,7 @@ router.post('/update-product', adminAuthCheck, upload.array('productImage'), asy
 
   try {
     const productId = req.body.productId;
+    
     let updateProduct = {
       name: req.body.name,
       price: req.body.price,
@@ -159,10 +160,13 @@ router.post('/update-product', adminAuthCheck, upload.array('productImage'), asy
       const productImages = req.files.map(file => `asset/images/${file.filename}`);
       updateProduct.productImage = productImages;
     } else {
-      const existingProduct = await product.findById(productId);
+      let existingProduct = await product.findById(productId);
       updateProduct.productImage = existingProduct.productImage;
     }
-
+    if(!req.body.expire_date){
+      const existingProduct2= await product.findById(productId);
+      updateProduct.expireDate = existingProduct2.expireDate
+    }
     const updatedProduct = await product.findByIdAndUpdate(productId, updateProduct, { new: true });
     res.redirect('/admin-products');
     console.log('Product updated:', updatedProduct);
@@ -174,15 +178,21 @@ router.post('/update-product', adminAuthCheck, upload.array('productImage'), asy
 
 router.get('/admin-users', adminAuthCheck, async (req, res) => {
   try {
-    const users = await Users.find({role:'user'});
+    const searchTerm = req.query.search || ''; 
+    const searchRegex = new RegExp(searchTerm, 'i'); 
     
+    const users = await Users.find({
+      role: 'user',
+      username: searchRegex 
+    });
     
-    
-    
-    res.render('admin/admin-users', {users});
-  } catch (err){
-    console.log(err, "error finding users");
-    res.status(500).send('server error')
+    res.render('admin/admin-users', { 
+      users,
+      searchTerm 
+    });
+  } catch (err) {
+    console.error(err, "error finding users");
+    res.status(500).send('server error');
   }
 });
 
@@ -380,11 +390,11 @@ router.post('/edit-coupon/:id', adminAuthCheck, async(req, res)=>{
 })
 
 
-router.get('/delete-coupon/:id', adminAuthCheck, async(req, res)=>{
+router.get('/delete-coupon', adminAuthCheck, async(req, res)=>{
   try{
 
     
-    const couponId = req.params.id;
+    const couponId = req.query.id;
     const deleteCoupon = await Coupon.findByIdAndDelete({_id:couponId})
     if(deleteCoupon){
       console.log("coupon deleted succesfully")
@@ -440,6 +450,15 @@ router.get('/add-banner',adminAuthCheck, (req, res)=>{
 router.post('/add-banner', adminAuthCheck, upload.array('bannerImage', []), async (req, res) => {
   try {
     const { title } = req.body;
+
+    if (!title.trim()) {
+      return res.status(400).render('admin/add-banner',{ error: 'Title is required.' });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).render('admin/add-banner',{ error: 'Banner image is required.' });
+    }
+
     const bannerImage = req.files.map(file => `asset/images/${file.filename}`);
     console.log(title, bannerImage);
 
@@ -454,50 +473,63 @@ router.post('/add-banner', adminAuthCheck, upload.array('bannerImage', []), asyn
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send('An error occurred while creating the banner.');
+    res.status(500).render('admin/add-banner',{ error: 'An error occurred while creating the banner.' });
   }
 });
 
 router.get('/edit-banner', adminAuthCheck, async (req, res) => {
   try {
     const bannerId = req.query.id;
+    if (!bannerId) {
+      return res.status(400).render('admin/edit-banner',{error:'Banner id is required'});
+    }
+
     const selectedBanner = await Banner.findById(bannerId);
     if (!selectedBanner) {
-      return res.status(404).send('banner not found');
+      return res.status(404).render('admin/edit-banner', { error: 'Banner not found' });
     }
+
     res.render('admin/edit-banner', { banner:selectedBanner });
   } catch (err) {
-    console.log(err);
-    res.status(500).send('Error fetching banner details');
+    console.error(err);
+    res.status(500).render('admin/edit-banner',{error:'Error fetching banner details'});
   }
 });
 
 router.post('/update-banner', adminAuthCheck, upload.array('bannerImage'), async (req, res) => {
-  console.log('the body is:',req.body)
   try {
     const bannerId = req.body.bannerId;
-    if(!bannerId) {
-      return res.status(400).send('Banner id is required');
+    if (!bannerId) {
+      return res.status(400).render('admin/edit-banner', { error: 'Banner id is required' });
     }
 
     let updateBanner = {
       title: req.body.title
     };
+    if(!updateBanner.title.trim()){
+      return res.status(400).render('admin/edit-banner', { error: 'Title is required' });
+    }
 
-    if (req.files.length > 0) {
+    if (req.files && req.files.length > 0) {
       const bannerImages = req.files.map(file => `asset/images/${file.filename}`);
       updateBanner.image = bannerImages;
     } else {
       const existingBanner = await Banner.findById(bannerId);
+      if (!existingBanner) {
+        return res.status(404).render('admin/edit-banner', { error: 'Banner not found' });
+      }
       updateBanner.image = existingBanner.image;
     }
 
     const updatedBanner = await Banner.findByIdAndUpdate(bannerId, updateBanner, { new: true });
+    if (!updatedBanner) {
+      return res.status(500).render('admin/edit-banner', { error: 'Error updating banner' });
+    }
     res.redirect('/admin-banner');
     console.log('banner updated:', updatedBanner);
   } catch (err) {
-    console.log(err);
-    res.status(500).send('Error updating product');
+    console.error(err);
+    res.status(500).render('admin/edit-banner', { error: 'Error updating banner' });
   }
 });
 
@@ -545,30 +577,174 @@ router.get('/admin-profile', adminAuthCheck, async(req, res)=>{
 })
 
 
-router.post('/update-admin-profile', adminAuthCheck, async(req, res)=>{ 
-  const {username, email, password, confirmpassword} = req.body;
-  if(!username.trim() || !email.trim() || !password.trim() || !confirmpassword.trim()){
-    return res.render('admin/profile', {admin, error: 'All fields are required'});
+// router.post('/update-admin-profile', adminAuthCheck, async(req, res)=>{ 
+//   const {username, email, password, confirmpassword} = req.body;
+//   if(!username.trim() || !email.trim() || !password.trim() || !confirmpassword.trim()){
+//     return res.render('admin/profile', {admin, error: 'All fields are required'});
+//   }
+//   const admin = await Users.findById(req.session.admin._id)
+//   admin.name = username
+//   admin.email = email
+//   if(password===confirmpassword){
+//     const hashedpassword = await bcrypt.hash(password, 10);
+//     admin.password = hashedpassword;
+//   }else{
+//     return res.render('admin/profile', {admin, error: 'Passwords do not match'  })
+//   }
+//   await admin.save()
+//   res.redirect('/admin-profile')
+// })
+
+router.post('/update-admin-profile', adminAuthCheck, async (req, res) => {
+  try {
+    const { username, email, password, confirmpassword } = req.body;
+
+    if (!username.trim() || !email.trim() || !password.trim() || !confirmpassword.trim()) {
+      return res.render('admin/profile', { admin: null, error: 'All fields are required' });
+    }
+
+    const adminId = req.session.admin._id;
+    const admin = await Users.findById(adminId);
+    if (!admin) {
+      return res.render('admin/profile', { admin: null, error: 'Admin not found' });
+    }
+
+    admin.name = username;
+    admin.email = email;
+    if (password === confirmpassword) {
+      const hashedPassword = await bcrypt.hash(password, 10);
+      admin.password = hashedPassword;
+    } else {
+      return res.render('admin/profile', { admin, error: 'Passwords do not match' });
+    }
+
+    await admin.save();
+    res.redirect('/admin-profile');
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('An error occurred while updating admin profile');
   }
-  const admin = await Users.findById(req.session.admin._id)
-  admin.name = username
-  admin.email = email
-  if(password===confirmpassword){
-    const hashedpassword = await bcrypt.hash(password, 10);
-    admin.password = hashedpassword;
-  }else{
-    return res.render('admin/profile', {admin, error: 'Passwords do not match'  })
-  }
-  await admin.save()
-  res.redirect('/admin-profile')
-})
+});
 
 router.get('/admin-logout',(req, res) => {
   req.session.destroy();
   res.redirect('/login')
 })
 
+router.get('/admin-return', adminAuthCheck, async (req, res) => {
+  try {
+    const returnOrders = await Order.find({ return: 'available' })
+      .populate({
+        path: 'returnItems.product',
+        select: 'name'
+      })
+      .populate('address');
+      
+    returnOrders.forEach(order => {
+      order.returnItems.forEach(item => {
+      });
+    });
+console.log('return orders',returnOrders)
+    res.render('admin/admin-return', { returnOrders });
+  } catch (err) {
+    console.error('Error fetching return orders:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 
+router.post('/update-return-status', adminAuthCheck, async (req, res) => {
+  const { orderId, returnItemId, status } = req.body;
+
+  // if (!mongoose.Types.ObjectId.isValid(orderId) || !mongoose.Types.ObjectId.isValid(returnItemId)) {
+  //   return res.status(400).json({ error: 'Invalid order ID or return item ID' });
+  // }
+
+  try {
+    const order = await Order.findById(orderId).populate('returnItems.product');
+    if (!order) {
+      return res.status(404).json({ error: 'Order not found' });
+    }
+    const returnItem = order.returnItems.id(returnItemId);
+    if (!returnItem) {
+      return res.status(404).json({ error: 'Return item not found' });
+    }
+
+    const statusTransitions = {
+      'pending': ['processing', 'refunded'],
+      'processing': ['refunded'],
+      'refunded': []
+    };
+
+    if (!statusTransitions[returnItem.status].includes(status)) {
+      return res.status(400).json({ error: `Cannot change status from ${returnItem.status} to ${status}` });
+    }
+    returnItem.status = status;
+    if (status === 'refunded') {
+      const user = await Users.findById(order.user);
+      if (user) {
+        user.walletAmount += returnItem.returnAmount;
+        await user.save();
+      } else {
+        return res.status(404).json({ error: 'User not found' });
+      }
+    }
+
+    await order.save();
+    res.status(200).json({ message: 'Return item status updated successfully' });
+  } catch (error) {
+    console.error('Failed to update return item status:', error);
+    res.status(500).json({ error: 'Failed to update return item status' });
+  }
+});
+
+
+router.get('/admin-orders', adminAuthCheck, async (req, res) => {
+  try {
+    const sortOption = req.query.sort || 'date_desc';
+
+    let sortCriteria;
+    if (sortOption === 'date_asc') {
+      sortCriteria = { deliveryExpectedDate: 1 };
+    } else {
+      sortCriteria = { deliveryExpectedDate: -1 };
+    }
+
+    const orders = await Order.find()
+      .populate({
+        path: 'user',
+        select: 'username'
+      })
+      .populate({
+        path: 'address',
+        select: 'firstName lastName street city state postCode'
+      })
+      .populate({
+        path: 'items.product',
+        select: 'name'
+      })
+      .sort(sortCriteria);
+
+    res.render('admin/admin-orders', { orders, sortOption });
+  } catch (error) {
+    console.error('Error fetching orders:', error);
+    res.status(500).send('An error occurred while fetching orders');
+  }
+});
+
+
+
+router.get('/admin-filter-orders',adminAuthCheck,async(req, res)=>{
+  const {Min, Max} = req.query;
+console.log('Min Max',Min, Max)
+  const orders= await Order.find({totalPrice:{$gte:Min, $lte:Max}})
+      .populate({
+    path: 'user',
+    select: 'username'}).populate({path: 'address',
+    select: 'firstName lastName street city state postCode'}).populate({path: 'items.product',
+    select: 'name'});
+   console.log('--------------------------------',orders)
+  res.render('admin/admin-orders',{orders})
+})
 
 module.exports = router;

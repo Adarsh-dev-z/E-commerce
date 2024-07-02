@@ -542,7 +542,31 @@
       		</div>
 		</div>
         <!--End Page Title-->
-        
+    {{!-- messageboxes --}}
+     <div class="message-box success">
+        <span class="icon">✔</span>
+        <span class="message">Success Message</span>
+        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
+    </div>
+
+    <div class="message-box error">
+        <span class="icon">✖</span>
+        <span class="message">Error Message</span>
+        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
+    </div>
+
+    <div class="message-box info">
+        <span class="icon">ℹ</span>
+        <span class="message">Informational Message</span>
+        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
+    </div>
+
+    <div class="message-box warning">
+        <span class="icon">⚠</span>
+        <span class="message">Warning Message</span>
+        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
+    </div>
+    {{!-- messageboxe --}}
         <div class="container">
     <div class="row">
         <div class="col-12 col-sm-12 col-md-6 col-lg-6 main-col offset-md-3">
@@ -638,11 +662,11 @@
                     	<div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
                         	<h4 class="h4">Quick Shop</h4>
                             <ul>
-                            	<li><a href="#">Women</a></li>
-                                <li><a href="#">Men</a></li>
-                                <li><a href="#">Kids</a></li>
-                                <li><a href="#">Sportswear</a></li>
-                                <li><a href="#">Sale</a></li>
+                            	<li><a href="/shop">Women</a></li>
+                                <li><a href="/shop">Men</a></li>
+                                <li><a href="/shop">Charecter Edition</a></li>
+                                <li><a href="/shop">Sport</a></li>
+                                <li><a href="/shop">Sneakers</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
@@ -652,7 +676,7 @@
                                 <li><a href="#">Careers</a></li>
                                 <li><a href="#">Privacy policy</a></li>
                                 <li><a href="#">Terms &amp; condition</a></li>
-                                <li><a href="#">My Account</a></li>
+                                <li><a href="/userprofile">My Account</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
@@ -717,6 +741,20 @@
      <script src="assets/js/main.js"></script>
      <script src="scripts.js"></script>
 </div>
+
+
+
+{{#if emailSent}}
+<script>
+  Swal.fire({
+    title: 'Success!',
+    text: 'Verification email has been sent to your mail',
+    icon: 'success',
+    confirmButtonText: 'OK'
+  })
+  
+</script>
+{{/if}}
 </body>
 
 <!-- belle/register.html   11 Nov 2019 12:22:27 GMT -->

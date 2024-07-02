@@ -10,7 +10,8 @@ const { getLogin, getProduct, getShop, getAbout, getBlog,
   postResetPassLink, resetPassword, getUpdatePass, postUpdatePass, getSearch, 
   changeAccountDetails, 
   checkoutRazorpay,
-  handleRazorpaySuccess} = require('../controller/userController');
+  handleRazorpaySuccess,
+  getShopByCategory} = require('../controller/userController');
 var router = express.Router();
 const passport=require("passport");
 const { AuthCheck, userAuthCheck } = require('../middlewares/userAuthentication');
@@ -23,6 +24,7 @@ const Wishlist = require('../models/wishlist')
 const Cart = require('../models/cart')
 const Product =require('../models/product')
 const Order = require('../models/order')
+const Review=require('../models/review')
 
 router.get('/login', getLogin)
 router.get('/product',userAuthCheck, getProduct)
@@ -351,8 +353,26 @@ console.log('totalQuantity and totalReturnQuantity', '1:',totalQuantity, '2:',to
         success: false,
       });
     }
-
+    order.return = 'available'
     await order.save();
+    console.log(order.returnItems,'order return items')
+    console.log(order.items,'order items')
+
+    const quantityInItems = order.items.reduce((acc, item) => {
+      return acc + item.quantity;
+    }, 0);
+    const quantityInReturnItems = order.returnItems.reduce((acc,item)=>{
+      return acc+item.quantity;
+    }, 0)
+
+    if(quantityInItems===quantityInReturnItems){
+      order.completeOrderReturn = true;
+      await order.save();
+    }
+    console.log('quantity in items', quantityInItems);
+    console.log('quantity in items', quantityInReturnItems);
+
+
     // console.log('maxQuantityreached', maxQuantityReached)
     res.redirect(`/view-order?id=${orderId}`);
   } catch (error) {
@@ -412,6 +432,7 @@ console.log('existing return item',existingReturnItem)
     }
 
     order.completeOrderReturn = true;
+    order.return = 'available'
     // const maxQuantityReached = true
     await order.save();
 
@@ -425,8 +446,43 @@ console.log('existing return item',existingReturnItem)
 
 
 
+router.get('/shopby-category', userAuthCheck, getShopByCategory)
 
 
+// POST a new review
+router.post('/reviews',userAuthCheck, async (req, res) => {
+  // console.log(req.body);
+  const userId = req.user._id
+  const { product, user, comment, title, author } = req.body;
+  const rating = Number(req.body.rating);
+  try {
+      const review = await Review.create({
+          product,
+          user: userId,
+          userEmail: user,
+          rating,
+          comment,
+          title,
+          author
+      });
+      // console.log(review, 'saved review');
+      res.status(201).json(review);
+  } catch (error) {
+      console.log('errrrrrrrrrrro');
+      res.status(400).json({ message: error.message });
+  }
+});
+
+// GET all reviews for a product
+router.get('/reviews/product/:productId', async (req, res) => {
+  try {
+      const reviews = await Review.find({ product: req.params.productId }).populate('product');
+      // console.log(reviews,'reviews');
+      res.json(reviews);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+});
 
 
 

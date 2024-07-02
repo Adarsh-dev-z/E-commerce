@@ -280,12 +280,15 @@
                         <div class="infinitpagin">	
                             {{!-- <a href="/return-entire-order?id={{order._id}}" class="btn loadMore"></a> --}}
                                 {{!-- <a href="/return-entire-order?id={{order._id}}">Return Entire Order</a> --}}
+                                {{#if (eq order.orderStatus 'delivered')}}
+
                                 {{#if order.completeOrderReturn}}
         <button class="btn btn--small" onclick="showPopupReturn('{{order._id}}')" type="button" disabled>Order Returned</button>
     {{else}}                                 
 <form class="variants" action="#">
     <button class="btn btn--small" onclick="showPopupReturn('{{order._id}}')" type="button">Return Entire Order</button>
 </form>
+{{/if}}
 {{/if}}
 
                         </div>
@@ -344,11 +347,11 @@
                     	<div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
                         	<h4 class="h4">Quick Shop</h4>
                             <ul>
-                            	<li><a href="#">Women</a></li>
-                                <li><a href="#">Men</a></li>
-                                <li><a href="#">Kids</a></li>
-                                <li><a href="#">Sportswear</a></li>
-                                <li><a href="#">Sale</a></li>
+                            	<li><a href="/shop">Women</a></li>
+                                <li><a href="/shop">Men</a></li>
+                                <li><a href="/shop">Charecter Edition</a></li>
+                                <li><a href="/shop">Sport</a></li>
+                                <li><a href="/shop">Sneakers</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
@@ -358,7 +361,7 @@
                                 <li><a href="#">Careers</a></li>
                                 <li><a href="#">Privacy policy</a></li>
                                 <li><a href="#">Terms &amp; condition</a></li>
-                                <li><a href="#">My Account</a></li>
+                                <li><a href="/userprofile">My Account</a></li>
                             </ul>
                         </div>
                         <div class="col-12 col-sm-12 col-md-3 col-lg-3 footer-links">
@@ -454,11 +457,19 @@
     function submitReturn() {
         const quantity = document.getElementById('returnQuantity').value;
         const reason = document.getElementById('singleReturnReason').value;
-        if (reason.trim() === '') {
-            alert('Please provide a reason for the return.');
-            return;
-        }
-        alert(`Return submitted for ${quantity} ${currentProductId}(s).\nReason: ${reason}`);
+        if (!reason.trim()) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please provide a reason for the return.'
+    });
+    return;
+}
+Swal.fire({
+    icon: 'success',
+    title: 'Return Submitted',
+    text: `Return submitted for ${quantity} ${currentProductId}(s).\nReason: ${reason}`
+});        
 
         window.location.href = '/return-items?productId=' + currentProductId + '&quantity=' + quantity + '&orderId=' + currentOrderId + '&reason=' + encodeURIComponent(reason);
         hidePopup();
@@ -477,12 +488,19 @@
 
     function submitReturnReturn() {
         const reason = document.getElementById('entireReturnReason').value;
-        if (reason.trim() === '') {
-            alert('Please provide a reason for the return.');
-            return;
-        }
-        alert(`Reason: ${reason}`);
-
+      if (!reason.trim()) {
+    Swal.fire({
+        icon: 'warning',
+        title: 'Missing Information',
+        text: 'Please provide a reason for the return.'
+    });
+    return;
+}
+Swal.fire({
+    icon: 'info',
+    title: 'Reason Provided',
+    text: `Reason: ${reason}`
+});
         window.location.href = '/return-entire-order?id=' + currentOrderId + '&reason=' + encodeURIComponent(reason);
         hidePopupReturn();
     }

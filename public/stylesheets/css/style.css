@@ -903,7 +903,9 @@ table { margin-bottom:15px; width:100%; border-collapse:collapse; border-spacing
 .spr-form-title { font-size:16px; line-height:24px; margin-top:0; text-transform:uppercase; }
 .spr-form-contact-name, .spr-form-contact-email, .spr-form-contact-location, .spr-form-review-rating, .spr-form-review-title, .spr-form-review-body { *zoom:1; margin:0 0 15px 0; }
 .spr-container input, .spr-container select, .spr-container textarea { border-color:#d3d3d3; }
-.product-template__container label { font-weight:400; text-transform:uppercase; letter-spacing:0.02em; }
+/* ------------------------------------------------------------------------ */
+.product-template__container label { font-weight:0; text-transform:uppercase; letter-spacing:0.02em; }
+/* ---------------------------------------------------------------------------- */
 .spr-button-primary { float:right; }
 .spr-reviews { padding:24px 0; }
 .spr-review { padding:24px 0; border-top:1px solid #DFDFDF; }

@@ -104,6 +104,10 @@ const orderSchema= mongoose.Schema({
     completeOrderReturn:{
         type:Boolean,
         default:false
+    },
+    return:{
+        type:String,
+        default:false
     }
 });
 
