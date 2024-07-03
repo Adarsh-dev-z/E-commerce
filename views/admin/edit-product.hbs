@@ -352,7 +352,7 @@ function validateForm() {
     var description = document.getElementById('description').value;
     var stock = document.getElementById('stock').value;
 
-    if (!name || !brand || !price || !description || !stock) {
+    if (!name.trim() || !brand.trim() || !price.trim() || !description.trim() || !stock.trim()) {
         alert("Please fill out all fields before submitting.");
         return false;
     }

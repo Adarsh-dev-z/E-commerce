@@ -1248,7 +1248,7 @@ const editAddress = async(req, res)=>{
 }
 
 const postAddAddress = async(req, res)=>{
-  userId = req.user._id;
+  const userId = req.user._id;
   const { firstname,lastname, email, telephone, company, address, apartment, city, postcode, street, state } = req.body
   if(!firstname.trim() || !lastname.trim() || !email.trim() || !telephone.trim() || !company.trim() || !address.trim() || !city.trim() || !postcode.trim() || !street.trim() || !state.trim()){
       return res.status(400).json({success:false, message:'Please provide all required fields'})
@@ -1653,7 +1653,7 @@ if(existingAddress){
     const newCartTotal = cartTotal - couponDiscount;
     req.session.couponDiscount = [];
     const options = {
-      amount: newCartTotal * 100, // amount in smallest currency unit
+      amount: newCartTotal * 100, 
       currency: 'INR',
       receipt: crypto.randomBytes(10).toString('hex')
     };
@@ -1673,7 +1673,7 @@ if(existingAddress){
         contact: telephone
       },
       notes: {
-        
+
         address: userAddress._id, couponDiscount:couponDiscount
       },
       callback_url: `${process.env.BASE_URL}/razorpay-success`,  

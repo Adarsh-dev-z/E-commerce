@@ -312,17 +312,45 @@ function validateForm() {
     var usagecount = document.getElementById("usagecount").value;
     var expireDate = document.getElementById("expireDate").value;
 
-    if (!code.trim()|| !discount.trim() || !minPriceRange.trim() || !maxPriceRange.trim() || !usagecount.trim() || !expireDate.trim()) {
+    if (!code.trim() || !discount.trim() || !minPriceRange.trim() || !maxPriceRange.trim() || !usagecount.trim() || !expireDate.trim()) {
         Swal.fire({
             icon: 'warning',
             title: 'Please fill in all fields',
             text: 'Please fill out all fields before submitting.',
             confirmButtonText: 'Ok'
         });
-            return false;
+        return false;
     }
+
+    // Convert to numbers for comparison
+    minPriceRange = parseFloat(minPriceRange);
+    maxPriceRange = parseFloat(maxPriceRange);
+    discount = parseFloat(discount);
+    usagecount = parseInt(usagecount);
+console.log(minPriceRange, maxPriceRange, discount, usagecount)
+    if (isNaN(minPriceRange) || isNaN(maxPriceRange) || isNaN(discount) || isNaN(usagecount)) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Invalid input',
+            text: 'Please enter valid numeric values for price ranges, discount, and usage count.',
+            confirmButtonText: 'Ok'
+        });
+        return false;
+    }
+
+    if (minPriceRange > maxPriceRange) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            text: 'Min Price Range cannot be greater than Max Price Range',
+            confirmButtonText: 'Ok'
+        });
+        return false;
+    }
+
     return true;
 }
 </script>
+
 </body>
 </html>

@@ -135,18 +135,18 @@
         <header class="topbar-nav">
  <nav class="navbar navbar-expand fixed-top">
   <ul class="navbar-nav mr-auto align-items-center">
-    <li class="nav-item">
-      <a class="nav-link toggle-menu" href="javascript:void();">
-       <i class="icon-menu menu-icon"></i>
-     </a>
-    </li>
-    <li class="nav-item">
-      <form class="search-bar">
-        <input type="text" class="form-control" placeholder="Enter keywords">
-         <a href="javascript:void();"><i class="icon-magnifier"></i></a>
-      </form>
-    </li>
-  </ul>
+            <li class="nav-item">
+                <a class="nav-link toggle-menu" href="javascript:void();">
+                    <i class="icon-menu menu-icon"></i>
+                </a>
+            </li>
+            <li class="nav-item">
+                <form class="search-bar" id="searchForm">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Enter keywords">
+                    <a href="javascript:void();" id="searchBtn"><i class="icon-magnifier"></i></a>
+                </form>
+            </li>
+        </ul>
      
   <ul class="navbar-nav align-items-center right-nav-link">
     {{!-- <li class="nav-item dropdown-lg">
@@ -202,70 +202,70 @@
             <div class="container-fluid">
 
                 <div class="col-md-12 grid-margin">
-                    <div class="card">
-                      <div class="card-body">
-                        <h5 class="card-title">Products</h5>
-                        <div class="form-group">
-    <!-- Add Product and Delete Selected buttons -->
-    <a href="/add-product" class="btn btn-light px-5"> Add Product</a>
-    <button type="submit" id="deleteSelected" class="btn btn-light px-5"> Delete Selected</button>
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Products</h5>
+            <div class="form-group d-flex align-items-center">
+                <!-- Add Product and Delete Selected buttons -->
+                <a href="/add-product" class="btn btn-light px-5 mr-2">Add Product</a>
+                <button type="submit" id="deleteSelected" class="btn btn-light px-5 mr-2">Delete Selected</button>
+
+                <!-- Category Filter Dropdown -->
+                <select id="categoryFilter" class="btn btn-light px-8 mr-2" style="width: 200px;">
+                    <option value="">All Categories</option>
+                    {{#each categories}}
+                    <option value="{{this}}">{{this}}</option>
+                    {{/each}}
+                </select>
+                    <button type="button" id="refreshButton" class="btn btn-light px-3"><i class="zmdi zmdi-refresh" onclick="refreshOrders()"></i></button>
+
+            </div>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col"><input type="checkbox" id="selectAll"></th>
+                            <th scope="col">Name</th>
+                            <th scope="col">Brand</th>
+                            <th scope="col">Price</th>
+                            <th scope="col">Category</th>
+                            <th scope="col">Description</th>
+                            <th scope="col">Stock</th>
+                            <th scope="col">Expire Date</th>
+                            <th scope="col">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                      {{#if products.length}}
+                        {{#each products}}
+                        <tr>
+                            <td><input type="checkbox" class="selectRow" data-id="{{this._id}}"></td>
+                            <td>{{this.name}}</td>
+                            <td>{{this.brand}}</td>
+                            <td>{{this.price}}</td>
+                            <td>{{this.category}}</td>
+                            <td>{{this.description}}</td>
+                            <td>{{this.stock}}</td>
+                            <td>{{this.expireDate}}</td>
+                            <td>
+                                <a href="/edit-product?id={{this._id}}"><i class="fas fa-edit action-icons"></i></a>
+                                <a href="/delete-product/{{this._id}}"><i class="fas fa-trash action-icons"></i></a>
+                            </td>
+                        </tr>
+                        {{/each}}
+                        {{else}}
+                        <tr>
+                            <td colspan="9">No products found.</td>
+                        </tr>
+                        {{/if}}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Filter Section -->
-{{!-- <div class="form-group">
-    <label for="filterAmountMin">Min Amount</label>
-    <input type="number" id="filterAmountMin" name="filterAmountMin" class="form-control" placeholder="Enter minimum amount">
-
-    <label for="filterAmountMax">Max Amount</label>
-    <input type="number" id="filterAmountMax" name="filterAmountMax" class="form-control" placeholder="Enter maximum amount">
-<br>
-    <button type="button" id="filterButton" class="btn btn-light px-5">Filter</button>
-</div> --}}
-
-                        <div class="table-responsive">
-                          <table class="table">
-                            <thead>
-                              <tr>
-                                <th scope="col"><input type="checkbox" id="selectAll"></th>
-                                {{!-- <th scope="col">#</th> --}}
-                                <th scope="col">name</th>
-                                <th scope="col">Brand</th>
-                                <th scope="col">Price</th>
-                                <th scope="col">Category</th>
-                                <th scope="col">Description</th>
-                                <th scope="col">Stock</th>
-                                <th scope="col">Expire Date</th>
-                                {{!-- <th scope="col">Heading</th> --}}
-                                <th scope="col">Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                {{#each products}}
-                              <tr>
-                                <td><input type="checkbox" class="selectRow" data-id="{{this._id}}"></td>
-                                {{!-- <th scope="row">1</th> --}}
-                                <td>{{this.name}}</td>
-                                <td>{{this.brand}}</td>
-                                <td>{{this.price}}</td>
-                                <td>{{this.category}}</td>
-                                <td>{{this.description}}</td>
-                                <td>{{this.stock}}</td>
-                                <td>{{this.expireDate}}</td>
-                                {{!-- <td>Cell</td> --}}
-                                <td>
-                                  {{!-- <i class="fas fa-edit action-icons" onclick="editRow(this)"></i> --}}
-                                  <a href="/edit-product?id={{this._id}}"><i class="fas fa-edit action-icons"></i></a>
-                                  <a href="/delete-product/{{this._id}}"><i class="fas fa-trash action-icons"></i></a>
-                                </td>
-                              </tr>
-                              {{/each}}
-                              <!-- Additional rows can be added here -->
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
                 <!--start overlay-->
                 <div class="overlay toggle-menu"></div>
@@ -453,6 +453,56 @@ Swal.fire({
     });
 </script>
 
+
+
+
+
+<script>
+    document.getElementById('categoryFilter').addEventListener('change', function() {
+        const selectedCategory = this.value;
+        const searchValue = document.getElementById('searchInput').value;
+        let url = '/admin-products?';
+
+        if (selectedCategory) {
+            url += `category=${selectedCategory}&`;
+        }
+
+        if (searchValue) {
+            url += `search=${searchValue}`;
+        }
+
+        window.location.href = url;
+    });
+
+    document.getElementById('searchBtn').addEventListener('click', function() {
+        const searchValue = document.getElementById('searchInput').value;
+        const filterCategory = document.getElementById('categoryFilter').value;
+        let url = '/admin-products?';
+
+        if (filterCategory) {
+            url += `category=${filterCategory}&`;
+        }
+
+        if (searchValue) {
+            url += `search=${searchValue}`;
+        }
+
+        window.location.href = url;
+    });
+
+    document.getElementById('searchInput').addEventListener('keypress', function(event) {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            document.getElementById('searchBtn').click();
+        }
+    });
+</script>
+
+<script>
+  function refreshOrders(){
+    window.location.href = '/admin-products';
+  }
+</script>
 </body>
 
 </html>

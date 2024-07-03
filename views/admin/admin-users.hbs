@@ -131,74 +131,69 @@
 
 
         <!--Start topbar header-->
-        <header class="topbar-nav">
-            <nav class="navbar navbar-expand fixed-top">
-                <ul class="navbar-nav mr-auto align-items-center">
-                    <li class="nav-item">
-                        <a class="nav-link toggle-menu" href="javascript:void();">
-                            <i class="icon-menu menu-icon"></i>
-                        </a>
-                    </li>
-                    <li class="nav-item">
-    <form class="search-bar" action="/admin-users" method="get">
-        <input type="text" name="search" class="form-control" placeholder="Enter keywords" value="{{searchTerm}}">
-        <a href="javascript:void(0);" class="search-button"><i class="icon-magnifier"></i></a>
-    </form>
+         <header class="topbar-nav">
+ <nav class="navbar navbar-expand fixed-top">
+  <ul class="navbar-nav mr-auto align-items-center">
+    <li class="nav-item">
+      <a class="nav-link toggle-menu" href="javascript:void();">
+       <i class="icon-menu menu-icon"></i>
+     </a>
+    </li>
+    <li class="nav-item">
+  <form class="search-bar" action="/admin-users" method="GET">
+    <input type="text" name="search" class="form-control" placeholder="Enter keywords" value="{{searchTerm}}">
+    <a href="javascript:void();" onclick="this.closest('form').submit();"><i class="icon-magnifier"></i></a>
+  </form>
 </li>
-                </ul>
-
-                <ul class="navbar-nav align-items-center right-nav-link">
-                    <li class="nav-item dropdown-lg">
-                        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown"
-                            href="javascript:void();">
-                            <i class="fa fa-envelope-open-o"></i></a>
-                    </li>
-                    <li class="nav-item dropdown-lg">
-                        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown"
-                            href="javascript:void();">
-                            <i class="fa fa-bell-o"></i></a>
-                    </li>
-                    <li class="nav-item language">
-                        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown"
-                            href="javascript:void();"><i class="fa fa-flag"></i></a>
-                        <ul class="dropdown-menu dropdown-menu-right">
-                            <li class="dropdown-item"> <i class="flag-icon flag-icon-gb mr-2"></i> English</li>
-                            <li class="dropdown-item"> <i class="flag-icon flag-icon-fr mr-2"></i> French</li>
-                            <li class="dropdown-item"> <i class="flag-icon flag-icon-cn mr-2"></i> Chinese</li>
-                            <li class="dropdown-item"> <i class="flag-icon flag-icon-de mr-2"></i> German</li>
-                        </ul>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown" href="#">
-                            <span class="user-profile"><img src="https://via.placeholder.com/110x110" class="img-circle"
-                                    alt="user avatar"></span>
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-right">
-                            <li class="dropdown-item user-details">
-                                <a href="javaScript:void();">
-                                    {{!-- <div class="media">
-                                        <div class="avatar"><img class="align-self-start mr-3"
-                                                src="https://via.placeholder.com/110x110" alt="user avatar"></div>
-                                        <div class="media-body">
-                                            <h6 class="mt-2 user-title">Sarajhon Mccoy</h6>
-                                            <p class="user-subtitle">mccoy@example.com</p>
-                                        </div>
-                                    </div> --}}
-                                </a>
-                            </li>
-                            <li class="dropdown-divider"></li>
-                            <li class="dropdown-item"><i class="icon-envelope mr-2"></i> Inbox</li>
-                            <li class="dropdown-divider"></li>
-                            <li class="dropdown-item"><i class="icon-wallet mr-2"></i> Account</li>
-                            <li class="dropdown-divider"></li>
-                            <li class="dropdown-item"><i class="icon-settings mr-2"></i> Setting</li>
-                            <li class="dropdown-divider"></li>
-                            <li class="dropdown-item"><i class="icon-power mr-2"></i> Logout</li>
-                        </ul>
-                    </li>
-                </ul>
-            </nav>
-        </header>
+  </ul>
+     
+  <ul class="navbar-nav align-items-center right-nav-link">
+    {{!-- <li class="nav-item dropdown-lg">
+      <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown" href="javascript:void();">
+      <i class="fa fa-envelope-open-o"></i></a>
+    </li>
+    <li class="nav-item dropdown-lg">
+      <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown" href="javascript:void();">
+      <i class="fa fa-bell-o"></i></a>
+    </li> --}}
+    {{!-- <li class="nav-item language">
+      <a class="nav-link dropdown-toggle dropdown-toggle-nocaret waves-effect" data-toggle="dropdown" href="javascript:void();"><i class="fa fa-flag"></i></a>
+      <ul class="dropdown-menu dropdown-menu-right">
+          <li class="dropdown-item"> <i class="flag-icon flag-icon-gb mr-2"></i> English</li>
+          <li class="dropdown-item"> <i class="flag-icon flag-icon-fr mr-2"></i> French</li>
+          <li class="dropdown-item"> <i class="flag-icon flag-icon-cn mr-2"></i> Chinese</li>
+          <li class="dropdown-item"> <i class="flag-icon flag-icon-de mr-2"></i> German</li>
+        </ul>
+    </li> --}}
+    <li class="nav-item">
+      <a class="nav-link dropdown-toggle dropdown-toggle-nocaret" data-toggle="dropdown" href="#">
+        <span class="user-profile"><img src="asset\images\profile-circle.1023x1024.png" class="img-circle" alt="user avatar"></span>
+      </a>
+      <ul class="dropdown-menu dropdown-menu-right">
+       <li class="dropdown-item user-details">
+        <a href="javaScript:void();">
+           {{!-- <div class="media">
+             <div class="avatar"><img class="align-self-start mr-3" src="asset\images\profile-circle.1023x1024.png" alt="user avatar"></div>
+            <div class="media-body">
+            <h6 class="mt-2 user-title">Sarajhon Mccoy</h6>
+            <p class="user-subtitle">mccoy@example.com</p>
+            </div>
+           </div> --}}
+          </a>
+        </li>
+        {{!-- <li class="dropdown-divider"></li>
+        <li class="dropdown-item"><i class="icon-envelope mr-2"></i> Inbox</li>
+        <li class="dropdown-divider"></li>
+        <li class="dropdown-item"><i class="icon-wallet mr-2"></i> Account</li> --}}
+        <li class="dropdown-divider"></li>
+        <li class="dropdown-item"><a href="/admin-profile"><i class="icon-settings mr-2"></i> Setting</a></li>
+        <li class="dropdown-divider"></li>
+        <li class="dropdown-item"><a href="/admin-logout"><i class="icon-power mr-2"></i> Logout</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+</header>
         <!--End topbar header-->
         <div class="clearfix"></div>
 
@@ -208,59 +203,68 @@
                 <div class="col-md-12 grid-margin">
                     <div class="card">
                       <div class="card-body">
-                        <h5 class="card-title">Users</h5>
-                        <button id="deleteSelected" class="btn btn-light px-5">Delete Selected</button>
-                        <div class="table-responsive">
-                          <table class="table">
-                            <thead>
-                              <tr>
-                                <th scope="col"><input type="checkbox" id="selectAll"></th>
-                                {{!-- <th scope="col">#</th> --}}
-                                <th scope="col">Username</th>
-                                <th scope="col">Email</th>
-                                <th scope="col">Phone Number</th>
-                                <th scope="col">Status</th>
-                                <th scope="col">IsVerified</th>
-                                <th scope="col">IsBlocked</th>
-                                {{!-- <th scope="col">Heading</th>
-                                <th scope="col">Heading</th> --}}
-                                <th scope="col">Actions</th>
-                              </tr>
-                            </thead>
-                            <tbody id="tableBody">
-                                {{#each users}}
-                              <tr>
-                                <td><input type="checkbox" class="selectRow"></td>
-                                {{!-- <th scope="row">1</th> --}}
-                                <td>{{this.username}}</td>
-                                <td>{{this.email}}</td>
-                                <td>{{this.phone}}</td>
-                                <td>{{this.status}}</td>
-                                <td>{{this.isVerifyed}}</td>
-                                <td>{{this.isBlocked}}</td>
-                                {{!-- <td>Cell</td>
-                                <td>Cell</td> --}}
-                               {{#if isBlocked}}
-<td>
-  <a href="/unblock-user?id={{this._id}}"><i class="fas fa-check action-icons" title="Unblock"></i></a>
-  <a href="javascript:void(0);" onclick="confirmDeleteUser('{{this._id}}')">
-    <i class="fas fa-trash action-icons ml-2" title="Delete"></i>
-  </a>
-</td>
-{{else}}
-<td>
-  <a href="/block-user?id={{this._id}}"><i class="fas fa-ban action-icons" title="Block"></i></a>
-  <a href="javascript:void(0);" onclick="confirmDeleteUser('{{this._id}}')">
-    <i class="fas fa-trash action-icons ml-2" title="Delete"></i>
-  </a>
-</td>
-{{/if}}
-                              </tr>
-                              {{/each}}
-                              <!-- Additional rows can be added here -->
-                            </tbody>
-                          </table>
-                        </div>
+                       <h5 class="card-title">Users</h5>
+<button id="deleteSelected" class="btn btn-light px-5">Delete Selected</button>
+<form id="filterForm" class="d-inline" action="/admin-users" method="GET">
+  <input type="hidden" name="search" value="{{searchTerm}}">
+  <input type="hidden" name="isBlocked" value="{{isBlockedFilter}}">
+  <button id="filterUser" class="btn btn-light px-5" type="submit">
+    Filter {{#if isBlockedFilter}}Unblocked{{else}}Blocked{{/if}} Users
+  </button>
+</form>
+  <button type="button" id="refreshButton" class="btn btn-light px-3"><i class="zmdi zmdi-refresh" onclick="refresusers()"></i></button>
+
+
+<div class="table-responsive">
+  <table class="table">
+    <thead>
+      <tr>
+        <th scope="col"><input type="checkbox" id="selectAll"></th>
+        <th scope="col">Username</th>
+        <th scope="col">Email</th>
+        <th scope="col">Phone Number</th>
+        <th scope="col">Status</th>
+        <th scope="col">IsVerified</th>
+        <th scope="col">IsBlocked</th>
+        <th scope="col">Actions</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      {{#if users.length}}
+      {{#each users}}
+      <tr>
+        <td><input type="checkbox" class="selectRow"></td>
+        <td>{{this.username}}</td>
+        <td>{{this.email}}</td>
+        <td>{{this.phone}}</td>
+        <td>{{this.status}}</td>
+        <td>{{this.isVerifyed}}</td>
+        <td>{{this.isBlocked}}</td>
+        {{#if this.isBlocked}}
+        <td>
+          <a href="/unblock-user?id={{this._id}}"><i class="fas fa-check action-icons" title="Unblock"></i></a>
+          <a href="javascript:void(0);" onclick="confirmDeleteUser('{{this._id}}')">
+            <i class="fas fa-trash action-icons ml-2" title="Delete"></i>
+          </a>
+        </td>
+        {{else}}
+        <td>
+          <a href="/block-user?id={{this._id}}"><i class="fas fa-ban action-icons" title="Block"></i></a>
+          <a href="javascript:void(0);" onclick="confirmDeleteUser('{{this._id}}')">
+            <i class="fas fa-trash action-icons ml-2" title="Delete"></i>
+          </a>
+        </td>
+        {{/if}}
+      </tr>
+      {{/each}}
+      {{else}}
+      <tr>
+        <td colspan="8">No users found</td>
+      </tr>
+      {{/if}}
+    </tbody>
+  </table>
+</div>
                       </div>
                     </div>
                   </div>
@@ -424,6 +428,22 @@ function confirmDeleteUser(userId) {
     });
   </script>
 
+<script>
+  document.getElementById('filterUser').addEventListener('click', function (e) {
+    e.preventDefault();
+    const filterForm = document.getElementById('filterForm');
+    const isBlockedInput = filterForm.querySelector('input[name="isBlocked"]');
+    isBlockedInput.value = isBlockedInput.value === 'true' ? 'false' : 'true';
+    filterForm.submit();
+  });
+</script>
+
+
+<script>
+  function refresusers(){
+    window.location.href = '/admin-users';
+  }
+</script>
 </body>
 
 </html>

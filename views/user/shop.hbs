@@ -420,6 +420,7 @@ body {
                 	<div class="productList">
                         <div class="grid-products grid--view-items">
                             <div class="row">
+                                {{#if Product.length}}
                                 {{#each Product}}
                                 <div class="col-6 col-sm-6 col-md-4 col-lg-3 item">
                                     <!-- start product image -->
@@ -493,6 +494,13 @@ body {
                                     <!-- End Variant -->
                                 </div>
                                 {{/each}}
+                                {{else}}
+                                <div class="container text-center">
+                                    <div style="margin-top: 5%;">
+                                        <p>No Products Found</p>
+                                    </div>
+                                </div>
+                                {{/if}}
                                 
                                 </div>
                             </div>

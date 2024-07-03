@@ -26,7 +26,26 @@
   <link href="adminAssets/css/app-style.css" rel="stylesheet"/>
   
       <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+<style>
+        .input-group {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
 
+        .input-group input {
+            padding-right: 120px; /* Adjust this value based on the button width */
+        }
+
+        .input-group button {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            border-radius: 0;
+        }
+        
+    </style>
 </head>
 
 <body class="bg-theme bg-theme1">
@@ -195,34 +214,37 @@
                     <div class="card-title">Add Coupon</div>
                     <hr>
                    <form action="/add-coupon" method="post" onsubmit="return validateForm()">
-    <div class="form-group">
-        <label for="input-1">Code</label>
-        <input type="text" class="form-control" name="code" id="code" placeholder="Enter Coupon code">
-    </div>
-    <div class="form-group">
-        <label for="input-2">Discount</label>
-        <input type="text" class="form-control" name="discount" id="discount" placeholder="Enter Discount">
-    </div>
-    <div class="form-group">
-        <label for="input-3">Min Price Range</label>
-        <input type="text" class="form-control" name="minPriceRange" id="minPriceRange" placeholder="Enter Min Price">
-    </div>
-    <div class="form-group">
-        <label for="input-4">Max Price Range</label>
-        <input type="text" class="form-control" name="maxPriceRange" id="maxPriceRange" placeholder="Enter Max Price">
-    </div>
-    <div class="form-group">
-        <label for="input-3">Usage Count</label>
-        <input type="text" class="form-control" name="usageCount" id="usagecount" placeholder="Enter usage count">
-    </div>
-    <div class="form-group">
-        <label for="input-7">Select Date</label>
-        <input type="date" class="form-control" name="expireDate" id="expireDate">
-    </div>
-    <div class="form-group">
-        <button type="submit" class="btn btn-light px-5">Add Coupon</button>
-    </div>
-</form>
+        <div class="form-group">
+            <label for="input-1">Code</label>
+            <div class="input-group">
+                <input type="text" class="form-control" name="code" id="code" placeholder="Coupon code will be generated">
+                <button type="button" class="btn btn-light" onclick="generateCouponCode()">Generate</button>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="input-2">Discount</label>
+            <input type="number" class="form-control" name="discount" id="discount" placeholder="Enter Discount">
+        </div>
+        <div class="form-group">
+            <label for="input-3">Min Price Range</label>
+            <input type="number" class="form-control" name="minPriceRange" id="minPriceRange" placeholder="Enter Min Price">
+        </div>
+        <div class="form-group">
+            <label for="input-4">Max Price Range</label>
+            <input type="number" class="form-control" name="maxPriceRange" id="maxPriceRange" placeholder="Enter Max Price">
+        </div>
+        <div class="form-group">
+            <label for="input-5">Usage Count</label>
+            <input type="number" class="form-control" name="usageCount" id="usageCount" placeholder="Enter Usage Count">
+        </div>
+        <div class="form-group">
+            <label for="input-6">Select Date</label>
+            <input type="date" class="form-control" name="expireDate" id="expireDate">
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-light px-5">Add Coupon</button>
+        </div>
+    </form>
                 </div>
             </div>
         </div>
@@ -303,16 +325,16 @@
   
   <!-- Custom scripts -->
   <script src="adminAssets/js/app-script.js"></script>
-	<script>
+<script>
 function validateForm() {
     var code = document.getElementById("code").value;
     var discount = document.getElementById("discount").value;
     var minPriceRange = document.getElementById("minPriceRange").value;
     var maxPriceRange = document.getElementById("maxPriceRange").value;
-    var usageCount = document.getElementById("usagecount").value;
+    var usageCount = document.getElementById("usageCount").value;
     var expireDate = document.getElementById("expireDate").value;
 
-    if (!code.trim() || !discount.trim()|| !minPriceRange.trim() || !maxPriceRange.trim() || !usageCount.trim() || !expireDate.trim()) {
+    if (!code.trim() || !discount.trim() || !minPriceRange.trim() || !maxPriceRange.trim() || !usageCount.trim() || !expireDate.trim()) {
         Swal.fire({
             icon: 'warning',
             title: 'Oops...',
@@ -320,8 +342,36 @@ function validateForm() {
         });
         return false;
     }
+     if(minPriceRange > maxPriceRange){
+        Swal.fire({
+            icon: 'warning',
+            title: 'Oops...',
+            text: 'Min Price Range cannot be greater than Max Price Range',
+        });
+        return false;
+    }
     return true;
+
+   
 }
+</script>
+
+
+
+
+
+<script>
+    function generateCouponCode() {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let couponCode = '';
+        for (let i = 0; i < 10; i++) {
+            couponCode += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        document.getElementById('code').value = couponCode;
+    }
+
+    // Generate a coupon code when the page loads
+    window.onload = generateCouponCode;
 </script>
 </body>
 </html>
