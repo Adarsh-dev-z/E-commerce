@@ -331,7 +331,7 @@
                                         <div id="bankTransferContent" class="payment-content">
                                             <p class="no-margin font-15"></p>
                                         </div>
-
+{{!-- 
                                         <div class="form-check">
                                             <input class="form-check-input" type="radio" name="payment" id="stripe"
                                                 value="stripe">
@@ -341,6 +341,11 @@
                                             <input class="form-check-input" type="radio" name="payment" id="razorpay"
                                                 value="razorpay">
                                             <label class="form-check-label" for="razorpay">Razorpay</label>
+                                        </div>
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="wallet" id="wallet"
+                                                value="wallet">
+                                            <label class="form-check-label" for="wallet">Wallet</label>
                                         </div>
 
 
@@ -354,7 +359,27 @@
                                 <div class="order-button-payment" class="payment-content">
                                     <button class="btn" id="checkout-button" value="Place order" type="submit">Place
                                         order</button>
-                                </div>
+                                </div> --}}
+                                <form id="checkout-form">
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="payment" id="stripe" value="stripe">
+        <label class="form-check-label" for="stripe">Stripe</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="payment" id="razorpay" value="razorpay">
+        <label class="form-check-label" for="razorpay">Razorpay</label>
+    </div>
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="payment" id="wallet" value="wallet">
+        <label class="form-check-label" for="wallet">Wallet</label>
+    </div>
+    <div id="paypalContent" class="payment-content">
+        <p class="no-margin font-15"></p>
+    </div>
+</form>
+<div class="order-button-payment" class="payment-content">
+    <button class="btn" id="checkout-button" value="Place order" type="submit">Place order</button>
+</div>
                             </div>
                         </div>
                     </div>
@@ -624,6 +649,111 @@ Swal.fire({
             });
         });
     </script> --}}
+<script>
+    document.addEventListener('DOMContentLoaded', async () => {
+        const checkoutButton = document.getElementById('checkout-button');
+
+        checkoutButton.addEventListener('click', async (event) => {
+            event.preventDefault(); 
+
+            const form = document.getElementById('checkout-form');
+            const formData = new FormData(form);
+            const paymentMethod = formData.get('payment');
+
+            if (!paymentMethod) {
+                Swal.fire({
+                    title: 'Error',
+                    text: `Please select a payment method`,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+                return;
+            }
+
+            const couponCodeElement = document.getElementById('coupon-discount');
+            const couponCode = couponCodeElement && couponCodeElement.textContent.trim() !== '' ? couponCodeElement.textContent.trim() : null;
+
+            const orderData = {
+                firstname: formData.get('firstname'),
+                lastname: formData.get('lastname'),
+                email: formData.get('email'),
+                telephone: formData.get('telephone'),
+                address: formData.get('address'),
+                apartment: formData.get('apartment'),
+                city: formData.get('city'),
+                state: formData.get('state'),
+                postcode: formData.get('postcode'),
+                notes: formData.get('notes'),
+                payment: paymentMethod,
+                couponCode: couponCode
+            };
+
+            if (paymentMethod === 'wallet') {
+                const requiredFields = [
+                    'firstname',
+                    'lastname',
+                    'email',
+                    'telephone',
+                    'address',
+                    'city',
+                    'postcode',
+                    'state',
+                    'apartment',
+                ];
+                let valid = true;
+
+                requiredFields.forEach(field => {
+                    if (!formData.get(field)?.trim()) {
+                        valid = false;
+                        Swal.fire({
+                            title: 'Error',
+                            text: `Please fill in your ${field}`,
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        });
+                        return; 
+                    }
+                });
+
+                if (!valid) {
+                    return; 
+                }
+
+                const response = await fetch('/place-order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(orderData),
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    Swal.fire({
+                        title: 'Success',
+                        text: `Order placed successfully`,
+                        icon: 'success',
+                        confirmButtonText: 'Ok'
+                    }).then(() => {
+                        window.location.href = '/orders'; // Redirect to order summary or orders page
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: result.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            }
+        });
+    });
+</script>
+
+
+
+
 
 
 
@@ -996,6 +1126,14 @@ Swal.fire({
     });    
 }
 </script>
+
+
+
+
+
+
+
+
 
 </div>
 </body>

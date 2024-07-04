@@ -25,7 +25,8 @@ const Cart = require('../models/cart')
 const Product =require('../models/product')
 const Order = require('../models/order')
 const Review=require('../models/review')
-
+const Razorpay = require('razorpay')
+require('dotenv').config()
 router.get('/login', getLogin)
 router.get('/product',userAuthCheck, getProduct)
 router.get('/shop', getShop)
@@ -484,11 +485,159 @@ router.get('/reviews/product/:productId', async (req, res) => {
   }
 });
 
+const razorpay = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET
+});
+
+router.post('/create-order', async (req, res) => {
+  const amount = parseInt(req.body.amount) * 100; // Convert amount to paise (Razorpay works in paise)
+  
+  const options = {
+      amount: amount, // Amount in paise
+      currency: 'INR',
+      receipt: `receipt_${new Date().getTime()}`,
+      payment_capture: 1, // Auto capture
+  };
+console.log(options,'reached')
+  try {
+      const order = await razorpay.orders.create(options);
+      res.json(order);
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
+// Route to verify payment signature and update wallet
+router.post('/verify-payment', userAuthCheck, async (req, res) => {
+  const { payment_id, order_id, signature } = req.body;
+console.log('req.body', req.body)
+  const crypto = require('crypto');
+  const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
+  hmac.update(`${order_id}|${payment_id}`);
+  const generated_signature = hmac.digest('hex');
+
+  if (signature === generated_signature) {
+      const userId = req.user._id;
+      const amount = req.body.amount
+      console.log(`amount: ${amount}`);
+     const user = await Users.findByIdAndUpdate(userId, { $inc: { walletAmount: amount } });
+     await user.save();
+console.log('user', user)
+      res.send({ success: true });
+  } else {
+      res.status(400).send({ error: 'Payment verification failed' });
+  }
+});
 
 
 
 
 
+
+
+
+router.post('/place-order',userAuthCheck, async (req, res) => {
+  try {
+      const userId = req.user._id; // Assuming user is authenticated and user ID is available
+      const {
+          firstname,
+          lastname,
+          email,
+          telephone,
+          company,
+          address,
+          apartment,
+          city,
+          state,
+          postcode,
+          notes,
+          payment,
+          couponCode
+      } = req.body;
+
+      const cart = await Cart.findOne({ user: userId }).populate('items.product');
+
+      if (!cart || !cart.items || cart.items.length === 0) {
+          return res.status(400).json({ success: false, message: 'Cart is empty.' });
+      }
+
+      let cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+      let discount = 0;
+
+      if (couponCode) {
+          const coupon = await Coupon.findOne({ code: couponCode });
+          if (coupon) {
+              discount = coupon.discount;
+              cartTotal -= discount;
+          }
+      }
+
+      const user = await Users.findById(userId);
+      if (payment === 'wallet') {
+          if (user.walletAmount < cartTotal) {
+              return res.status(400).json({ success: false, message: 'Insufficient wallet balance.' });
+          }
+          user.walletAmount -= cartTotal;
+          await user.save();
+      }
+
+      const orderItems = cart.items.map(item => ({
+          product: item.product._id,
+          quantity: item.quantity,
+          price: item.product.price,
+          totalPrice: item.totalPrice
+      }));
+
+      const newOrder = new Order({
+          user: userId,
+          orderID: `order_${new Date().getTime()}`,
+          address: {
+              firstname,
+              lastname,
+              email,
+              telephone,
+              address,
+              apartment,
+              city,
+              state,
+              postcode,
+              notes
+          },
+          datePlaced: new Date(),
+          orderStatus: 'pending',
+          payment: payment,
+          items: orderItems,
+          totalAmount: cartTotal,
+          totalPrice: cartTotal,
+          discountAmount: discount,
+          stockUpdated: true,
+          deliveryExpectedDate: new Date(new Date().setDate(new Date().getDate() + 7))
+      });
+
+      await newOrder.save();
+
+      // Update stock
+      for (const item of cart.items) {
+          const product = await Product.findById(item.product._id);
+          if (product) {
+              product.stock -= item.quantity;
+              await product.save();
+          }
+      }
+
+      // Clear user's cart
+      cart.items = [];
+      await cart.save();
+
+      res.status(200).json({ success: true, message: 'Order placed successfully.' });
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Internal Server Error.' });
+  }
+});
 
 
 // //----------------------CHECKOUT---------------------------------------

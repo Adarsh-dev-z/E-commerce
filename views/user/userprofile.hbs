@@ -351,14 +351,41 @@
                                 <div class="row user-profile mt-4">
                                     <div class="col-12 col-lg-6">
                                         <div class="profile-img">
-                                            <div class="img"><img src="asset\images\profile-circle.1023x1024.png" alt="profile"
-                                                    width="65" /></div>
-                                            <div class="detail ms-3">
-                                                <h5 class="mb-1">{{user.username}}</h5>
-                                                <p>Balance: <strong>₹{{user.walletAmount}}</strong></p>
-                                            </div>
-                                            <div class="lbl"></div>
-                                        </div>
+    <div class="img">
+        <img src="asset/images/profile-circle.1023x1024.png" alt="profile" width="65" />
+    </div>
+    <div class="detail ms-3">
+        <h5 class="mb-1">{{user.username}}</h5>
+        <p>Balance: <strong>₹{{user.walletAmount}}</strong></p>
+    </div>
+    <div class="lbl">
+        <!-- Add Money Button -->
+        <button id="add-money-button" class="btn btn-primary">Add Money</button>
+    </div>
+</div>
+
+<!-- Add Money Modal -->
+<div id="add-money-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Money to Wallet</h5>
+                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="add-money-form">
+                    <div class="form-group">
+                        <label for="amount">Amount (INR):</label>
+                        <input type="number" id="amount" class="form-control" name="amount" min="1" required />
+                    </div>
+                    <button type="submit" class="btn btn-primary mt-3">Pay Now</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
                                     </div>
                                     <div class="col-12 col-lg-6">
                                         <ul class="profile-order mt-3 mt-lg-0">
@@ -1730,6 +1757,67 @@ swal.fire({
 </script>
 
 
+
+
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script>
+    
+    document.getElementById('add-money-button').addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('add-money-modal'));
+        modal.show();
+    });
+    document.getElementById('add-money-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        
+        const amount = document.getElementById('amount').value;
+
+        const response = await fetch('/create-order', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ amount: amount })
+        });
+        const data = await response.json();
+
+        const options = {
+            key: '{{razorpayKeyId}}',
+            amount: data.amount,
+            currency: data.currency,
+            name: 'Your E-commerce Site',
+            order_id: data.id,
+            handler: async (response) => {
+                await fetch('/verify-payment', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        payment_id: response.razorpay_payment_id,
+                        order_id: response.razorpay_order_id,
+                        signature: response.razorpay_signature,
+                        amount: amount
+                    })
+                }).then(res => res.json())
+                  .then(data => {
+                      if (data.success) {
+                          alert('Payment successful!');
+                          window.location.reload(); 
+                      } else {
+                          alert('Payment verification failed.');
+                      }
+                  });
+            },
+            prefill: {
+                name: '{{user.username}}',
+                email: '{{user.email}}'
+            },
+            theme: {
+                color: '#3399cc'
+            }
+        };
+
+        const paymentObject = new Razorpay(options);
+        paymentObject.open();
+    });
+</script>
 </body>
 
 </html>

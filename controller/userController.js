@@ -306,7 +306,8 @@ const getShop = async function(req, res) {
       wishlist,
       awaitingDeliveryOrders,
       findReturnItems,
-      canceledOrders
+      canceledOrders,
+      razorpayKeyId:process.env.RAZORPAY_KEY_ID
       
     })
   }catch(err){
@@ -1838,6 +1839,9 @@ const getShopByCategory = async (req, res) => {
     return res.status(500).send('Internal Server Error');
   }
 };
+
+
+
 
 
 
