@@ -38,10 +38,8 @@ const getLogin = function(req, res) {
     try {
       const product =await findProduct(productId);
       const review = await Reviews.find({product:product._id}).populate('user');
-     console.log('review----------',review)
       const relatedProducts =await Product.find({category:product.category}).limit(5);
-      console.log('related products:', relatedProducts)
-      console.log(product);
+     
       res.render('user/product', { product, relatedProducts });
     } catch (error) {
       console.log(error);
@@ -101,7 +99,6 @@ const getShop = async function(req, res) {
     const userId = req.user._id;
     try {
       const cart = await Cart.findOne({ user: userId }).populate("items.product");
-      console.log(cart);
 
       if (!cart) {
         return res.render("user/cart", { cart: { items: [] }, cartTotal: 0 });
@@ -120,9 +117,7 @@ const getShop = async function(req, res) {
     const userId = req.user._id;
     try{
 
-      console.log('req coming from shop')
       const cart = await Cart.findOne({user:userId}).populate("items.product")
-      console.log('hhhhhhhhhhhhhhhhhhhhhhhhhh',cart)
   
       if(!cart){
 
@@ -229,11 +224,9 @@ const getShop = async function(req, res) {
     
     
     
-        console.log(mainBanner)
         if(req.session.user){
           cart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
           const userName=req.session.user.username
-          console.log(userName)
           let showWelcomeMessage = false;
           if(!req.session.seenWelcomeMessage){
             showWelcomeMessage = true;
@@ -255,7 +248,6 @@ const getShop = async function(req, res) {
 
   const getWishlist = async function(req, res) {
     const userId = req.user._id;
-    console.log(userId)
     try{
       const wishlist = await Wishlist.findOne({user:userId}).populate('products');
       res.render('user/wishlist',{wishlist: wishlist? wishlist.products: []});
@@ -283,19 +275,16 @@ const getShop = async function(req, res) {
   });
 
   const returnOrderItems = await Order.find({user:userId}).populate('returnItems.product')
-  console.log('orders',returnOrderItems)
   
   const findReturnItems = returnOrderItems.flatMap(order => 
     order.returnItems.map(item => ({ ...item.toObject(), orderID: order.orderID }))
   );
 
   
-  console.log('find return Items', findReturnItems);
 
   
     const address = await Address.find({user:userId}).populate('user')
     const wishlist = await Wishlist.findOne({user:userId}).populate('products')
-    console.log("wishlist is ", wishlist)
 
     res.render("user/userprofile",{
       order,
@@ -307,7 +296,7 @@ const getShop = async function(req, res) {
       awaitingDeliveryOrders,
       findReturnItems,
       canceledOrders,
-      razorpayKeyId:process.env.RAZORPAY_KEY_ID
+      razorpayKeyId:process.env.RAZORPAY_KEY_ID,
       
     })
   }catch(err){
@@ -322,7 +311,6 @@ const getShop = async function(req, res) {
       req.session.user= req.user;
       req.session.loggedIn = true;
       res.redirect("home");
-      console.log("User signed and logged in");
     }catch(err){
       console.log(err);
     }
@@ -375,7 +363,7 @@ const getShop = async function(req, res) {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: 'adarsh7013a@gmail.com',
+      user: process.env.APP_EMAIL,
       pass: process.env.APP_PASSWORD 
     }
   });
@@ -465,9 +453,9 @@ async function userRegister(req, res, next) {
 
     const {token, expireTime} = generateToken();
 
-    const verificationLink = `http://localhost:3001/verify?token=${token}`;
+    const verificationLink = `${process.env.DURL}/verify?token=${token}`;
     await transporter.sendMail({
-      from: 'adarsh7013a@gmail.com',
+      from: process.env.APP_EMAIL,
       to: email,
       subject: 'Email Verification',
       html: `Hi, click <a href="${verificationLink}">here</a> to verify your email for only shoes.`
@@ -525,9 +513,7 @@ async function userRegister(req, res, next) {
 // }
 async function handleVerification(req, res) {
   const token = req.query.token;
-  console.log(token)
   const user = await findToken(token);
-  console.log(user)
 
   if (!user) {
     return res.status(400).send('Invalid token');
@@ -577,7 +563,6 @@ const postLogin = async (req, res) => {
       return res.status(401).json({ success: false, message: 'Invalid password' });
     }
 
-    console.log("user id",currentUser._id)
    await addToCart(currentUser._id, parsedGuestCart)
 
     // req.session.userId = user._id;
@@ -613,12 +598,10 @@ const postLogin = async (req, res) => {
 const postAddToWishlist = async (req, res)=>{
   try {
       const productId= req.body.id;
-      console.log(productId)
       if(!productId){
           return res.status(400).json({ success:false, message:'product not found'});
       }else{
          const userId = req.user._id
-          console.log(userId)
 
           let wishlist = await Wishlist.findOne({user: userId});
           if(!wishlist){
@@ -640,7 +623,6 @@ const GetRemoveWishlist = async (req, res)=>{
   try{
       const productId = req.query.id;
   const userId = req.user._id
-  console.log(productId, userId)
   const updateWishlist = await Wishlist.findOneAndUpdate({user: userId}, {$pull:{products: productId}},
       {new: true}
   )
@@ -669,7 +651,6 @@ const postAddToCart = async (req, res) => {
   }
 
   const itemsToAdd = [{ productId, quantity: 1 }];
-  console.log('items to add', itemsToAdd);
   try {
     await addToCart(userId, itemsToAdd);
     res.json({ success: true });
@@ -759,21 +740,17 @@ const getClearCart = async (req, res) => {
 const getProductCheckout = async (req, res)=>{
   const userId = req.user._id
   const cartId = req.query.id
-  // console.log(cartId)
   const USER = await User.findById(userId)
   const orderCount = await Order.countDocuments({ user: userId });
   const address = await Address.find({user:userId}).lean()
 
   
   const cart = await Cart.findOne({user:userId}).populate('items.product').lean();
-  // console.log("cart items"+cart)
 
   const cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
   const coupon = await Coupon.findOne({minPriceRange:{$lt:cartTotal},maxPriceRange:{$gt:cartTotal}})
-  console.log("coupon"+coupon)
   // if(cartTotal)
 
-      console.log(coupon)
   res.render('user/checkout',{cart, cartTotal, coupon, orderCount, USER, address})
 }
 
@@ -781,14 +758,11 @@ const getOrderSuccess = async(req, res)=>{
   const sessionId = req.query.session_id;
   const userId = req.user._id
 
-  // console.log(sessionId);
   const session = await stripe.checkout.sessions.retrieve(sessionId, {
       expand: ['total_details.breakdown.discounts']
   })
-  console.log('session is:',session)
   // const order = await Order.findOne({stripeSessionId:sessionId}).populate('address').populate('items.product')
   const address=await Address.findById(session.metadata.addressId).lean()
-  console.log('address in session.metadata',address)
   const userCart = await Cart.findOne({user:userId}).populate('items.product')
   const order = new Order({
     user: userId,
@@ -812,7 +786,6 @@ await order.save();
 
   if (session.total_details && session.total_details.breakdown && session.total_details.breakdown.discounts) {
       const discount = session.total_details.breakdown.discounts[0];
-      console.log('discount',discount)
       if (discount) {
           // couponCode = discount.coupon.id; 
           discountAmount = discount.amount / 100; 
@@ -829,16 +802,13 @@ await order.save();
           for(const item of order.items){
               const product = await Product.findById(item.product._id);
               if(product){
-                  // console.log('product befor', product.stock)
                   product.stock -=item.quantity;
 
                   await product.save();
-                  // console.log('product after', product.stock)
               }
           }
           order.stockUpdated=true;
           await order.save();
-          // console.log('order after', order.stockUpdated)
       }catch (err){
           console.err('error updating product stock', err);
           return res.status(500).send('error updating product stock')
@@ -855,17 +825,14 @@ await order.save();
           })          
           order.deliveryExpectedDate = formatedDate;
           await order.save();  
-// console.log(session.amount_discount)
-// console.log(session.amount_off)
-          // console.log(order.items)
+
           const clearCart = await Cart.findOneAndDelete({user:userId})
           if(clearCart){
             console.log('cart deleted');
           }else{
             console.log('error updating cart')
           }
-          console.log('user order:',order)
-          console.log('address:',order.address)
+          
           res.render('user/order-success',{
               order,
               address:address,
@@ -1187,13 +1154,10 @@ const createCheckoutSession = async (req, res) => {
           sessionData.discounts = [{
               coupon: req.session.couponDiscount[0].couponCode
           }];
-          console.log("Applied coupon:", req.session.couponDiscount[0]);
-          console.log("Total discount:", totalDiscount);
-          console.log("Session data:", sessionData);
+         
       }
 
       const session = await stripe.checkout.sessions.create(sessionData);
-      console.log('hiiii', session.total_details.breakdown.discounts);
       // order.items = cart.items;
       // order.stripeSessionId = session.id;
       // await order.save();
@@ -1291,10 +1255,8 @@ const removeAddress = async (req, res) => {
       const addressId = req.params.id;
       const address = await Address.findByIdAndDelete(addressId);
       if (address) {
-          console.log('Address deleted');
           res.json({ success: true, message: 'Address deleted successfully' });
       } else {
-          console.log('Address not found');
           res.json({ success: false, message: 'Address not found' });
       }
   } catch (err) {
@@ -1333,10 +1295,9 @@ const postResetPassLink = async(req, res)=>{
         const {token, expireTime}= generateToken();
         user.tokenExpires =expireTime
         user.verificationToken =token;
-        console.log(user)
         await user.save()
   
-        const verificationLink = `http://localhost:3001/resetpass?token=${token}`;
+        const verificationLink = `${proces.env.DURL}/resetpass?token=${token}`;
         transporter.sendMail({
           from: 'adarsh7013a@gmail.com',
           to: userEmail,
@@ -1365,9 +1326,7 @@ const postResetPassLink = async(req, res)=>{
 
 const resetPassword = async function resetPassword(req, res) {
   const token = req.query.token;
-  console.log(token)
   const user = await User.findOne({verificationToken:token});
-  console.log(user)
 
   if (!user) {
     return res.status(400).send('Invalid token');
@@ -1385,7 +1344,6 @@ const email= user.email;
 req.session.email=email
     
   // req.session.loggedIn = true;
-console.log("latest user: ",user)
   return res.redirect('/update-password');
 }
 
@@ -1643,7 +1601,6 @@ if(existingAddress){
         amount: item.totalPrice
       }
     })
-    console.log('items',items)
     const cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
     let couponDiscount = 0;
     if(req.session.couponDiscount){
@@ -1677,7 +1634,7 @@ if(existingAddress){
 
         address: userAddress._id, couponDiscount:couponDiscount
       },
-      callback_url: `${process.env.BASE_URL}/razorpay-success`,  
+      callback_url: `${process.env.DURL}/razorpay-success`,  
     };
     
      
@@ -1755,7 +1712,6 @@ const handleRazorpaySuccess = async (req, res) => {
 
     const { razorpay_payment_id, razorpay_order_id } = req.body;
     const paymentDetails = await razorpay.payments.fetch(razorpay_payment_id);
-    console.log('paymentDetails:', paymentDetails);
 
     const deliveryDate = new Date();
     deliveryDate.setDate(deliveryDate.getDate() + 5);
@@ -1776,10 +1732,8 @@ const handleRazorpaySuccess = async (req, res) => {
       deliveryExpectedDate: formatedDate,
     });
 
-    console.log('userOrder:', userOrder);
     await userOrder.save();
 
-    console.log('cart.items:', cart.items);
 
     await Promise.all(cart.items.map(async (item) => {
       const product = item.product;
@@ -1788,16 +1742,13 @@ const handleRazorpaySuccess = async (req, res) => {
         product.isOutOfStock = true;
       }
       await product.save();
-      console.log('updateStock:', product);
     }));
 
     userOrder.stockUpdated = true;
     await userOrder.save();
-    console.log('stockUpdated:', userOrder);
     cart.items = [];
     cart.totalPrice = 0;
     await cart.save();
-    console.log('cart cleared:', cart);
     const userAddress = await Address.findById(paymentDetails.notes.address);
 
     const subtotal=parseFloat(userOrder.totalPrice)+parseFloat(userOrder.discountAmount)
@@ -1839,6 +1790,7 @@ const getShopByCategory = async (req, res) => {
     return res.status(500).send('Internal Server Error');
   }
 };
+
 
 
 

@@ -119,7 +119,7 @@
                 	<div class="site-cart">
                     	<a href="#" class="site-header__cart" title="Cart">
                         	<i class="icon anm anm-bag-l"></i>
-                            <span id="CartCount" class="site-header__cart-count" data-cart-render="item_count">2</span>
+                            <span id="CartCount" class="site-header__cart-count" data-cart-render="item_count">{{data.count}}</span>
                         </a>
                         {{>minicart}}
                        	{{!-- <!--Minicart Popup-->
@@ -238,3 +238,18 @@
         </li>
       </ul>
 	</div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const response = await fetch('/cart-count');
+    const data = await response.json();
+    console.log('data', data);
+    const cartCountElement = document.getElementById('CartCount');
+    cartCountElement.textContent = data.count;
+  } catch (error) {
+    console.error('Error fetching cart count:', error);
+  }
+});
+
+    </script>

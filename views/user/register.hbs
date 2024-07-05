@@ -65,9 +65,9 @@
                 <div class="col-2 col-sm-4 col-md-3 col-lg-4 text-right">
                 	<span class="user-menu d-block d-lg-none"><i class="anm anm-user-al" aria-hidden="true"></i></span>
                     <ul class="customer-links list-inline">
-                        <li><a href="login.html">Login</a></li>
-                        <li><a href="register.html">Create Account</a></li>
-                        <li><a href="wishlist.html">Wishlist</a></li>
+                        <li><a href="/login">Login</a></li>
+                        <li><a href="/register">Create Account</a></li>
+                        <li><a href="/wishlist">Wishlist</a></li>
                     </ul>
                 </div>
             </div>
@@ -80,7 +80,7 @@
             <div class="row align-items-center">
             	<!--Desktop Logo-->
                 <div class="logo col-md-2 col-lg-2 d-none d-lg-block">
-                    <a href="index.html">
+                    <a href="/home">
                     	<img src="assets/images/logo.svg" alt="Belle Multipurpose Html Template" title="Belle Multipurpose Html Template" />
                     </a>
                 </div>
@@ -279,7 +279,7 @@
                 </div>
                 <div class="col-6 col-sm-6 col-md-6 col-lg-2 d-block d-lg-none mobile-logo">
                 	<div class="logo">
-                        <a href="index.html">
+                        <a href="/home">
                             <img src="assets/images/logo.svg" alt="Belle Multipurpose Html Template" title="Belle Multipurpose Html Template" />
                         </a>
                     </div>
@@ -298,9 +298,9 @@
                                         <img src="assets/images/product-images/cape-dress-1.jpg" alt="3/4 Sleeve Kimono Dress" title="" />
                                     </a>
                                     <div class="product-details">
-                                        <a href="#" class="remove"><i class="anm anm-times-l" aria-hidden="true"></i></a>
-                                        <a href="#" class="edit-i remove"><i class="anm anm-edit" aria-hidden="true"></i></a>
-                                        <a class="pName" href="cart.html">Sleeve Kimono Dress</a>
+                                        <a href="/cart" class="remove"><i class="anm anm-times-l" aria-hidden="true"></i></a>
+                                        <a href="/cart" class="edit-i remove"><i class="anm anm-edit" aria-hidden="true"></i></a>
+                                        <a class="pName" href="/cart">Sleeve Kimono Dress</a>
                                         <div class="variant-cart">Black / XL</div>
                                         <div class="wrapQtyBtn">
                                             <div class="qtyField">
@@ -347,8 +347,8 @@
                                     <span class="label">Cart Subtotal:</span><span class="product-price"><span class="money">$748.00</span></span>
                                 </div>
                                  <div class="buttonSet text-center">
-                                    <a href="cart.html" class="btn btn-secondary btn--small">View Cart</a>
-                                    <a href="checkout.html" class="btn btn-secondary btn--small">Checkout</a>
+                                    <a href="/cart" class="btn btn-secondary btn--small">View Cart</a>
+                                    {{!-- <a href="/checkout" class="btn btn-secondary btn--small">Checkout</a> --}}
                                 </div>
                             </div>
                         </div>
@@ -542,31 +542,7 @@
       		</div>
 		</div>
         <!--End Page Title-->
-    {{!-- messageboxes --}}
-     <div class="message-box success">
-        <span class="icon">✔</span>
-        <span class="message">Success Message</span>
-        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
-    </div>
-
-    <div class="message-box error">
-        <span class="icon">✖</span>
-        <span class="message">Error Message</span>
-        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
-    </div>
-
-    <div class="message-box info">
-        <span class="icon">ℹ</span>
-        <span class="message">Informational Message</span>
-        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
-    </div>
-
-    <div class="message-box warning">
-        <span class="icon">⚠</span>
-        <span class="message">Warning Message</span>
-        <span class="close" onclick="this.parentElement.style.display='none';">✖</span>
-    </div>
-    {{!-- messageboxe --}}
+   
         <div class="container">
     <div class="row">
         <div class="col-12 col-sm-12 col-md-6 col-lg-6 main-col offset-md-3">

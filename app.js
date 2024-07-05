@@ -9,7 +9,7 @@ var logger = require('morgan');
 const passport =require("passport");
 const session = require("express-session");
 const db=require('./config/db/config')
-// const MongoDBStore = require("connect-mongodb-session")(session);
+const MongoDBStore = require("connect-mongodb-session")(session);
 require("./config/passport-config")(passport)
 const hbs = require("express-handlebars");
 var app = express();
@@ -72,7 +72,7 @@ app.use(session({
   resave:false,
   saveUninitialized:false,
   cookie: { maxAge: 600000*24 },
-  // store: new MongoDBStore({ mongooseConnection: db,})
+  store: new MongoDBStore({ mongooseConnection: db,})
 }));
 app.use(flash());
 

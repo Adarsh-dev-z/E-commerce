@@ -54,6 +54,9 @@ const userSchema =mongoose.Schema({
     },
     tokenExpires:{
         type:Date
+    },
+    stripeAccountId:{
+        type:String
     }
 },
 {timestamps:true}

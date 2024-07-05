@@ -360,27 +360,27 @@
     </div>
     <div class="lbl">
         <!-- Add Money Button -->
-        <button id="add-money-button" class="btn btn-primary">Add Money</button>
+    <button id="withdraw-money-button" class="btn btn-primary">Withdraw Money</button>
     </div>
 </div>
 
-<!-- Add Money Modal -->
-<div id="add-money-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+<!-- Withdraw Money Modal -->
+<div id="withdraw-money-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add Money to Wallet</h5>
+                <h5 class="modal-title">Withdraw Money from Wallet</h5>
                 <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
             <div class="modal-body">
-                <form id="add-money-form">
+                <form id="withdraw-money-form">
                     <div class="form-group">
-                        <label for="amount">Amount (INR):</label>
-                        <input type="number" id="amount" class="form-control" name="amount" min="1" required />
+                        <label for="withdraw-amount">Amount (INR):</label>
+                        <input type="number" id="withdraw-amount" class="form-control" name="amount" min="1" required />
                     </div>
-                    <button type="submit" class="btn btn-primary mt-3">Pay Now</button>
+                    <button type="submit" class="btn btn-primary mt-3">Withdraw Now</button>
                 </form>
             </div>
         </div>
@@ -1762,17 +1762,17 @@ swal.fire({
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script>
-    
-    document.getElementById('add-money-button').addEventListener('click', () => {
-        const modal = new bootstrap.Modal(document.getElementById('add-money-modal'));
+    document.getElementById('withdraw-money-button').addEventListener('click', () => {
+        const modal = new bootstrap.Modal(document.getElementById('withdraw-money-modal'));
         modal.show();
     });
-    document.getElementById('add-money-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        
-        const amount = document.getElementById('amount').value;
 
-        const response = await fetch('/create-order', {
+    document.getElementById('withdraw-money-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const amount = document.getElementById('withdraw-amount').value;
+
+        const response = await fetch('/create-withdrawal-order', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: new URLSearchParams({ amount: amount })
@@ -1783,10 +1783,10 @@ swal.fire({
             key: '{{razorpayKeyId}}',
             amount: data.amount,
             currency: data.currency,
-            name: 'Your E-commerce Site',
+            name: 'Witdraw',
             order_id: data.id,
             handler: async (response) => {
-                await fetch('/verify-payment', {
+                await fetch('/verify-withdrawal', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -1798,10 +1798,10 @@ swal.fire({
                 }).then(res => res.json())
                   .then(data => {
                       if (data.success) {
-                          alert('Payment successful!');
-                          window.location.reload(); 
+                          showSuccessPopup();
+                          window.location.reload();
                       } else {
-                          alert('Payment verification failed.');
+                          alert('Withdrawal verification failed.');
                       }
                   });
             },
@@ -1817,7 +1817,31 @@ swal.fire({
         const paymentObject = new Razorpay(options);
         paymentObject.open();
     });
+
+    function showSuccessPopup() {
+        const popup = document.createElement('div');
+        popup.className = 'success-popup';
+        popup.innerText = 'Withdrawal successful!';
+        document.body.appendChild(popup);
+
+        setTimeout(() => {
+            document.body.removeChild(popup);
+        }, 3000);
+    }
 </script>
+
+<style>
+    .success-popup {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: #28a745;
+        color: #fff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+</style>
 </body>
 
 </html>
