@@ -1840,7 +1840,7 @@ const handleRazorpaySuccess = async (req, res) => {
             <h2 style="color: #333;">Order Summary</h2>
             <p><strong>Order ID:</strong> ${userOrder.orderID}</p>
             <p><strong>Total Amount:</strong> $${(userOrder.totalPrice / 100).toFixed(2)}</p>
-            ${userOrder.discountAmount ? `<p><strong>Discount Applied:</strong> -$${userOrder.discountAmount.toFixed(2)}</p>` : ''}
+            ${userOrder.discountAmount ? `<p><strong>Discount Applied:</strong> -$${userOrder.discountAmount.toFixed}</p>` : ''}
             <p><strong>Expected Delivery Date:</strong> ${formatedDate}</p>
           </div>
           <div style="background-color: #f8f8f8; padding: 20px;">
