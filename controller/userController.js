@@ -457,7 +457,7 @@ async function userRegister(req, res, next) {
 
     const {token, expireTime} = generateToken();
 
-    const verificationLink = `${process.env.DURL}/verify?token=${token}`;
+    const verificationLink = `localhost:3001/verify?token=${token}`;
     await transporter.sendMail({
       from: process.env.APP_EMAIL,
       to: email,
@@ -1697,7 +1697,7 @@ if(existingAddress){
 
         address: userAddress._id, couponDiscount:couponDiscount
       },
-      callback_url: `${process.env.DURL}/razorpay-success`,  
+      callback_url: `/razorpay-success`,  
     };
     
      
