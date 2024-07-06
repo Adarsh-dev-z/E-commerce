@@ -173,7 +173,6 @@
 .price-filter-form input {
     width: 100px;
     border: 1px solid #ddd;
-    border-radius: 4px;
     padding: 5px;
     margin-right: 10px;
     text-align: center;
@@ -182,19 +181,7 @@
     background-color: #fff;
 }
 
-.price-filter-form .btn {
-    padding: 5px 10px;
-    border: none;
-    background-color: #555;
-    color: #fff;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
 
-.price-filter-form .btn:hover {
-    background-color: #333;
-}
 
 .ui-slider {
     width: 150px;
@@ -243,17 +230,21 @@ body {
 .topbar_widget {
     display: flex;
     align-items: center;
+    justify-content: center;
+    width: 100%;
 }
 
 .topbar_categories {
     display: flex;
+    flex-wrap: wrap;
     list-style: none;
     padding: 0;
     margin: 0;
+    justify-content: center;
 }
 
 .topbar_categories li {
-    margin-right: 25px;
+    margin: 5px;
 }
 
 .topbar_categories a {
@@ -271,14 +262,14 @@ body {
 }
 
 .price-filter-form {
-    display: flex;
+    display: none; /* Initially hidden */
     align-items: center;
     background: rgba(255, 255, 255, 0.1);
     padding: 10px;
-    border-radius: 8px;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
     margin-top: 10px;
     margin-bottom: 10px;
+    flex-wrap: wrap;
 }
 
 .price-filter-form label {
@@ -288,8 +279,6 @@ body {
 
 .price-filter-form input {
     width: 100px;
-    border: none;
-    border-radius: 4px;
     padding: 5px;
     margin-right: 10px;
     text-align: center;
@@ -299,21 +288,7 @@ body {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.price-filter-form .btn {
-    padding: 5px 15px;
-    border: none;
-    background-color: #ffd700;
-    color: #333;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
-}
 
-.price-filter-form .btn:hover {
-    background-color: #ffbf00;
-    transform: scale(1.1);
-    box-shadow: 0 2px 5px rgba(255, 191, 0, 0.5);
-}
 
 .ui-slider {
     width: 150px;
@@ -329,19 +304,51 @@ body {
     background-color: #fff;
     width: 20px;
     height: 20px;
-    border-radius: 50%;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
-.topbar_categories a{
-    margin-left: 55px;
-    margin-right: 55px;
+@media (max-width: 768px) {
+    .topbar_categories {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .topbar_categories a {
+        margin-left: 0;
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .price-filter-form {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .price-filter-form label,
+    .price-filter-form input,
+     {
+        margin-bottom: 10px;
+    }
 }
 
-.topbar_categories{
-    background-color: #f3f3f3;
-    width: 1232px;
+@media (min-width: 769px) {
+    .topbar_categories a {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+
+    .topbar_categories {
+        background-color: #f3f3f3;
+                width: 1224px;
+
+    }
+
+    .price-filter-form {
+        flex-direction: row;
+    }
 }
+
+
 
 </style>
   
@@ -382,19 +389,31 @@ body {
         	<div class="row">
                 {{!-- ----------------------------------------------------------- --}}
            <!-- Categories -->
-        <div class="topbar_widget categories">
-            <div class="widget-content">
-                <ul class="topbar_categories d-flex flex-wrap justify-content-between mt-2 mb-2">
-                    <li class="level1 mr-2 mb-2"><a href="/shop">All</a></li>
-                    <li class="level1 mr-2 mb-2"><a href="/shop?category=Trending">Trending</a></li>
-                    <li class="level1 mr-2 mb-2"><a href="/shop?category=Men's Shoes">Mens</a></li>
-                    <li class="level1 mr-2 mb-2"><a href="/shop?category=Womens">Womens</a></li>
-                    <li class="level1 mr-2 mb-2"><a href="/shop?category=Charecter Edition">Character Editions</a></li>
-                    <li class="level1 mr-2 mb-2"><a href="/shop?category=New Arrival">New Arrival</a></li>
-                    {{!-- <li class="level1 mr-2 mb-2"><a href="#">Most Popular</a></li> --}}
-                </ul>
-            </div>
-        </div>
+       <div class="topbar_widget categories">
+    <div class="widget-content">
+        <ul id="topbar-categories" class="topbar_categories d-flex flex-wrap justify-content-between mt-2 mb-2">
+            {{!-- <li>
+                 <button id="filter-toggle" class="btn">Filter</button>
+        <form id="price-filter-form" class="price-filter-form">
+            <label for="min-price">Min Price:</label>
+            <input type="number" id="minPrice" name="minPrice" min="0" placeholder="0">
+            <label for="max-price">Max Price:</label>
+            <input type="number" id="maxPrice" name="maxPrice" min="0" placeholder="1000">
+                 <button id="" class="btn">Apply</button>
+        </form>
+            </li> --}}
+            <li class="level1 mr-2 mb-2"><a href="/shop">All</a></li>
+            <li class="level1 mr-2 mb-2"><a href="/shop?category=Trending">Trending</a></li>
+            <li class="level1 mr-2 mb-2"><a href="/shop?category=Men's Shoes">Mens</a></li>
+            <li class="level1 mr-2 mb-2"><a href="/shop?category=Womens">Womens</a></li>
+            <li class="level1 mr-2 mb-2"><a href="/shop?category=Charecter Edition">Character Editions</a></li>
+            <li class="level1 mr-2 mb-2"><a href="/shop?category=New Arrival">New Arrival</a></li>
+        </ul>
+    </div>
+</div>
+
+
+
         <!-- End Categories -->
 
         {{!-- <!-- Price Filter -->
@@ -666,11 +685,20 @@ $(document).ready(function() {
                         $('#wishlist-popup').fadeOut();
                     }, 2000);
                 } else {
-                    alert('Error adding item to wishlist');
-                }
+swal.fire({
+    title: "Login Required",
+    text: "Please login to add products to your wishlist",
+    icon: "warning",
+    confirmButtonColor: "#3085d6" 
+  });                }
             },
             error: function() {
-                alert('Internal server error');
+               swal.fire({
+  title: "Error",
+  text: "Internal server error",
+  icon: "error",
+  confirmButtonColor: "#dc3545"
+});
             }
         });
     });
@@ -738,7 +766,12 @@ $(document).ready(function() {
                     }
                 },
                 error: function() {
-                    alert('internal server error');
+                    swal.fire({
+  title: "Error",
+  text: "Internal server error",
+  icon: "error",
+  confirmButtonColor: "#dc3545"
+});
                 }
             });
         } else {
@@ -780,6 +813,23 @@ $(document).ready(function() {
             $("#amount").val("$" + $("#slider-range").slider("values", 0) + " - $" + $("#slider-range").slider("values", 1));
         });
     </script>
+
+    <script>
+document.getElementById('filter-toggle').addEventListener('click', function() {
+    var categories = document.getElementById('topbar-categories');
+    var filterForm = document.getElementById('price-filter-form');
+    if (filterForm.style.display === 'none' || filterForm.style.display === '') {
+        categories.style.display = 'none';
+        filterForm.style.display = 'flex';
+    } else {
+        categories.style.display = 'flex';
+        filterForm.style.display = 'none';
+    }
+});
+</script>
+
+
+
 </div>
 </body>
 

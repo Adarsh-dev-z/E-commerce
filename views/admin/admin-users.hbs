@@ -377,7 +377,6 @@ function confirmDeleteUser(userId) {
       function editRow(icon) {
         const row = icon.closest('tr');
         alert('Edit functionality not implemented yet.');
-        // Implement your edit functionality here
       }
   
       function deleteRow(icon) {
@@ -403,16 +402,23 @@ function confirmDeleteUser(userId) {
       const row = icon.closest('tr');
       row.querySelector('.fa-ban').classList.add('d-none');
       row.querySelector('.fa-check').classList.remove('d-none');
-      alert('User has been blocked.');
-      // Implement any additional block functionality here
-    }
+swal.fire({
+  title: "Account Blocked",
+  text: "User has been blocked",
+  icon: "warning",
+  confirmButtonColor: "#f0ad4e"
+});    }
 
     function unblockRow(icon) {
       const row = icon.closest('tr');
       row.querySelector('.fa-check').classList.add('d-none');
       row.querySelector('.fa-ban').classList.remove('d-none');
-      alert('User has been unblocked.');
-      // Implement any additional unblock functionality here
+swal.fire({
+  title: "Account Unblocked!",
+  text: "User has been unblocked",
+  icon: "success",
+  confirmButtonColor: "#28a745"
+});      // Implement any additional unblock functionality here
     }
 
     function deleteRow(icon) {

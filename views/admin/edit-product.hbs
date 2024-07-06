@@ -353,8 +353,12 @@ function validateForm() {
     var stock = document.getElementById('stock').value;
 
     if (!name.trim() || !brand.trim() || !price.trim() || !description.trim() || !stock.trim()) {
-        alert("Please fill out all fields before submitting.");
-        return false;
+swal.fire({
+  title: "Missing Information",
+  text: "Please fill out all required fields before submitting",
+  icon: "warning",
+  confirmButtonColor: "#3085d6"
+});        return false;
     }
     return true;
 }

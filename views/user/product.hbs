@@ -721,8 +721,12 @@
                     
                 },
                 error:function(){
-                    alert('internal server error');
-                }
+swal.fire({
+  title: "Error",
+  text: "Internal server error",
+  icon: "error",
+  confirmButtonColor: "#dc3545"
+});                }
             })
         })
     })
@@ -746,12 +750,20 @@
                   },2000)
                    console.log('added to wishlist successfully')
                 } else {
-                    alert('Error adding item to wishlist');
-                }
+swal.fire({
+  title: "Error",
+  text: "Couldn't add item to wishlist",
+  icon: "error",
+  confirmButtonColor: "#dc3545"
+});                }
             },
             error: function() {
-                alert('Internal server error');
-            }
+swal.fire({
+  title: "Error",
+  text: "Internal server error",
+  icon: "error",
+  confirmButtonColor: "#dc3545"
+});            }
         });
     });
 });
@@ -777,8 +789,12 @@
             const body = document.getElementById('review_body').value.trim();
             console.log(productId, author, email, rating, title, body,'datasss');
             if(!author || !email || !rating || !title || !body) {
-                alert('Please fill in all fields');
-                return;
+swal.fire({
+  title: "Missing Information",
+  text: "Please fill in all required fields",
+  icon: "warning",
+  confirmButtonColor: "#3085d6"
+});                return;
             }else{
             const response = await fetch('/reviews', {
                 method: 'POST',
@@ -789,12 +805,20 @@
             });
 
             if (response.ok) {
-                alert('Review submitted successfully');
-                loadReviews(productId);  // Reload reviews after submission
+swal.fire({
+  title: "Success!",
+  text: "Your review has been submitted successfully",
+  icon: "success",
+  confirmButtonColor: "#28a745"
+});                loadReviews(productId);  
                 
             } else {
-                alert('Failed to submit review');
-            }
+swal.fire({
+  title: "Submission Failed",
+  text: "Failed to submit your review. Please try again",
+  icon: "error",
+  confirmButtonColor: "#dc3545"
+});            }
                 
             }
         });
@@ -843,8 +867,12 @@ function validateForm() {
     const body = document.getElementById('review_body').value.trim();
 
     if (!author|| !title|| !body) {
-        alert("Please fill out all fields.");
-        return false;
+swal.fire({
+  title: "Missing Information",
+  text: "Please fill in all required fields",
+  icon: "warning",
+  confirmButtonColor: "#3085d6"
+});        return false;
     }
     return true;
 }

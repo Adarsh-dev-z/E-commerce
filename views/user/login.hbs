@@ -308,8 +308,10 @@
           if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
             message = jqXHR.responseJSON.message;
           }
-          alert(message);
-        }
+swal.fire({
+  title: message,
+  confirmButtonColor: "#dc3545"
+});        }
       });
     });
   });

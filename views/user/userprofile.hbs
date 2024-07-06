@@ -1801,8 +1801,12 @@ swal.fire({
                           showSuccessPopup();
                           window.location.reload();
                       } else {
-                          alert('Withdrawal verification failed.');
-                      }
+ swal.fire({
+    title: "Withdrawal Failed",
+    text: "Withdrawal verification failed.",
+    icon: "error",
+    confirmButtonColor: "#dc3545"
+  });                      }
                   });
             },
             prefill: {

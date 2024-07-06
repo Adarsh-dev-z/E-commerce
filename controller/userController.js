@@ -68,10 +68,14 @@ const getShop = async function(req, res) {
   try {
     let cart = {items: []};
     let product = [];
-    if(!req.query.category){
-      product = await Product.find().skip(44);
+    const { category, minPrice, maxPrice } = req.query;
+    console.log(req.query)
+    if(!category && !minPrice && !maxPrice){
+      product = await Product.find();
+    } else if(minPrice && maxPrice){
+      product = await Product.find({ price: { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) } }); 
+      console.log('product', product)
     } else {
-      const category = req.query.category;
       product = await Product.find({ category });
     }
 
@@ -602,6 +606,9 @@ const postAddToWishlist = async (req, res)=>{
           return res.status(400).json({ success:false, message:'product not found'});
       }else{
          const userId = req.user._id
+         if(!userId){
+            return res.status(400).json({ success:false, message:'please login to add to wishlist'});
+         }
 
           let wishlist = await Wishlist.findOne({user: userId});
           if(!wishlist){
@@ -833,6 +840,62 @@ await order.save();
             console.log('error updating cart')
           }
           
+
+          const findUser = await User.findOne({ _id: userId });
+
+          const transporter = nodemailer.createTransport({
+            service: 'gmail',
+            auth: {
+              user: process.env.APP_EMAIL,
+              pass: process.env.APP_PASSWORD
+            }
+          });
+      
+          const mailOptions = {
+            from: process.env.APP_EMAIL,
+            to: findUser.email,
+            subject: 'Order Confirmation - Your Order has been Placed!',
+            html: `
+              <div style="font-family: Arial, sans-serif; color: #333;">
+                <div style="background-color: #f8f8f8; padding: 20px;">
+                  <h1 style="color: #4CAF50;">Order Confirmation</h1>
+                  <p>Hi <strong>${findUser.username}</strong>,</p>
+                  <p>Thank you for shopping with us! Your order has been successfully placed. Here are your order details:</p>
+                </div>
+                <div style="background-color: #fff; padding: 20px; border: 1px solid #ddd;">
+                  <h2 style="color: #333;">Order Summary</h2>
+                  <p><strong>Order ID:</strong> ${order.orderID}</p>
+                  <p><strong>Total Amount:</strong> $${(session.amount_total / 100).toFixed(2)}</p>
+                  ${discountAmount ? `<p><strong>Discount Applied:</strong> -$${discountAmount.toFixed(2)}</p>` : ''}
+                  <p><strong>Expected Delivery Date:</strong> ${formatedDate}</p>
+                </div>
+                <div style="background-color: #f8f8f8; padding: 20px;">
+                  <h2 style="color: #333;">Delivery Address</h2>
+                  <p>${address.street}, ${address.city}, ${address.state}, ${address.postCode}, ${address.address}</p>
+                </div>
+                <div style="background-color: #fff; padding: 20px; border: 1px solid #ddd;">
+                  <h2 style="color: #333;">Items in Your Order</h2>
+                  <ul>
+                    ${order.items.map(item => `
+                      <li>
+                        <p><strong>${item.product.name}</strong></p>
+                        <p>Quantity: ${item.quantity}</p>
+                        <p>Price: $${(item.product.price / 100).toFixed(2)}</p>
+                      </li>
+                    `).join('')}
+                  </ul>
+                </div>
+                <div style="background-color: #f8f8f8; padding: 20px; text-align: center;">
+                  <p>We hope you enjoy your purchase! If you have any questions, feel free to <a href="mailto:${process.env.APP_EMAIL}" style="color: #4CAF50;">contact us</a>.</p>
+                  <p>Best regards,</p>
+                  <p>Your Company Name</p>
+                </div>
+              </div>
+            `
+          };
+      
+          await transporter.sendMail(mailOptions);
+
           res.render('user/order-success',{
               order,
               address:address,
@@ -1752,6 +1815,63 @@ const handleRazorpaySuccess = async (req, res) => {
     const userAddress = await Address.findById(paymentDetails.notes.address);
 
     const subtotal=parseFloat(userOrder.totalPrice)+parseFloat(userOrder.discountAmount)
+
+    const findUser = await User.findById(userId);
+    const transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.APP_EMAIL,
+        pass: process.env.APP_PASSWORD
+      }
+    });
+
+    const mailOptions = {
+      from: process.env.APP_EMAIL,
+      to: findUser.email,
+      subject: 'Order Confirmation - Your Order has been Placed!',
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <div style="background-color: #f8f8f8; padding: 20px;">
+            <h1 style="color: #4CAF50;">Order Confirmation</h1>
+            <p>Hi <strong>${findUser.username}</strong>,</p>
+            <p>Thank you for shopping with us! Your order has been successfully placed. Here are your order details:</p>
+          </div>
+          <div style="background-color: #fff; padding: 20px; border: 1px solid #ddd;">
+            <h2 style="color: #333;">Order Summary</h2>
+            <p><strong>Order ID:</strong> ${userOrder.orderID}</p>
+            <p><strong>Total Amount:</strong> $${(userOrder.totalPrice / 100).toFixed(2)}</p>
+            ${userOrder.discountAmount ? `<p><strong>Discount Applied:</strong> -$${userOrder.discountAmount.toFixed(2)}</p>` : ''}
+            <p><strong>Expected Delivery Date:</strong> ${formatedDate}</p>
+          </div>
+          <div style="background-color: #f8f8f8; padding: 20px;">
+            <h2 style="color: #333;">Delivery Address</h2>
+            <p>${userAddress.street}, ${userAddress.city}, ${userAddress.state}, ${userAddress.postCode}, ${userAddress.address}</p>
+          </div>
+          <div style="background-color: #fff; padding: 20px; border: 1px solid #ddd;">
+            <h2 style="color: #333;">Items in Your Order</h2>
+            <ul>
+              ${order.items.map(item => `
+                <li>
+                  <p><strong>${item.product.name}</strong></p>
+                  <p>Quantity: ${item.quantity}</p>
+                  <p>Price: $${(item.product.price / 100).toFixed(2)}</p>
+                </li>
+              `).join('')}
+            </ul>
+          </div>
+          <div style="background-color: #f8f8f8; padding: 20px; text-align: center;">
+            <p>We hope you enjoy your purchase! If you have any questions, feel free to <a href="mailto:${process.env.APP_EMAIL}" style="color: #4CAF50;">contact us</a>.</p>
+            <p>Best regards,</p>
+            <p>Your Company Name</p>
+          </div>
+        </div>
+      `
+    };
+
+    await transporter.sendMail(mailOptions);
+
+
+
     return res.render(`user/order-success`, {
       // paymentId:razorpay_payment_id,
       // orderId:razorpay_order_id,

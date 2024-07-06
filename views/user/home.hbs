@@ -171,7 +171,7 @@
 {{!-- ----------------------------------------------------welcome user---------------------------------------------------------- --}}
 {{#if showWelcomeMessage}}
 <div id="welcome-box">
-		hi <span id="username">{{userName}}</span>, welcome to our e-commerce website!
+		hi <span id="username">{{userName}}</span>, welcome to OnlyShoes!
 	</div>
 {{/if}}
 {{!-- ----------------------------------------------------welcome user---------------------------------------------------------- --}}
@@ -372,12 +372,12 @@
                     </div>
                     <div class="col-12 col-sm-4 col-md-4 col-lg-4">
                         <div class="custom-text text-center">
-                            <img class="blur-up lazyload" data-src="assets/images/collection/shoes-collection1.jpg" src="assets/images/collection/shoes-collection1.jpg" alt="" title="">
+                            <img class="blur-up lazyload" data-src="asset\images\1718004775559-full-force-low-shoes-BJkxkR.png" src="asset\images\1718004775559-full-force-low-shoes-BJkxkR.png" alt="" title="">
                         </div>
                     </div>
                     <div class="col-12 col-sm-4 col-md-4 col-lg-4">
                         <div class="custom-text text-center">
-                            <img class="blur-up lazyload" data-src="assets/images/collection/shoes-collection2.jpg" src="assets/images/collection/shoes-collection2.jpg" alt="" title="">
+                            <img class="blur-up lazyload" data-src="asset\images\1718004775544-dunk-low-shoes-wbxcmN.png" src="asset\images\1718004775544-dunk-low-shoes-wbxcmN.png" alt="" title="">
                         </div>
                     </div>
                 </div>
@@ -788,18 +788,24 @@ $(document).ready(function() {
             data: { id: productId },
             success: function(response) {
                 if(response.success) {
-                    // Show the popup
                     $('#wishlist-popup').fadeIn();
                     setTimeout(function() {
                         $('#wishlist-popup').fadeOut();
                     }, 2000);
                 } else {
-                    alert('Error adding item to wishlist');
-                }
+    Swal.fire({
+        icon: 'warning',
+        title: 'Please login to add products to wishlist',
+    });
+}
             },
             error: function() {
-                alert('Internal server error');
-            }
+    Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Something went wrong on the server.',
+    });
+}
         });
     });
 });
@@ -828,9 +834,13 @@ $(document).ready(function() {
                         console.log('error adding to cart');
                     }
                 },
-                error: function() {
-                    alert('internal server error');
-                }
+               error: function() {
+    Swal.fire({
+        icon: 'error',
+        title: 'Internal Server Error',
+        text: 'Something went wrong on the server.',
+    });
+}
             });
         } else {
             var guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];

@@ -521,8 +521,13 @@
                             var z = document.forms["update-admin-profile"]["password"].value;
                             var a = document.forms["update-admin-profile"]["confirmpassword"].value;
                             if (x == "" || y == "" || z == "" || a == "") {
-                                alert("Please fill all the fileds");
-                                return false;
+                                swal.fire({
+    title: "Missing Information",
+    text: "Please fill in all required fields",
+    icon: "warning",
+    confirmButtonColor: "#3085d6"
+  });
+  return false;
                             }
                         }
                     </script>
