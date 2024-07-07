@@ -367,7 +367,7 @@ const getShop = async function(req, res) {
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: process.env.APP_EMAIL,
+      user: 'adarsh7013a@gmail.com',
       pass: process.env.APP_PASSWORD 
     }
   });
@@ -459,7 +459,7 @@ async function userRegister(req, res, next) {
 
     const verificationLink = `${process.env.DURL}/verify?token=${token}`;
     await transporter.sendMail({
-      from: process.env.APP_EMAIL,
+      from: 'adarsh7013a@gmail.com',
       to: email,
       subject: 'Email Verification',
       html: `Hi, click <a href="${verificationLink}">here</a> to verify your email for only shoes.`
@@ -846,13 +846,13 @@ await order.save();
           const transporter = nodemailer.createTransport({
             service: 'gmail',
             auth: {
-              user: process.env.APP_EMAIL,
+              user: 'adarsh7013a@gmail.com',
               pass: process.env.APP_PASSWORD
             }
           });
       
           const mailOptions = {
-            from: process.env.APP_EMAIL,
+            from: 'adarsh7013a@gmail.com',
             to: findUser.email,
             subject: 'Order Confirmation - Your Order has been Placed!',
             html: `
@@ -886,7 +886,7 @@ await order.save();
                   </ul>
                 </div>
                 <div style="background-color: #f8f8f8; padding: 20px; text-align: center;">
-                  <p>We hope you enjoy your purchase! If you have any questions, feel free to <a href="mailto:${process.env.APP_EMAIL}" style="color: #4CAF50;">contact us</a>.</p>
+                  <p>We hope you enjoy your purchase! If you have any questions, feel free to <a href="mailto:${'adarsh7013a@gmail.com'}" style="color: #4CAF50;">contact us</a>.</p>
                   <p>Best regards,</p>
                   <p>Your Company Name</p>
                 </div>
@@ -1819,10 +1819,10 @@ const handleRazorpaySuccess = async (req, res) => {
     const findUser = await User.findById(userId);
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-      port: 587, // Use 465 for SSL
-      secure: false, // Set to true if using port 465
+      port: 587,
+      secure: false, 
       auth: {
-        user: process.env.APP_EMAIL,
+        user: 'adarsh7013a@gmail.com',
         pass: process.env.APP_PASSWORD
       },
       tls: {
@@ -1831,7 +1831,7 @@ const handleRazorpaySuccess = async (req, res) => {
     });
 
     const mailOptions = {
-      from: process.env.APP_EMAIL,
+      from: 'adarsh7013a@gmail.com',
       to: findUser.email,
       subject: 'Order Confirmation - Your Order has been Placed!',
       html: `
@@ -1865,7 +1865,7 @@ const handleRazorpaySuccess = async (req, res) => {
             </ul>
           </div>
           <div style="background-color: #f8f8f8; padding: 20px; text-align: center;">
-            <p>We hope you enjoy your purchase! If you have any questions, feel free to <a href="mailto:${process.env.APP_EMAIL}" style="color: #4CAF50;">contact us</a>.</p>
+            <p>We hope you enjoy your purchase! If you have any questions, feel free to <a href="mailto:${'adarsh7013a@gmail.com'}" style="color: #4CAF50;">contact us</a>.</p>
             <p>Best regards,</p>
             <p>Your Company Name</p>
           </div>
