@@ -10,6 +10,7 @@ const Coupon = require('../models/coupon')
 const { Users, DeletedUser } = require('../models/user');
 const { AuthCheck, adminAuthCheck } = require('../middlewares/userAuthentication');
 const Banner = require('../models/banner');
+const bcrypt = require('bcrypt')
 const Order = require('../models/order');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -602,7 +603,7 @@ const adminProfile = async(req, res)=>{
 const updateAdminProfile = async (req, res) => {
   try {
     const { username, email, password, confirmpassword } = req.body;
-
+console.log(username, email, password, confirmpassword)
     if (!username.trim() || !email.trim() || !password.trim() || !confirmpassword.trim()) {
       return res.render('admin/profile', { admin: null, error: 'All fields are required' });
     }
@@ -613,7 +614,7 @@ const updateAdminProfile = async (req, res) => {
       return res.render('admin/profile', { admin: null, error: 'Admin not found' });
     }
 
-    admin.name = username;
+    admin.username = username;
     admin.email = email;
     if (password === confirmpassword) {
       const hashedPassword = await bcrypt.hash(password, 10);
