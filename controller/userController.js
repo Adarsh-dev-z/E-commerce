@@ -457,7 +457,7 @@ async function userRegister(req, res, next) {
 
     const {token, expireTime} = generateToken();
 
-    const verificationLink = `${process.env.DURL}/verify?token=${token}`;
+    const verificationLink = `https://onlyshoes.site/verify?token=${token}`;
     await transporter.sendMail({
       from: 'adarsh7013a@gmail.com',
       to: email,
