@@ -458,6 +458,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            {{#if order.length}}
                                            {{#each order}}
 <tr data-order-id="{{this._id}}">
     <td>{{this.orderID}}</td>
@@ -487,6 +488,11 @@
     </td>
 </tr>
 {{/each}}
+{{else}}
+    <tr>
+        <td colspan="6">No orders found</td>
+    </tr>
+    {{/if}}
 
                                         </tbody>
                                     </table>
@@ -512,6 +518,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
+                                            {{#if findReturnItems.length}}
                                             {{#each findReturnItems}}
                                             {{!-- {{#each this.items}} --}}
                                             <tr data-order-id="{{this._id}}">
@@ -537,6 +544,11 @@
                                             </tr>
                                             {{!-- {{/each}} --}}
                                             {{/each}}
+                                            {{else}}
+                                                <tr>
+                                                    <td colspan="6">No retruns found</td>
+                                                </tr>
+                                                {{/if}}
                                         </tbody>
                                     </table>
                                 </div>
@@ -595,6 +607,7 @@
                                 <div class="row">
                                     <div class="col-12 col-sm-12">
                                         <h4 class="billing-address">Shipping address</h4>
+                                        {{#if address.length}}
                                         {{#each address}}
                                         
                                         <a href="#" data-id="{{this.id}}" class="remove-address-btn float-right"
@@ -753,6 +766,9 @@
                                         </div>
                                         <hr>
                                         {{/each}}
+                                        {{else}}
+                                        <p>No address found</p>
+                                        {{/if}}
                                         
 
 
@@ -1778,7 +1794,7 @@ swal.fire({
             body: new URLSearchParams({ amount: amount })
         });
         const data = await response.json();
-
+console.log(data);
         const options = {
             key: '{{razorpayKeyId}}',
             amount: data.amount,

@@ -532,19 +532,32 @@ const razorpay = new Razorpay({
 // });
 
 -
-router.post('/create-withdrawal-order', async (req, res) => {
-  const amount = parseInt(req.body.amount) * 100; // Convert amount to paise (Razorpay works in paise)
-  
-  const options = {
-      amount: amount, // Amount in paise
-      currency: 'INR',
-      receipt: `receipt_${new Date().getTime()}`,
-      payment_capture: 1, // Auto capture
-  };
-
+router.post('/create-withdrawal-order', userAuthCheck, async (req, res) => {
   try {
+      const userId = req.user._id;
+      const amount = parseInt(req.body.amount) * 100; 
+      const maxWithdrawAmount = 200000 * 100; 
+      const user = await User.findOne({ _id: userId });
+      const userWalletAmount = user.walletAmount*100; 
+    console.log('amount', amount,'maxwithdraw', maxWithdrawAmount, 'userwalllwt amount', userWalletAmount)
+      if (amount > maxWithdrawAmount) {
+          return res.status(400).json({ error: 'Cannot withdraw more than ₹200,000 at once.' });
+      }
+
+      if (amount > userWalletAmount) {
+          return res.status(400).json({ error: 'Insufficient balance.' });
+      }
+
+      const options = {
+          amount: amount, 
+          currency: 'INR',
+          receipt: `receipt_${new Date().getTime()}`,
+          payment_capture: 1,
+      };
+
       const order = await razorpay.orders.create(options);
       res.json(order);
+
   } catch (error) {
       console.error(error);
       res.status(500).send('Internal Server Error');
