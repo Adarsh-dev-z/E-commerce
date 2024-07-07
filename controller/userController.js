@@ -457,7 +457,7 @@ async function userRegister(req, res, next) {
 
     const {token, expireTime} = generateToken();
 
-    const verificationLink = `localhost:3001/verify?token=${token}`;
+    const verificationLink = `${process.env.DURL}/verify?token=${token}`;
     await transporter.sendMail({
       from: process.env.APP_EMAIL,
       to: email,
@@ -880,7 +880,7 @@ await order.save();
                       <li>
                         <p><strong>${item.product.name}</strong></p>
                         <p>Quantity: ${item.quantity}</p>
-                        <p>Price: $${(item.product.price / 100).toFixed(2)}</p>
+                        <p>Price: $${(item.product.price).toFixed(2)}</p>
                       </li>
                     `).join('')}
                   </ul>
@@ -1839,7 +1839,7 @@ const handleRazorpaySuccess = async (req, res) => {
           <div style="background-color: #fff; padding: 20px; border: 1px solid #ddd;">
             <h2 style="color: #333;">Order Summary</h2>
             <p><strong>Order ID:</strong> ${userOrder.orderID}</p>
-            <p><strong>Total Amount:</strong> $${(userOrder.totalPrice / 100).toFixed(2)}</p>
+            <p><strong>Total Amount:</strong> $${(userOrder.totalPrice).toFixed(2)}</p>
             ${userOrder.discountAmount ? `<p><strong>Discount Applied:</strong> -$${userOrder.discountAmount.toFixed}</p>` : ''}
             <p><strong>Expected Delivery Date:</strong> ${formatedDate}</p>
           </div>
@@ -1850,11 +1850,11 @@ const handleRazorpaySuccess = async (req, res) => {
           <div style="background-color: #fff; padding: 20px; border: 1px solid #ddd;">
             <h2 style="color: #333;">Items in Your Order</h2>
             <ul>
-              ${order.items.map(item => `
+              ${userOrder.items.map(item => `
                 <li>
                   <p><strong>${item.product.name}</strong></p>
                   <p>Quantity: ${item.quantity}</p>
-                  <p>Price: $${(item.product.price / 100).toFixed(2)}</p>
+                  <p>Price: $${(item.product.price).toFixed(2)}</p>
                 </li>
               `).join('')}
             </ul>
