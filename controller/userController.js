@@ -1,4 +1,5 @@
 // const passport=require('passport')
+require('dotenv').config();
 const bcrypt = require('bcrypt');
 const nodemailer=require('nodemailer')
 const { Users: User } = require("../models/user");
@@ -12,7 +13,6 @@ const crypto=require('crypto')
 const { createUser, findToken, findProduct, findcart } = require("../helpers/userHelper");
 const { addToCart } = require('../utils/cartUtils');
 
-require('dotenv').config();
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Coupon = require('../models/coupon');
@@ -1818,10 +1818,15 @@ const handleRazorpaySuccess = async (req, res) => {
 
     const findUser = await User.findById(userId);
     const transporter = nodemailer.createTransport({
-      service: 'gmail',
+      host: 'smtp.gmail.com',
+      port: 587, // Use 465 for SSL
+      secure: false, // Set to true if using port 465
       auth: {
         user: process.env.APP_EMAIL,
         pass: process.env.APP_PASSWORD
+      },
+      tls: {
+        rejectUnauthorized: false
       }
     });
 
