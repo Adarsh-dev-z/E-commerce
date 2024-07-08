@@ -1513,57 +1513,6 @@ const getSearch = async(req, res)=>{
   res.render('user/shop',{Product:product})
 }
 
-// const changeAccountDetails = async(req, res)=>{
-
-//   console.log(req.body)
-//   const {username, mobile, email, currentpassword, newpassword, confirmpassword } = req.body
-//   if(!username.trim() || !mobile.trim() || !email.trim() || !currentpassword || !newpassword || !confirmpassword){
-//       console.log('all fields are required')
-//       // return res.render('user/userprofile', {errorMessage:'all fields are required'})
-//       return res.json({success:false, message:'all fields are required'})
-//   }
-//   if(username.length<3 || username.length>20){
-//   console.log('username must be between 3 and 20 characters');
-//       // return res.render('user/userprofile', {errorMessage:"username must be between 3 and 20 characters"})
-//       return res.json({success:false, message:"username must be between 3 and 20 characters"})
-//   }
-//   if(mobile.length<8|| mobile.length>12){
-//   console.log('mobile number must be between 8 and 12 characters');
-//       // return res.render('user/userprofile', {errorMessage:'mobile number must be between 8 and 12 characters'})
-//       return res.json({success:false, message:'mobile number must be between 8 and 12 characters'})
-//   }
-//   if(!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(newpassword)){
-//   console.log('password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number');
-//       // return res.render('user/userprofile', {errorMessage:'password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number'})
-//       return res.json({success:false, message:'password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number'})
-//   }
-//   const user = await User.findOne({email:email})
-//   if(!user){
-//       console.log('user not found')
-//       return res.json({success:false, message:'user not found'})
-//       // return res.render('user/userprofile', {errorMessage:'user not found'});
-//   }
-//   const passwordMatch = await bcrypt.compare(currentpassword, user.password)
-//   if(passwordMatch){
-//       if(newpassword===confirmpassword){
-//           const hashedPassword = await bcrypt.hash(newpassword,10)
-//           const updatePassword = await User.findOneAndUpdate({email:email},{
-//               username:username,
-//               email:email,
-//               mobile:mobile,
-//               password:hashedPassword
-//           }, {new:true})
-//           console.log('user details updated', 'password updated')
-//           return res.json({success:true, message:'user details updated'})
-//       }else{
-//           console.log('newpassword not matching with confirmpassword')
-//           res.json({success:false, message:'newpassword not matching with confirmpassword'})
-//       }
-//   }else{
-//       console.log('current password not matching')
-//       res.redirect('/userprofile')
-//   }
-// }
 
 
 
@@ -1583,12 +1532,10 @@ const changeAccountDetails = async (req, res) => {
       throw new Error('Request body is missing');
     }
 
-    const { username, mobile, email, currentpassword, newpassword, confirmpassword } = req.body;
+    const { username, mobile, currentpassword, newpassword, confirmpassword } = req.body;
 
-    if(findUser.email !== email){
-      throw new Error('wrong email')
-    }
-    if (!username || !mobile || !email || !currentpassword || !newpassword || !confirmpassword) {
+    
+    if (!username || !mobile || !currentpassword || !newpassword || !confirmpassword) {
       throw new Error('All fields are required');
     }
 
@@ -1604,15 +1551,12 @@ const changeAccountDetails = async (req, res) => {
       throw new Error('Mobile number must contain only digits and be between 8 and 12 characters');
     }
 
-    if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
-      throw new Error('Invalid email format');
+    
+    if (!/^(?=.*[a-z])(?=.*\d).{8,}$/.test(newpassword)) {
+      throw new Error('Password must contain at least 8 characters, including a small letter and a number');
     }
 
-    if (!/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/.test(newpassword)) {
-      throw new Error('Password must contain at least 8 characters, including a small letter, a capital letter, a symbol, and a number');
-    }
-
-    const user = await User.findOne({ email: email });
+    const user = await User.findOne({ _id: userId });
     if (!user) {
       throw new Error('User with the specified email not found');
     }
@@ -1630,7 +1574,7 @@ const changeAccountDetails = async (req, res) => {
 
     const updateData = {
       username: username,
-      email: email,
+      // email: email,
       mobile: mobile,
       password: hashedPassword
     };
@@ -1759,55 +1703,7 @@ if(existingAddress){
     };
     
      
-      // const existingAddress = await Address.findOne({
-      //     user:userId,
-      //     firstName: firstname,
-      //     lastName: lastname,
-      //     email:email,
-      //     telephone:telephone,
-      //     company:company,
-      //     address:address,
-      //     apartment:apartment,
-      //     city:city,
-      //     state:state,
-      //     postCode: postcode,
-      // })
-      // let useAddress;
-      // if(existingAddress){
-      //     useAddress= existingAddress;
-      // }else{
-
-      //     const newAddress = new Address({
-      //         user:userId,
-      //         firstName: firstname,
-      //         lastName: lastname,
-      //         email,
-      //         telephone,
-      //         company,
-      //         address,
-      //         apartment,
-      //         city,
-      //         state,
-      //         postCode: postcode,
-      //         notes
-      //     });
-  
-      //    useAddress= await newAddress.save();
-      // }
-
-      // const userOrder = new Order({
-      //     user: userId,
-      //     address: useAddress._id,
-      //     orderID: `ORDER-${Date.now()}`,
-      //     payment: payment,
-      //     items: cart.items,
-      //     total: newCartTotal,
-      //     couponDiscount: couponDiscount,
-        
-      // });
-
-      // console.log('userOrder',userOrder)
-      // await userOrder.save();      
+       
     
     res.json({ razorpayOptions });
   } catch (error) {
@@ -1976,8 +1872,269 @@ const getShopByCategory = async (req, res) => {
 };
 
 
+const getCancelOrder = async (req, res) => {
+  const userId = req.user._id;
+  const orderId = req.params.id;
+  try {
+      const order = await Order.findOneAndUpdate(
+          { _id: orderId },
+          { $set: { orderStatus: 'canceled' } },
+          { new: true }
+      );
+      if (order) {
+          const user = await Users.findOne({ _id: userId });
+          console.log(order.totalPrice)
+          console.log(user.walletAmount)
+          if(order.refund===false){
+            user.walletAmount = parseFloat(order.totalPrice) + user.walletAmount;
+            console.log(user.walletAmount)
+            order.refund = true;
+          }
+          await user.save();
+          await order.save();
+          res.json({ success: true,message:'Order canceled', order });
+      } else {
+          res.json({ success: false,message:'Order not found'});
+      }
+  } catch (error) {
+      console.log(error); 
+      res.json({ success: false, message: 'An error occurred', error });
+  }
+}
 
 
+const returnItems = async (req, res) => {
+  try {
+    const { productId, quantity, reason, orderId } = req.query;
+
+    if (!productId || !quantity || !orderId) {
+      return res.status(400).send('Missing required query parameters');
+    }
+
+    const order = await Order.findById(orderId).populate('items.product');
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
+
+    const totalQuantity = order.items
+      .filter(item => item.product._id.toString() === productId)
+      .reduce((acc, item) => acc + item.quantity, 0);
+
+    const totalReturnQuantity = order.returnItems
+      .filter(item => item.product.toString() === productId)
+      .reduce((acc, item) => acc + item.quantity, 0) + Number(quantity);
+
+
+    if (totalReturnQuantity > totalQuantity) {
+      return res.status(400).send('You cannot return more products than ordered');
+    }
+
+   
+    const product = await Product.findById(productId);
+    if (!product) {
+      return res.status(404).send('Product not available now');
+    }
+
+    const returnAmount = product.price * Number(quantity);
+    const returnItem = order.returnItems.find(item => item.product.toString() === productId);
+
+    if (returnItem) {
+      returnItem.quantity += Number(quantity);
+      returnItem.returnAmount += returnAmount;
+    } else {
+      order.returnItems.push({
+        product: new mongoose.Types.ObjectId(productId),
+        quantity: Number(quantity),
+        returnAmount,
+        reason,
+        status: 'pending',
+        success: false,
+      });
+    }
+    order.return = 'available'
+    await order.save();
+    
+
+    const quantityInItems = order.items.reduce((acc, item) => {
+      return acc + item.quantity;
+    }, 0);
+    const quantityInReturnItems = order.returnItems.reduce((acc,item)=>{
+      return acc+item.quantity;
+    }, 0)
+
+    if(quantityInItems===quantityInReturnItems){
+      order.completeOrderReturn = true;
+      await order.save();
+    }
+    
+
+
+    res.redirect(`/view-order?id=${orderId}`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
+
+const returnEntireOrder = async (req, res) => {
+  try {
+    const orderId = req.query.id;
+    const reason = req.query.reason;
+    const order = await Order.findById(orderId).populate('items.product');
+
+    if (!order) {
+      return res.status(404).send('Order not found');
+    }
+
+    const adjustedItems = order.items.map(item => {
+      // const returnItem = order.returnItems.find(returnItem => returnItem.product.toString() === item.product._id.toString() && !returnItem.success);
+      const returnItem = order.returnItems.find(returnItem => returnItem.product.toString() === item.product._id.toString());
+
+      if (returnItem) {
+        return {
+          product: item.product._id,
+          quantity: item.quantity - returnItem.quantity,
+          price: item.price,
+        };
+      } else {
+        return item;
+      }
+    }).filter(item=>item.quantity>0);
+    
+    for (const item of adjustedItems) {
+      if (item.quantity < 0) {
+        return res.status(400).send('Invalid return request: more items returned than ordered');
+      }
+
+      // const existingReturnItem = order.returnItems.find(returnItem => returnItem.product.toString() === item.product._id.toString() && returnItem.success);
+      const existingReturnItem = order.returnItems.find(returnItem => returnItem.product.toString() === item.product._id.toString());
+      if (existingReturnItem) {
+        existingReturnItem.quantity += item.quantity;
+        existingReturnItem.returnAmount += item.quantity * item.price;
+      } else {
+        order.returnItems.push({
+          product: item.product._id,
+          quantity: item.quantity,
+          returnAmount: item.quantity * item.price,
+          reason: reason,
+          status: 'pending',
+          success: false,
+        });
+      }
+    }
+
+    order.completeOrderReturn = true;
+    order.return = 'available'
+    // const maxQuantityReached = true
+    await order.save();
+
+    res.redirect(`/view-order?id=${orderId}`);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+}
+
+
+const postReview = async (req, res) => {
+  const userId = req.user._id
+  const { product, user, comment, title, author } = req.body;
+  const rating = Number(req.body.rating);
+  try {
+      const review = await Review.create({
+          product,
+          user: userId,
+          userEmail: user,
+          rating,
+          comment,
+          title,
+          author
+      });
+      // console.log(review, 'saved review');
+      res.status(201).json(review);
+  } catch (error) {
+      console.log('errrrrrrrrrrro');
+      res.status(400).json({ message: error.message });
+  }
+}
+
+
+const getReviews = async (req, res) => {
+  try {
+      const reviews = await Review.find({ product: req.params.productId }).populate('product');
+      res.json(reviews);
+  } catch (error) {
+      res.status(500).json({ message: error.message });
+  }
+}
+
+
+const createWithdrawl = async (req, res) => {
+  try {
+      const userId = req.user._id;
+      const amount = parseInt(req.body.amount) * 100; 
+      const maxWithdrawAmount = 200000 * 100; 
+      const user = await User.findOne({ _id: userId });
+      const userWalletAmount = user.walletAmount*100; 
+    console.log('amount', amount,'maxwithdraw', maxWithdrawAmount, 'userwalllwt amount', userWalletAmount)
+      if (amount > maxWithdrawAmount) {
+          return res.status(400).json({ error: 'Cannot withdraw more than ₹200,000 at once.' });
+      }
+
+      if (amount > userWalletAmount) {
+          return res.status(400).json({ error: 'Insufficient balance.' });
+      }
+
+      const options = {
+          amount: amount, 
+          currency: 'INR',
+          receipt: `receipt_${new Date().getTime()}`,
+          payment_capture: 1,
+      };
+
+      const order = await razorpay.orders.create(options);
+      res.json(order);
+
+  } catch (error) {
+      console.error(error);
+      res.status(500).send('Internal Server Error');
+  }
+}
+
+
+
+const verifyWithdrawal = async (req, res) => {
+  const { payment_id, order_id, signature, amount } = req.body;
+
+  const crypto = require('crypto');
+  const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
+  hmac.update(`${order_id}|${payment_id}`);
+  const generated_signature = hmac.digest('hex');
+
+  if (signature === generated_signature) {
+      const userId = req.user._id;
+      
+      const user = await Users.findByIdAndUpdate(userId, { $inc: { walletAmount: -amount } });
+      await user.save();
+      
+      res.send({ success: true });
+  } else {
+      res.status(400).send({ error: 'Withdrawal verification failed' });
+  }
+}
+
+
+const cartCount = async (req, res) => {
+  const userId = req.user._id;
+  const cart = await Cart.findOne({ user: userId });
+  if (!cart) {
+    return res.json({ count: 0 });
+  }
+  const count = cart.items.reduce((total, item) => total + item.quantity, 0);
+  console.log(count,'count');
+  res.json({ count });
+}
 
 
 
@@ -1990,4 +2147,5 @@ const getShopByCategory = async (req, res) => {
        postLogin, updateCartQuantity, postAddToWishlist, GetRemoveWishlist, postAddToCart, postRemoveCart, getClearCart,
        getProductCheckout, getOrderSuccess, postApplyCoupon, postRemoveCoupon, createCheckoutSession, editAddress,
        postAddAddress, removeAddress, getForgotpassword, postResetPassLink, resetPassword, getUpdatePass, postUpdatePass,
-       getSearch, changeAccountDetails, miniCart, checkoutRazorpay, handleRazorpaySuccess, getShopByCategory  }
+       getSearch, changeAccountDetails, miniCart, checkoutRazorpay, handleRazorpaySuccess, getShopByCategory,
+       getCancelOrder, returnItems, returnEntireOrder, postReview, getReviews, createWithdrawl, verifyWithdrawal, cartCount  }

@@ -959,26 +959,28 @@
                                                 </div>
                                             </div>
                                             <div class="row">
-                                                <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
+                                                {{!-- <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
                                                     <label for="input-email">E-Mail <span
                                                             class="required-f">*</span></label>
-                                                    <input name="email" value="" id="input-email" class="form-control"
-                                                        type="email">
-                                                </div>
-                                                <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
+                                                    <input name="email" value="{{user.email}}" id="input-email" class="form-control"
+                                                        type="email" readonly>
+                                                </div> --}}
+                                                 <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
                                                     <label for="input-currentpassword">Current Password <span
                                                             class="required-f">*</span></label>
                                                     <input name="currentpassword" value="" id="input-currentpassword"
                                                         class="form-control" type="password">
                                                 </div>
-                                            </div>
-                                            <div class="row">
                                                 <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
                                                     <label for="input-newpassword">New Password <span
                                                             class="required-f">*</span></label>
                                                     <input name="newpassword" value="" id="input-newpassword"
                                                         class="form-control" type="password">
                                                 </div>
+                                               
+                                            </div>
+                                            <div class="row">
+                                                
                                                 <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
                                                     <label for="input-confirmpassword">Confirm Password <span
                                                             class="required-f">*</span></label>
