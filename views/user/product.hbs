@@ -263,9 +263,12 @@
 </form>
                                 <div class="display-table shareRow">
                                     <div class="display-table-cell medium-up--one-third">
+                                        {{#if user}}
                                         <div class="wishlist-btn" data-id="{{product._id}}">
                                             <a class="wishlist add-to-wishlist" href="javascript:void(0);" title="Add to Wishlist"><i class="icon anm anm-heart-l" aria-hidden="true"></i> <span>Add to Wishlist</span></a>
                                         </div>
+                                        {{/if}}
+                                        
                                     </div>
                                     <div class="display-table-cell text-right">
                                         <div class="social-sharing">
@@ -294,9 +297,7 @@
                     			<div class="tabs-listing">
                         <ul class="product-tabs">
                             <li rel="tab1"><a class="tablink">Product Details</a></li>
-                            {{#if user}}
                             <li rel="tab2"><a class="tablink">Product Reviews</a></li>
-                            {{/if}}
                             <li rel="tab4"><a class="tablink">Shipping &amp; Returns</a></li>
                         </ul>
                         <div class="tab-container">
@@ -333,6 +334,8 @@
                                         </div>
                                         <div class="spr-content">
                                             <div class="spr-form clearfix">
+                                                                            {{#if user}}
+
                                                  <form id="review-form" data-id="{{product._id}}">
             <h3>Write a review</h3>
             <div class="spr-form-contact">
@@ -365,6 +368,7 @@
                 <input type="submit" value="Submit Review">
             </div>
         </form>
+        {{/if}}
         <div class="review-container">
         <h3>Customer Reviews</h3>
         <div id="reviews-list"></div>

@@ -1719,7 +1719,7 @@ const postReview = async (req, res) => {
 
 const getReviews = async (req, res) => {
   try {
-      const reviews = await Review.find({ product: req.params.productId }).populate('product');
+      const reviews = await Reviews.find({ product: req.params.productId }).populate('product');
       res.json(reviews);
   } catch (error) {
       res.status(500).json({ message: error.message });
