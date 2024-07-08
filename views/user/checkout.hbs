@@ -835,8 +835,7 @@ Swal.fire({
 
             const data = await response.json();
             window.open(data.url, '_blank'); 
-            location.reload()
-
+            
             if (data.error) {
 
  Swal.fire({
@@ -1125,7 +1124,13 @@ Swal.fire({
 
 
 
-
+<script>
+    document.addEventListener('visibilitychange', function() {
+    if (document.visibilityState === 'visible') {
+        location.reload();
+    }
+});
+</script>
 
 
 

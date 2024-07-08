@@ -21,10 +21,12 @@ const product = require('../models/product');
 const order = require('../models/order');
 const coupon = require('../models/coupon');
 const Reviews = require('../models/review');
+const { setCacheControlHeaders } = require('../utils/cachClear');
 
 
 
 const getLogin = function(req, res) {
+  setCacheControlHeaders(res);
   if(req.session.user){
     res.redirect('/home')
   }else{
@@ -34,6 +36,7 @@ const getLogin = function(req, res) {
   };
 
   const getProduct = async function(req, res) {
+  
     const productId =req.query.id;
     try {
       const product =await findProduct(productId);
@@ -65,6 +68,7 @@ const getLogin = function(req, res) {
 //   };
 
 const getShop = async function(req, res) {
+  setCacheControlHeaders(res);
   try {
     let cart = {items: []};
     let product = [];
@@ -744,24 +748,78 @@ const getClearCart = async (req, res) => {
   
 }
 
-const getProductCheckout = async (req, res)=>{
-  const userId = req.user._id
-  const cartId = req.query.id
-  const USER = await User.findById(userId)
-  const orderCount = await Order.countDocuments({ user: userId });
-  const address = await Address.find({user:userId}).lean()
+// const getProductCheckout = async (req, res)=>{
+//   setCacheControlHeaders(res);
+
+//   const userId = req.user._id
+//   const cartId = req.query.id
+//   const USER = await User.findById(userId)
+//   const orderCount = await Order.countDocuments({ user: userId });
+//   const address = await Address.find({user:userId}).lean()
 
   
-  const cart = await Cart.findOne({user:userId}).populate('items.product').lean();
+//   const cart = await Cart.findOne({user:userId}).populate('items.product').lean();
+// console.log(cart)
+// if(cart.items.length===0){
+//   console.log('empty cart')
+//   return res.redirect('/shop')
 
-  const cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-  const coupon = await Coupon.findOne({minPriceRange:{$lt:cartTotal},maxPriceRange:{$gt:cartTotal}})
-  // if(cartTotal)
+// }
 
-  res.render('user/checkout',{cart, cartTotal, coupon, orderCount, USER, address})
-}
+//   const cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+//   const coupon = await Coupon.findOne({minPriceRange:{$lt:cartTotal},maxPriceRange:{$gt:cartTotal}})
+//   // if(cartTotal)
+
+//   res.render('user/checkout',{cart, cartTotal, coupon, orderCount, USER, address})
+// }
+
+
+const getProductCheckout = async (req, res) => {
+  setCacheControlHeaders(res);
+
+  const userId = req.user?._id;
+  if (!userId) {
+    return res.redirect('/shop');
+  }
+
+  const cartId = req.query.id;
+  const USER = await User.findById(userId);
+  if (!USER) {
+    return res.redirect('/shop');
+  }
+
+  const orderCount = await Order.countDocuments({ user: userId });
+  const address = await Address.find({ user: userId }).lean();
+
+  const cart = await Cart.findOne({ user: userId })
+    .populate('items.product')
+    .lean();
+  if (!cart || cart.items.length === 0) {
+    console.log('empty cart');
+    return res.redirect('/shop');
+  }
+
+  const cartTotal = cart.items.reduce(
+    (total, item) => total + (item.totalPrice || 0),
+    0
+  );
+  const coupon = await Coupon.findOne({
+    minPriceRange: { $lt: cartTotal },
+    maxPriceRange: { $gt: cartTotal }
+  });
+
+  res.render('user/checkout', {
+    cart,
+    cartTotal,
+    coupon,
+    orderCount,
+    USER,
+    address
+  });
+};
 
 const getOrderSuccess = async(req, res)=>{
+  
   const sessionId = req.query.session_id;
   const userId = req.user._id
 
@@ -895,7 +953,7 @@ await order.save();
           };
       
           await transporter.sendMail(mailOptions);
-
+          
           res.render('user/order-success',{
               order,
               address:address,
@@ -1761,6 +1819,7 @@ if(existingAddress){
 
 
 const handleRazorpaySuccess = async (req, res) => {
+
   try {
     const userId = req.user._id;
 

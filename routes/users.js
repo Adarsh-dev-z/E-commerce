@@ -92,9 +92,13 @@ router.post('/login', postLogin, userLogin)
 
 router.get("/logout", logOut)
 router.get('/order-success', (req, res) => {
+  setCacheControlHeaders(res);
+
   res.render('user/order-success');
 })
-router.get('/razorpay-order-success', (req, res) => {
+router.get('/razorpay-order-success', (req, res) => { 
+     setCacheControlHeaders(res);
+
   res.render('user/order-success');
 })
 
@@ -122,6 +126,7 @@ router.get('/clear-cart', userAuthCheck, getClearCart)
 
 
 const Coupon = require('../models/coupon');
+const { setCacheControlHeaders } = require('../utils/cachClear');
 // const { default: items } = require('razorpay/dist/types/items');
 router.get('/product-checkout', userAuthCheck, getProductCheckout)
 
