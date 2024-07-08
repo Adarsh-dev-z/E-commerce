@@ -297,7 +297,9 @@
                     			<div class="tabs-listing">
                         <ul class="product-tabs">
                             <li rel="tab1"><a class="tablink">Product Details</a></li>
+                            {{#if user}}
                             <li rel="tab2"><a class="tablink">Product Reviews</a></li>
+                            {{/if}}
                             <li rel="tab4"><a class="tablink">Shipping &amp; Returns</a></li>
                         </ul>
                         <div class="tab-container">
@@ -327,17 +329,14 @@
                                         <div class="spr-header clearfix">
                                             <div class="spr-summary">
                                                 <span class="product-review"><a class="reviewLink"><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star"></i><i class="font-13 fa fa-star-o"></i><i class="font-13 fa fa-star-o"></i> </a><span class="spr-summary-actions-togglereviews">Based on 6 reviews456</span></span>
-                                                {{#if user}}
                                                 <span class="spr-summary-actions">
                                                     <a href="#" class="spr-summary-actions-newreview btn">Write a review</a>
                                                 </span>
-                                                {{/if}}
                                             </div>
                                         </div>
                                         <div class="spr-content">
                                             <div class="spr-form clearfix">
-                                                                            {{#if user}}
-
+                                                
                                                  <form id="review-form" data-id="{{product._id}}">
             <h3>Write a review</h3>
             <div class="spr-form-contact">
@@ -370,7 +369,6 @@
                 <input type="submit" value="Submit Review">
             </div>
         </form>
-        {{/if}}
         <div class="review-container">
         <h3>Customer Reviews</h3>
         <div id="reviews-list"></div>
