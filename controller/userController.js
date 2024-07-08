@@ -42,8 +42,9 @@ const getLogin = function(req, res) {
       const product =await findProduct(productId);
       const review = await Reviews.find({product:product._id}).populate('user');
       const relatedProducts =await Product.find({category:product.category}).limit(5);
-     
-      res.render('user/product', { product, relatedProducts });
+      const isLoggedIn = Boolean(req.session.user);
+
+      res.render('user/product', { product, relatedProducts, user:isLoggedIn});
     } catch (error) {
       res.status(500).send('Internal Server Error');
     }
@@ -455,7 +456,9 @@ async function handleVerification(req, res) {
 
 const postLogin = async (req, res) => {
   try {
+    
     const { email, password, guestCart } = req.body;
+    console.log(req.body)
     const parsedGuestCart = JSON.parse(guestCart || '[]');
 
     const user = await User.findOne({ email: email, role: 'user' });

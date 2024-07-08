@@ -236,7 +236,9 @@
                                     <div class="product-single__description rte">
                                         <p>{{product.description}}</p>
                                     </div>
-                                <form method="post" action="/add-to-cart/{{product._id}}" id="product_form_10508262282" accept-charset="UTF-8" class="product-form product-form-product-template hidedropdown" enctype="multipart/form-data">
+                                <form method="post" action="/add-to-cart/{{product._id}}" accept-charset="UTF-8" class="product-form product-form-product-template hidedropdown" enctype="multipart/form-data">
+                                    <input type="hidden" name="id" value="{{product._id}}">
+
     <div class="swatch clearfix swatch-0 option1" data-option-index="0">
     </div>
     
@@ -292,7 +294,9 @@
                     			<div class="tabs-listing">
                         <ul class="product-tabs">
                             <li rel="tab1"><a class="tablink">Product Details</a></li>
+                            {{#if user}}
                             <li rel="tab2"><a class="tablink">Product Reviews</a></li>
+                            {{/if}}
                             <li rel="tab4"><a class="tablink">Shipping &amp; Returns</a></li>
                         </ul>
                         <div class="tab-container">
@@ -700,36 +704,60 @@
         });
         </script>
  
-        <script>
-    $(document).ready(function(){
-        $('.btn.product-form__cart-submit').on('click', function(event){
-            event.preventDefault();
-            var productId = $(this).data('product-id')
+      <script>
+    $(document).ready(function() {
+    $('.btn.product-form__cart-submit').on('click', function(event) {
+        event.preventDefault();
+        var productId = $(this).closest('form').find('input[name="id"]').val();
+        var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
+
+        if (isLoggedIn) {
+            // User is logged in, make an AJAX request
             $.ajax({
-                url:'/add-to-cart/' + productId,
-                type:'POST',
-                success:function(response){
-                    if(response.success){
-                      $('#cart-popup').fadeIn();
-                      setTimeout(()=>{
-                        $('#cart-popup').fadeOut();
-                      },2000)
-                        console.log('added to cart successfully')
-                    }else{
-                        console.log('error adding to cart')
+                url: '/add-to-cart/' + productId,
+                type: 'POST',
+                success: function(response) {
+                    console.log(response)
+                    if (response.success) {
+                        $('#cart-popup').fadeIn();
+                        setTimeout(function() {
+                            $('#cart-popup').fadeOut();
+                        }, 2000);
+                        console.log('added to cart successfully');
+                    } else {
+                        console.log('error adding to cart');
                     }
-                    
                 },
-                error:function(){
-swal.fire({
+                error: function() {
+                    swal.fire({
   title: "Error",
   text: "Internal server error",
   icon: "error",
   confirmButtonColor: "#dc3545"
-});                }
-            })
-        })
-    })
+});
+                }
+            });
+        } else {
+            // User is not logged in, save to localStorage
+            var guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
+            var itemIndex = guestCart.findIndex(item => item.productId === productId);
+
+            if (itemIndex > -1) {
+                guestCart[itemIndex].quantity += 1;
+            } else {
+                guestCart.push({ productId: productId, quantity: 1 });
+            }
+
+            localStorage.setItem('guestCart', JSON.stringify(guestCart));
+            $('#cart-popup').fadeIn();
+            setTimeout(function() {
+                $('#cart-popup').fadeOut();
+            }, 2000);
+            console.log('added to guest cart successfully');
+        }
+    });
+});
+
 </script>
 
 <script>
