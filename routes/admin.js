@@ -39,29 +39,6 @@ router.get('/add-product', adminAuthCheck, getAddProduct);
 router.get('/edit-product', adminAuthCheck, editProduct);
 router.get('/admin-products', adminAuthCheck, adminProducts);
 
-// router.post('/update-product', upload.single('productImage'), async (req, res) => {
-    
-//   try {
-//     const productId = req.body.productId;
-//     const updateProduct = {
-//       name: req.body.name,
-//       price: req.body.price,
-//       description: req.body.description,
-//       category: req.body.category,
-//       expireDate: req.body.expire_date,
-//       stock: req.body.stock,
-//       productImage: `asset/images/${req.file.filename}`
-//     };
-//     const updatedProduct = await product.findByIdAndUpdate(productId, updateProduct, { new: true });
-//     res.redirect('/admin-products');
-//     console.log('Product updated:', updatedProduct);
-//   } catch (err) {
-//     console.log(err);
-//     res.status(500).send('Error updating product');
-//   }
-// });
-
-
 
 router.post('/update-product', adminAuthCheck, upload.array('productImage'), async (req, res) => {
 
@@ -76,7 +53,6 @@ router.post('/update-product', adminAuthCheck, upload.array('productImage'), asy
       expireDate: req.body.expire_date,
       stock: req.body.stock
     };
-    console.log(req.files)
     if (req.files.length > 0) {
       const productImages = req.files.map(file => `asset/images/${file.filename}`);
       updateProduct.productImage = productImages;
@@ -90,9 +66,7 @@ router.post('/update-product', adminAuthCheck, upload.array('productImage'), asy
     }
     const updatedProduct = await product.findByIdAndUpdate(productId, updateProduct, { new: true });
     res.redirect('/admin-products');
-    console.log('Product updated:', updatedProduct);
   } catch (err) {
-    console.log(err);
     res.status(500).send('Error updating product');
   }
 });
@@ -104,7 +78,6 @@ router.get('/admin-accounts', (req, res) => {
 
 router.post('/add-product', adminAuthCheck, upload.array('productImage', []), async (req, res) => {
   try {
-    console.log(req.body)
     const { name, brand, price, description, category, expireDate, stock } = req.body;
     // const productImage = req.file ? req.file.path : null;
     const productImage = req.files.map(file => `asset/images/${file.filename}`);
@@ -118,10 +91,8 @@ router.post('/add-product', adminAuthCheck, upload.array('productImage', []), as
         stock, 
         productImage });
     const savedProduct = await newProduct.save();
-    console.log('New product added:', savedProduct);
     res.redirect('/admin-products');
   } catch (err) {
-    console.error('Error adding product:', err);
     res.status(500).send('Error adding product');
   }
 });
@@ -163,7 +134,6 @@ router.post('/add-banner', adminAuthCheck, upload.array('bannerImage', []), asyn
     }
 
     const bannerImage = req.files.map(file => `asset/images/${file.filename}`);
-    console.log(title, bannerImage);
 
     const createBanner = await Banner.create({
       title: title,
@@ -171,11 +141,9 @@ router.post('/add-banner', adminAuthCheck, upload.array('bannerImage', []), asyn
     });
 
     if (createBanner) {
-      console.log("banner created:" + createBanner);
       res.redirect('/admin-banner');
     }
   } catch (error) {
-    console.error(error);
     res.status(500).render('admin/add-banner',{ error: 'An error occurred while creating the banner.' });
   }
 });
@@ -212,9 +180,7 @@ router.post('/update-banner', adminAuthCheck, upload.array('bannerImage'), async
       return res.status(500).render('admin/edit-banner', { error: 'Error updating banner' });
     }
     res.redirect('/admin-banner');
-    console.log('banner updated:', updatedBanner);
   } catch (err) {
-    console.error(err);
     res.status(500).render('admin/edit-banner', { error: 'Error updating banner' });
   }
 });
@@ -227,23 +193,6 @@ router.post('/delete-banners', adminAuthCheck, deleteBanners);
 router.get('/admin-profile', adminAuthCheck, adminProfile)
 
 
-// router.post('/update-admin-profile', adminAuthCheck, async(req, res)=>{ 
-//   const {username, email, password, confirmpassword} = req.body;
-//   if(!username.trim() || !email.trim() || !password.trim() || !confirmpassword.trim()){
-//     return res.render('admin/profile', {admin, error: 'All fields are required'});
-//   }
-//   const admin = await Users.findById(req.session.admin._id)
-//   admin.name = username
-//   admin.email = email
-//   if(password===confirmpassword){
-//     const hashedpassword = await bcrypt.hash(password, 10);
-//     admin.password = hashedpassword;
-//   }else{
-//     return res.render('admin/profile', {admin, error: 'Passwords do not match'  })
-//   }
-//   await admin.save()
-//   res.redirect('/admin-profile')
-// })
 
 router.post('/update-admin-profile', adminAuthCheck, updateAdminProfile);
 router.get('/admin-logout',adminLogout)

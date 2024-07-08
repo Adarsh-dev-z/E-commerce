@@ -187,7 +187,6 @@ router.get('/view-order', async (req, res) => {
     const totalReturnQuantity = order.returnItems
       .filter(returnItem => returnItem.product.toString() === item.product._id.toString())
       .reduce((acc, returnItem) => acc + returnItem.quantity, 0);
-    console.log('total return quantity:', totalReturnQuantity)
     return {
       ...item.toObject(),
       maxQuantityReached: totalReturnQuantity >= totalQuantity

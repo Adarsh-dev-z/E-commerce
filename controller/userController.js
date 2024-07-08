@@ -45,7 +45,6 @@ const getLogin = function(req, res) {
      
       res.render('user/product', { product, relatedProducts });
     } catch (error) {
-      console.log(error);
       res.status(500).send('Internal Server Error');
     }
   };
@@ -73,12 +72,10 @@ const getShop = async function(req, res) {
     let cart = {items: []};
     let product = [];
     const { category, minPrice, maxPrice } = req.query;
-    console.log(req.query)
     if(!category && !minPrice && !maxPrice){
       product = await Product.find();
     } else if(minPrice && maxPrice){
       product = await Product.find({ price: { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) } }); 
-      console.log('product', product)
     } else {
       product = await Product.find({ category });
     }
@@ -90,7 +87,6 @@ const getShop = async function(req, res) {
     const isLoggedIn = Boolean(req.session.user);
     res.render('user/shop',{ Product:product, user:isLoggedIn, cart: cart || {items: []} });
   } catch (error) {
-    console.error('Error fetching products:', error);
     res.status(500).send('Internal Server Error');
   }
 };
@@ -115,7 +111,6 @@ const getShop = async function(req, res) {
 
       res.render("user/cart", { cart, cartTotal });
     } catch (err) {
-      console.log(err);
       res.status(500).send("server error");
     }
   };
@@ -138,7 +133,6 @@ const getShop = async function(req, res) {
       
       res.render('user/partials/minicart', {cart, cartTotal});
     } catch(err){
-      console.log(err)
       res.status(500).send('server error')
     }
   };
@@ -178,7 +172,7 @@ const getShop = async function(req, res) {
           if (cart.items[productIndex].quantity > 1) {
               cart.items[productIndex].quantity -= 1;
           } else {
-              console.log("Quantity cannot be decreased below 1");
+
           }
       }
       
@@ -196,7 +190,6 @@ const getShop = async function(req, res) {
             cartTotal: cartTotal
         });
     } catch (err) {
-        console.error(err);
         res.status(500).json({ success: false, message: 'Server error' });
     }
 };
@@ -260,7 +253,6 @@ const getShop = async function(req, res) {
       const wishlist = await Wishlist.findOne({user:userId}).populate('products');
       res.render('user/wishlist',{wishlist: wishlist? wishlist.products: []});
     }catch(err){
-      console.error(err);
       res.status(500).json({success: false, message: 'Server error'});
     }
   };
@@ -320,7 +312,7 @@ const getShop = async function(req, res) {
       req.session.loggedIn = true;
       res.redirect("home");
     }catch(err){
-      console.log(err);
+
     }
   }
 
@@ -336,15 +328,12 @@ const getShop = async function(req, res) {
       let redirectUrl;
       if (req.session.user) {
         redirectUrl = '/home';
-        console.log('user authenticated and logged in');
       } else if (req.session.admin) {
         redirectUrl = '/admin';
-        console.log('admin authenticated and logged in');
       }
   
       res.json({ success: true, clearGuestCart: true, redirectUrl });
     } catch (err) {
-      console.log(err);
       res.status(500).json({ success: false, message: 'Internal server error' });
     }
   };
@@ -357,7 +346,6 @@ const getShop = async function(req, res) {
   
 
   const callbackUrl = (req, res)=>{
-    console.log("reqest user:",req.user)
     res.redirect('/home')
   }
 
@@ -383,60 +371,7 @@ const getShop = async function(req, res) {
   }
 
   
-// async function userRegister(req, res, next) {
-//   // const username = req.body.username;
-//   // const phone = req.body.mobile;
-//   // const email = req.body.email;
-//   // const password = req.body.password;
-// const {username, mobile, email, password}=req.body
-//   if (username === "" || mobile === "" || email === "" || password === "") {
-//     return res.render("user/register", { errorMessage: "all fields are required" });
-//   }
 
-//   if (mobile.length < 8 || mobile.length > 12) {
-//     return res.render("user/register", { errorMessage: "phone number length should be between 8 to 12 digits" });
-//   }
-
-//   if (username.length <3 || username.length > 20){
-//     return res.render('user/register', {errorMessage: 'user name should be 3 to 20 long'})
-//   }
-
-//   const dbEmail = await User.findOne({ email: email });
-//   if (dbEmail === null) {
-//     const {token, expireTime} = generateToken();
-
-//     const verificationLink = `http://localhost:3001/verify?token=${token}`;
-//     transporter.sendMail({
-//       from: 'adarsh7013a@gmail.com',
-//       to: email,
-//       subject: 'Email Verification',
-//       html: `Hi, click <a href="${verificationLink}">here</a> to verify your email.`
-//     }, async (err) => {
-//       if (err) {
-//         console.error('Error sending email:', err);
-//         return res.status(500).send('Error sending email');
-//       } else {
-//         const hashedPass = await bcrypt.hash(password, 10);
-//         // user.password = hashedPass;
-//         const data = {
-//           username:username,
-//           email:email,
-//           phone:phone,
-//           password:hashedPass,
-//           verificationToken:token,
-//           tokenExpires: expireTime
-        
-//         }
-//         const user = await createUser(data)
-//         // Store token in the database
-//         // const newUser = new User({
-//         //   username,
-//         //   phone,
-//         //   email,
-//         //   password,
-//         //   verificationToken: token
-//         // });
-//         // await newUser.save();
 
 async function userRegister(req, res, next) {
   const {username, mobile, email, password} = req.body || {};
@@ -482,7 +417,6 @@ async function userRegister(req, res, next) {
 
     res.render('user/register',{ emailSent: true });
   } catch (err) {
-    console.error('Error sending email:', err);
     return res.status(500).send('Error sending email');
   }
 }
@@ -490,35 +424,7 @@ async function userRegister(req, res, next) {
 
 //++++++++++++++++++++++++++++++++++
 
-// async function handleVerification(req, res) {
-//   const token = req.query.token;
-//   // const user = await User.findOne({ verificationToken: token });
-//   const user = await findToken(token)
 
-//   if (user) {
-    
-//     // Remove token from the user object
-//     user.verificationToken = undefined;
-//     // delete user.verificationToken
-
-    
-//     // Hash the password
-//     // const hashedPass = await bcrypt.hash(user.password, 10);
-//     // user.password = hashedPass;
-
-//     // Save the user
-//     user.isVerifyed="true"
-//     await user.save();
-
-//     // Add the user to the session
-//     req.session.user = user;
-//     req.session.loggedIn = true;
-
-//     return res.redirect('/home');
-//   } else {
-//     return res.status(400).send('Invalid or expired token');
-//   }
-// }
 async function handleVerification(req, res) {
   const token = req.query.token;
   const user = await findToken(token);
@@ -580,24 +486,20 @@ const postLogin = async (req, res) => {
 
     req.session.save((err) => {
       if (err) {
-        console.error('Session save error:', err);
         return res.status(500).json({ success: false, message: 'Internal server error' });
       }
 
       let redirectUrl;
       if (req.session.user) {
         redirectUrl = '/home';
-        console.log('user authenticated and logged in');
       } else if (req.session.admin) {
         redirectUrl = '/admin';
-        console.log('admin authenticated and logged in');
       }
 
       res.json({ success: true, clearGuestCart: true, redirectUrl, role: currentUser.role });
     });
 
   } catch (error) {
-    console.error('Error during login:', error);
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
@@ -625,7 +527,6 @@ const postAddToWishlist = async (req, res)=>{
           res.status(200).json({success:true, message:'product added to wishlist'})
       }
   }catch(err){
-      console.log(err);
       res.status(500).json({success:false, message:'internal server error'})
   }
 }
@@ -638,16 +539,13 @@ const GetRemoveWishlist = async (req, res)=>{
       {new: true}
   )
   if(updateWishlist){
-      console.log('product removed succesfully');
       res.json({success:true});
 
   }else{
-      console.log('error removing item');
       res.json({success:false});
   }
   }
   catch(err){
-      console.log(err);
       res.status(500).json({success:false, message:'internal server error'})
   }
   
@@ -666,7 +564,6 @@ const postAddToCart = async (req, res) => {
     await addToCart(userId, itemsToAdd);
     res.json({ success: true });
   } catch (error) {
-    console.error('Error adding to cart:', error);
     res.status(500).send('Internal server error');
   }
 };
@@ -686,92 +583,23 @@ const postRemoveCart = async (req, res) => {
       res.status(200).json({ message: 'Product removed from cart' });
       
   } catch (error) {
-      console.error(error);
       res.status(500).json({ error: 'An error occurred while removing the product from the cart' });
   }
 }
-// --------------------------COMMENTED POST LOGIN MOD FOR GUST CART--------------------------------------------------
 
-
-
-// const postLogin= async (req,res,next)=>{
-//   const email = req.body.email;
-//   const password = req.body.password;
-//   // const notVerified = await User.findOne({email:email, role:'user', isVerifyed:false})
-//   const user = await User.findOne({email:email, role:'user'});
-//   const admin = await User.findOne({email:email, role:'admin'})
-//   if(user || admin){
-//     currentUser = user || admin;
-
-//     //
-//     if(currentUser.isVerifyed==='true'){
-//       const passwordMatch = await bcrypt.compare(password, currentUser.password)
-//     if(passwordMatch){
-//       console.log(currentUser.role + 'login successful')
-//       req.user = user;
-//       req.admin = admin;
-//       next()
-//     } else{
-//       console.log("invalid password");
-//       return res.render("user/login",{errorMessage:'invalid password'})
-//     }
-//   }if(currentUser.isVerifyed==='false'){
-//     console.log(currentUser.role + 'is not verified')
-//     return res.render('user/login', {errorMessage: currentUser.role +' not verified', verificationPopup: true})
-
-//   }
-  
-  
-//   else{
-//     console.log("user not verifiedzzzzzzzzz");
-//       return res.render("user/login", { errorMessage: 'user not verified..................'});
-//   }
-//     }
-    
-//   else{
-//     console.log('user not found');
-//     return res.render('user/login', {errorMessage:'user not found'})
-//   }
-// }
 //+++++++++++++++++++++++++++++++++++++++
 
 const getClearCart = async (req, res) => {
   const userId = req.user._id;
   const clearCart = await Cart.findOneAndUpdate({user:userId}, {$set:{items:[]}},{new:true})
   if(clearCart){
-      console.log("cart cleared")
       res.redirect('/cart');
   }else{
-      console.log("error clearing cart")
       res.redirect('/cart');
   }
   
 }
 
-// const getProductCheckout = async (req, res)=>{
-//   setCacheControlHeaders(res);
-
-//   const userId = req.user._id
-//   const cartId = req.query.id
-//   const USER = await User.findById(userId)
-//   const orderCount = await Order.countDocuments({ user: userId });
-//   const address = await Address.find({user:userId}).lean()
-
-  
-//   const cart = await Cart.findOne({user:userId}).populate('items.product').lean();
-// console.log(cart)
-// if(cart.items.length===0){
-//   console.log('empty cart')
-//   return res.redirect('/shop')
-
-// }
-
-//   const cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-//   const coupon = await Coupon.findOne({minPriceRange:{$lt:cartTotal},maxPriceRange:{$gt:cartTotal}})
-//   // if(cartTotal)
-
-//   res.render('user/checkout',{cart, cartTotal, coupon, orderCount, USER, address})
-// }
 
 
 const getProductCheckout = async (req, res) => {
@@ -795,7 +623,6 @@ const getProductCheckout = async (req, res) => {
     .populate('items.product')
     .lean();
   if (!cart || cart.items.length === 0) {
-    console.log('empty cart');
     return res.redirect('/shop');
   }
 
@@ -862,7 +689,6 @@ await order.save();
 
 
   if(!order.stockUpdated){
-      // console.log('order befor', order.stockUpdated)
       try{
           for(const item of order.items){
               const product = await Product.findById(item.product._id);
@@ -875,7 +701,6 @@ await order.save();
           order.stockUpdated=true;
           await order.save();
       }catch (err){
-          console.err('error updating product stock', err);
           return res.status(500).send('error updating product stock')
       }
   }
@@ -893,7 +718,6 @@ await order.save();
 
           const clearCart = await Cart.findOneAndDelete({user:userId})
           if(clearCart){
-            console.log('cart deleted');
           }else{
             console.log('error updating cart')
           }
@@ -1020,144 +844,10 @@ const postRemoveCoupon = async (req, res) => {
 }
 
 
-// const createCheckoutSession = async (req, res) => {
-//   const userId = req.user._id
-//   console.log(req.body);
-//   try {
-//       const {
-//           firstname,
-//           lastname,
-//           email,
-//           telephone,
-//           company,
-//           address,
-//           apartment,
-//           city,
-//           state,
-//           postcode,
-//           notes,
-//           payment
-//       } = req.body;
 
-//       const existingAddress = await Address.findOne({
-//           user:userId,
-//           firstName: firstname,
-//           lastName: lastname,
-//           email:email,
-//           telephone:telephone,
-//           company:company,
-//           address:address,
-//           apartment:apartment,
-//           city:city,
-//           state:state,
-//           postCode: postcode,
-//       })
-//       let useAddress;
-//       if(existingAddress){
-//           useAddress= existingAddress;
-//       }else{
-
-//           const newAddress = new Address({
-//               user:userId,
-//               firstName: firstname,
-//               lastName: lastname,
-//               email,
-//               telephone,
-//               company,
-//               address,
-//               apartment,
-//               city,
-//               state,
-//               postCode: postcode,
-//               notes
-//           });
-  
-//          useAddress= await newAddress.save();
-//       }
-
-//       // const userId = req.user._id;
-//       const order = new Order({
-//           user: userId,
-//           address: useAddress._id,
-//           orderID: `ORDER-${Date.now()}`,
-//           payment: payment,
-          
-//       });
-
-//       await order.save();
-
-//       const cart = await Cart.findOne({ user: userId }).populate('items.product');
-
-//       if (!cart || !cart.items || cart.items.length === 0) {
-//           return res.status(400).json({ error: 'Cart is empty or invalid' });
-//       }
-
-//       const items = cart.items.map(item => ({
-//           price_data: {
-//               currency: 'inr', 
-//               product_data: {
-//                   name: item.product.name,
-//               },
-//               unit_amount: item.product.price * 100, 
-//           },
-//           quantity: item.quantity,
-//       }));
-
-//       const sessionData = {
-//           payment_method_types: ['card'],
-//           line_items: items,
-//           mode: 'payment',
-//           payment_intent_data: {
-//               receipt_email: email,
-//               shipping: {
-//                   name: `${firstname} ${lastname}`,
-//                   address: {
-//                       line1: address,
-//                       line2: apartment,
-//                       city: city,
-//                       state: state,
-//                       postal_code: postcode,
-//                       country: 'IN'
-//                   }
-//               }
-//           },
-//           success_url: `${req.headers.origin}/userOrder-success?session_id={CHECKOUT_SESSION_ID}`,
-//           cancel_url: `${req.headers.origin}/product-checkout`,
-//           expand: ['total_details.breakdown.discounts'],
-//       };
-     
-
-      
-//       if (req.session.couponDiscount && req.session.couponDiscount.length > 0) {
-//           const totalDiscount = req.session.couponDiscount.reduce((acc, item) => acc + item.discount, 0);
-//           sessionData.discounts = [{
-//               coupon: req.session.couponDiscount[0].couponCode
-//           }];
-//           console.log("Applied coupon:", req.session.couponDiscount[0]);
-//           console.log("Total discount:", totalDiscount);
-//           console.log("Session data:", sessionData);
-//       }
-
-//       const session = await stripe.checkout.sessions.create(sessionData);
-//       console.log('hiiii', session.total_details.breakdown.discounts);
-//       order.items = cart.items;
-//       order.stripeSessionId = session.id;
-//       await order.save();
-
-//       req.session.couponDiscount = [];
-//       res.json({ url: session.url });
-//       // const couponDetails = req.session.couponDiscount;
-//       // console.log("coupon details in session", couponDetails)
-//       // req.session.couponDiscount === undefined
-//   } catch (error) {
-//       console.error('Error creating checkout session:', error);
-//       res.status(500).json({ error: 'An error occurred while creating the checkout session.' });
-//   }
-// }
 
 const createCheckoutSession = async (req, res) => {
   const userId = req.user._id
-  console.log(req.body);
   try {
       const {
           firstname,
@@ -1210,9 +900,6 @@ const createCheckoutSession = async (req, res) => {
          useAddress= await newAddress.save();
       }
 
-      // const userId = req.user._id;
-      
-
       const cart = await Cart.findOne({ user: userId }).populate('items.product');
 
       if (!cart || !cart.items || cart.items.length === 0) {
@@ -1259,16 +946,6 @@ const createCheckoutSession = async (req, res) => {
           expand: ['total_details.breakdown.discounts'],
       };
      
-
-    //   const order = new Order({
-    //     user: userId,
-    //     address: useAddress._id,
-    //     orderID: `ORDER-${Date.now()}`,
-    //     payment: payment,
-        
-    // });
-
-    // await order.save();
       
       if (req.session.couponDiscount && req.session.couponDiscount.length > 0) {
           const totalDiscount = req.session.couponDiscount.reduce((acc, item) => acc + item.discount, 0);
@@ -1285,11 +962,8 @@ const createCheckoutSession = async (req, res) => {
 
       req.session.couponDiscount = [];
       res.json({ url: session.url });
-      // const couponDetails = req.session.couponDiscount;
-      // console.log("coupon details in session", couponDetails)
-      // req.session.couponDiscount === undefined
+     
   } catch (error) {
-      console.error('Error creating checkout session:', error);
       res.status(500).json({ error: 'An error occurred while creating the checkout session.' });
   }
 }
@@ -1328,7 +1002,6 @@ const editAddress = async(req, res)=>{
   }
    res.json({ success: true, message: 'Address updated successfully'});
   }catch(err){
-      console.log(err);
       return res.status(500).json({success:false, message:'internal server error'})
   }
 }
@@ -1365,7 +1038,6 @@ const postAddAddress = async(req, res)=>{
       })
       res.status(200).json({success:true, message:'address added successfully'})
   }catch(err){
-      console.log(err);
       return res.status(500).json({success:false, message:'error adding address'})
   }
 }
@@ -1381,7 +1053,6 @@ const removeAddress = async (req, res) => {
           res.json({ success: false, message: 'Address not found' });
       }
   } catch (err) {
-      console.log('Error removing address:', err);
       res.status(500).json({ success: false, message: 'Internal server error, error removing address' });
   }
 }
@@ -1428,17 +1099,14 @@ const postResetPassLink = async(req, res)=>{
 
           res.render('user/forgot-password', {emailSent:true})
           async (err)=>{
-              console.log(err)
               if(err){
                   return res.status(500).send('errror sending link')
               }else{
                   res.send('we sent a link to reset your password.')
               }
           }
-          // req.session.email=userEmail;
-          // console.log(req.session.email,"email in session")
+        
   }catch(err){
-      console.log(err);
       return res.status(500).send('error resetting your password')
   }
 
@@ -1498,10 +1166,8 @@ const postUpdatePass = async(req, res)=>{
       return res.render('user/update-password', {errorMessage:'User not found'});
     }
 
-    console.log('user password reseted')
     res.redirect('/login')
   } catch (err) {
-    console.log(err);
     return res.render('user/update-password', {errorMessage:'Error resetting password'});
   }
 }
@@ -1586,7 +1252,6 @@ const changeAccountDetails = async (req, res) => {
 
     return res.json({ success: true, message: 'User details updated' });
   } catch (error) {
-    console.error(error);
     return res.status(400).json({ success: false, message: error.message });
   }
 };
@@ -1707,7 +1372,6 @@ if(existingAddress){
     
     res.json({ razorpayOptions });
   } catch (error) {
-    console.error('Error creating Razorpay order:', error);
     res.status(500).send({ error: error.message });
   }
 };
@@ -1719,7 +1383,6 @@ const handleRazorpaySuccess = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // Fetch user's cart and calculate the new cart total
     const cart = await Cart.findOne({ user: userId }).populate('items.product');
     if (!cart || !cart.items.length) {
       return res.status(400).send({ error: 'Cart is empty' });
@@ -1849,7 +1512,6 @@ const handleRazorpaySuccess = async (req, res) => {
 
     });
   } catch (error) {
-    console.error('Error handling Razorpay success:', error);
     res.status(500).send({ error: error.message });
   }
 };
@@ -1866,7 +1528,6 @@ const getShopByCategory = async (req, res) => {
     const products = await Product.find({ category });
     return res.render('user/shop', { Product: products });
   } catch (error) {
-    console.error('Error fetching products:', error);
     return res.status(500).send('Internal Server Error');
   }
 };
@@ -1883,11 +1544,9 @@ const getCancelOrder = async (req, res) => {
       );
       if (order) {
           const user = await Users.findOne({ _id: userId });
-          console.log(order.totalPrice)
-          console.log(user.walletAmount)
+          
           if(order.refund===false){
             user.walletAmount = parseFloat(order.totalPrice) + user.walletAmount;
-            console.log(user.walletAmount)
             order.refund = true;
           }
           await user.save();
@@ -1897,7 +1556,6 @@ const getCancelOrder = async (req, res) => {
           res.json({ success: false,message:'Order not found'});
       }
   } catch (error) {
-      console.log(error); 
       res.json({ success: false, message: 'An error occurred', error });
   }
 }
@@ -1971,7 +1629,6 @@ const returnItems = async (req, res) => {
 
     res.redirect(`/view-order?id=${orderId}`);
   } catch (error) {
-    console.error(error);
     res.status(500).send('Internal Server Error');
   }
 }
@@ -2031,7 +1688,6 @@ const returnEntireOrder = async (req, res) => {
 
     res.redirect(`/view-order?id=${orderId}`);
   } catch (error) {
-    console.error(error);
     res.status(500).send('Internal Server Error');
   }
 }
@@ -2051,10 +1707,8 @@ const postReview = async (req, res) => {
           title,
           author
       });
-      // console.log(review, 'saved review');
       res.status(201).json(review);
   } catch (error) {
-      console.log('errrrrrrrrrrro');
       res.status(400).json({ message: error.message });
   }
 }
@@ -2077,7 +1731,6 @@ const createWithdrawl = async (req, res) => {
       const maxWithdrawAmount = 200000 * 100; 
       const user = await User.findOne({ _id: userId });
       const userWalletAmount = user.walletAmount*100; 
-    console.log('amount', amount,'maxwithdraw', maxWithdrawAmount, 'userwalllwt amount', userWalletAmount)
       if (amount > maxWithdrawAmount) {
           return res.status(400).json({ error: 'Cannot withdraw more than ₹200,000 at once.' });
       }
@@ -2097,7 +1750,6 @@ const createWithdrawl = async (req, res) => {
       res.json(order);
 
   } catch (error) {
-      console.error(error);
       res.status(500).send('Internal Server Error');
   }
 }
@@ -2132,7 +1784,6 @@ const cartCount = async (req, res) => {
     return res.json({ count: 0 });
   }
   const count = cart.items.reduce((total, item) => total + item.quantity, 0);
-  console.log(count,'count');
   res.json({ count });
 }
 

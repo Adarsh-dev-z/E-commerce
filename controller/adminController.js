@@ -47,7 +47,6 @@ const storage = multer.diskStorage({
         { $sort: { totalBought: -1 } }
     ]);
     
-    console.log(topCategory,'results')
       const currentYear = new Date().getFullYear();
       
       const chartOrders = await Order.find({
@@ -83,9 +82,7 @@ const storage = multer.diskStorage({
         .sort({ createdAt: -1 })
         .limit(10);
   
-      // console.log('Orders:', orders);
-      // console.log('Latest Updates:', latestUpdates);
-      // console.log('Users:', users);
+  
   
       const totalOrders = await Order.countDocuments()
       const totalRevenue = await Order.aggregate([
@@ -120,69 +117,22 @@ const storage = multer.diskStorage({
             totalQuantity: 1
         }}
     ]);
-    console.log(topProducts,'top products')
-// console.log('total revenue:',totalRevenue)
-// console.log('total products', totalUsers)
+  
       res.render('admin/index', { orders, users, latestUpdates, totalOrders, totalRevenue, totalProducts,topCategory,topProducts, totalUsers, 
                    ordersPerMonth: JSON.stringify(ordersPerMonth)
 
        });
     } catch (err) {
-      console.log('Error:', err);
       res.status(500).send('Error fetching orders');
     }
   };
   
 
 
-// const getAdmin = async (req, res) => {
-//   try {
-//       const currentYear = new Date().getFullYear();
-      
-//       // Fetch orders for the current year
-//       const orders = await Order.find({
-//           datePlaced: {
-//               $gte: new Date(`${currentYear}-01-01`),
-//               $lt: new Date(`${currentYear + 1}-01-01`)
-//           }
-//       });
-
-//       // Calculate orders per month
-//       const ordersPerMonth = new Array(12).fill(0);
-//       orders.forEach(order => {
-//           const month = new Date(order.datePlaced).getMonth();
-//           ordersPerMonth[month] += 1;
-//       });
-
-//       const totalOrders = await Order.countDocuments();
-//       const totalRevenue = await Order.aggregate([
-//           {
-//               $group: {
-//                   _id: null,
-//                   totalRevenue: { $sum: '$totalPrice' }
-//               }
-//           }
-//       ]);
-//       const totalProducts = await product.countDocuments();
-//       const totalUsers = await Users.countDocuments();
-
-//       res.render('admin/index', { 
-//           ordersPerMonth: JSON.stringify(ordersPerMonth), // Ensure ordersPerMonth is serialized to JSON
-//           totalOrders, 
-//           totalRevenue: totalRevenue[0]?.totalRevenue || 0, 
-//           totalProducts, 
-//           totalUsers 
-//       });
-//   } catch (err) {
-//       console.log('Error:', err);
-//       res.status(500).send('Error fetching orders');
-//   }
-// };
 
 
 const updateOrderStatus = async (req, res) => {
   const { orderId, status } = req.body;
-  console.log(orderId, status);
   try {
     const order = await Order.findOne({ _id: orderId });
     if (!order) {
@@ -201,7 +151,6 @@ const updateOrderStatus = async (req, res) => {
     };
 
     if (!statusTransitions[order.orderStatus].includes(status)) {
-      console.log(`Cannot change status from ${order.orderStatus} to ${status}`);
       return res.status(400).send({ error: `Cannot change status from ${order.orderStatus} to ${status}` });
     }
 
@@ -215,36 +164,29 @@ const updateOrderStatus = async (req, res) => {
           order.refund = true;
           await user.save();
           await order.save();
-          console.log('Order canceled, amount refunded');
         } else {
-          console.log('User not found');
           return res.status(404).send('User not found');
         }
       } else {
-        console.log('Refund status already updated');
       }
     }
 
     await order.save();
     res.status(200).send({ message: 'Order status updated successfully' });
   } catch (error) {
-    console.error('Failed to update order status:', error);
     res.status(500).send({ error: 'Failed to update order status' });
   }
 }
 
 const editProduct = async (req, res) => {
   try {
-    console.log(req.query)
     const productId = req.query.id;
-    console.log(productId)
     const selectedProduct = await product.findById(productId);
     if (!selectedProduct) {
       return res.render('admin/edit-product',{errorMesage:'Product not found'});
     }
     res.render('admin/edit-product', { product: selectedProduct });
   } catch (err) {
-    console.log(err);
     res.status(500).send('Error fetching product details');
   }
 }
@@ -270,7 +212,6 @@ const adminProducts = async (req, res) => {
       const products = await product.find(query);
       res.render('admin/admin-products', { products, categories });
   } catch (err) {
-      console.error(err);
       res.status(500).send('Error fetching products');
   }
 };
@@ -288,7 +229,6 @@ const adminUsers = async (req, res) => {
       username: searchRegex
     };
 
-    // Add isBlocked filter if specified
     if (isBlockedFilter !== null) {
       filter.isBlocked = isBlockedFilter;
     }
@@ -298,10 +238,9 @@ const adminUsers = async (req, res) => {
     res.render('admin/admin-users', { 
       users,
       searchTerm,
-      isBlockedFilter: req.query.isBlocked // Pass the filter status to the template
+      isBlockedFilter: req.query.isBlocked 
     });
   } catch (err) {
-    console.error(err, "error finding users");
     res.status(500).send('server error');
   }
 };
@@ -321,7 +260,6 @@ const deleteProduct=async (req, res)=>{
       await product.findByIdAndDelete(productId)
       res.redirect('/admin-products')
   } catch(err){
-      console.log(err);
       res.status(500).send('error deleting product')
   }
 }
@@ -329,7 +267,6 @@ const deleteProduct=async (req, res)=>{
 const deleteProducts = async (req, res) => {
   try {
     const productIds = req.body.productIds; 
-    console.log(req.body);
 
     if (!Array.isArray(productIds)) {
       return res.status(400).send('Invalid request body');
@@ -339,7 +276,6 @@ const deleteProducts = async (req, res) => {
 
     res.status(200).send({ message: 'products deleted successfully', deletedproducts });
   } catch (err) {
-    console.error(err);
     res.status(500).send('An error occurred while deleting coupons');
   }
 }
@@ -350,7 +286,6 @@ const blockUser = async (req, res) => {
     await Users.findByIdAndUpdate(userId, { isBlocked: true });
     res.redirect('/admin-users');
   } catch (err) {
-    console.log(err, "error blocking user");
     res.status(500).send('Server error');
   }
 }
@@ -361,7 +296,6 @@ const unblockUser = async (req, res) => {
     await Users.findByIdAndUpdate(userId, { isBlocked: false });
     res.redirect('/admin-users');
   } catch (err) {
-    console.log(err, "error unblocking user");
     res.status(500).send('Server error');
   }
 }
@@ -369,7 +303,6 @@ const unblockUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
       const userId = req.query.id;
-      console.log(req.query)
       const deletingUser = await Users.findById(userId);
       
       if (deletingUser) {
@@ -381,14 +314,12 @@ const deleteUser = async (req, res) => {
               address: deletingUser.address,
               password: deletingUser.password
           });
-          console.log(softdelete)
           await Users.findByIdAndDelete(userId);
           res.redirect('/admin-users');
       } else {
           res.status(404).send('User not found');
       }
   } catch (err) {
-      console.log(err);
       res.status(500).send('Internal Server Error');
   }
 }
@@ -423,13 +354,11 @@ const postAddCoupon = async (req, res) => {
     });
 
     if (createCoupon) {
-      console.log("Coupon created: " + createCoupon);
       res.redirect('/admin-coupon');
     } else {
       res.status(500).send('Failed to create coupon');
     }
   } catch (err) {
-    console.error(err);
     res.status(500).send('Internal Server Error');
   }
 }
@@ -439,7 +368,6 @@ const adminCoupon = async (req, res)=>{
     const coupon = await Coupon.find();
     res.render('admin/admin-coupon', {coupon});
   } catch (err) {
-    console.error(err);
     res.status(500).render('admin/admin-coupon', { error: 'Failed to fetch coupons' });
   }
 }
@@ -449,7 +377,6 @@ const getEditCoupon = async (req, res)=>{
   const couponId = req.query.id
   
   const selectedCoupon = await Coupon.findById({_id: couponId})
-  console.log(selectedCoupon)
 
 
   res.render("admin/edit-coupon", {coupon: selectedCoupon})
@@ -462,7 +389,6 @@ const postEditCoupon = async(req, res)=>{
 
     let { code, discount, minPriceRange, maxPriceRange, usageCount, expireDate }= req.body;
     const couponId = req.params.id
-    console.log(couponId)
     const coupon = await Coupon.findById({_id:couponId})
     if(!expireDate){
       expireDate = coupon.expireDate
@@ -477,11 +403,9 @@ const postEditCoupon = async(req, res)=>{
     }
   
     const updateCoupon = await Coupon.findByIdAndUpdate(couponId, couponData, {new:true})
-  console.log(updateCoupon)
   res.redirect('/admin-coupon')
 
   }catch(err){
-    console.log(err)
     res.status(500).send("error updating coupon")
   }
 
@@ -494,13 +418,10 @@ const deleteCoupon = async(req, res)=>{
     const couponId = req.query.id;
     const deleteCoupon = await Coupon.findByIdAndDelete({_id:couponId})
     if(deleteCoupon){
-      console.log("coupon deleted succesfully")
       res.redirect('/admin-coupon')
     }else{
-      console.log("error deleting coupon")
     }
   }catch(err){
-    console.log(err);
     res.status(500).send('server error, error deleting coupon')
   }
 
@@ -509,7 +430,6 @@ const deleteCoupon = async(req, res)=>{
 const deleteCoupons= async (req, res) => {
   try {
     const couponIds = req.body.couponIds; 
-    console.log(req.body);
 
     if (!Array.isArray(couponIds)) {
       return res.status(400).send('Invalid request body');
@@ -519,7 +439,6 @@ const deleteCoupons= async (req, res) => {
 
     res.status(200).send({ message: 'Coupons deleted successfully', deletedCoupons });
   } catch (err) {
-    console.error(err);
     res.status(500).send('An error occurred while deleting coupons');
   }
 }
@@ -530,7 +449,6 @@ const adminBanner = async (req, res) => {
     const banner = await Banner.find();
     res.render('admin/admin-banner', { banner });
   } catch (error) {
-    console.error(error);
     res.status(500).send('An error occurred while fetching the banner.');
   }
 }
@@ -554,7 +472,6 @@ const getEditBanner = async (req, res) => {
 
     res.render('admin/edit-banner', { banner:selectedBanner });
   } catch (err) {
-    console.error(err);
     res.status(500).render('admin/edit-banner',{error:'Error fetching banner details'});
   }
 }
@@ -562,13 +479,10 @@ const getEditBanner = async (req, res) => {
 
 const deleteBanner = async(req, res)=>{
   const bannerId= req.params.id
-  console.log(bannerId)
   const deleteBanner = await Banner.findByIdAndDelete(bannerId);
   if(deleteBanner){
-    console.log('banner deleted')
     return res.redirect('/admin-banner')
   }else{
-    console.log('error deleting banner')
     res.redirect('/admin-banner')
   }
 }
@@ -577,7 +491,6 @@ const deleteBanner = async(req, res)=>{
 const deleteBanners = async (req, res) => {
   try {
     const bannerIds = req.body.Ids; 
-    console.log(req.body);
 
     if (!Array.isArray(bannerIds)) {
       return res.status(400).send('Invalid request body');
@@ -587,14 +500,12 @@ const deleteBanners = async (req, res) => {
 
     res.status(200).send({ message: 'Banners deleted successfully', deletedBanners });
   } catch (err) {
-    console.error(err);
     res.status(500).send('An error occurred while deleting banners');
   }
 }
 
 
 const adminProfile = async(req, res)=>{
-  console.log(req.session.admin)
   const admin = await Users.findById(req.session.admin._id)
   res.render('admin/profile', {admin})
 }
@@ -603,7 +514,6 @@ const adminProfile = async(req, res)=>{
 const updateAdminProfile = async (req, res) => {
   try {
     const { username, email, password, confirmpassword } = req.body;
-console.log(username, email, password, confirmpassword)
     if (!username.trim() || !email.trim() || !password.trim() || !confirmpassword.trim()) {
       return res.render('admin/profile', { admin: null, error: 'All fields are required' });
     }
@@ -626,7 +536,6 @@ console.log(username, email, password, confirmpassword)
     await admin.save();
     res.redirect('/admin-profile');
   } catch (error) {
-    console.error(error);
     res.status(500).send('An error occurred while updating admin profile');
   }
 }
@@ -651,10 +560,8 @@ const adminReturn = async (req, res) => {
       order.returnItems.forEach(item => {
       });
     });
-console.log('return orders',returnOrders)
     res.render('admin/admin-return', { returnOrders });
   } catch (err) {
-    console.error('Error fetching return orders:', err);
     res.status(500).send('Internal Server Error');
   }
 }
@@ -701,7 +608,6 @@ const updateReturnStatus = async (req, res) => {
     await order.save();
     res.status(200).json({ message: 'Return item status updated successfully' });
   } catch (error) {
-    console.error('Failed to update return item status:', error);
     res.status(500).json({ error: 'Failed to update return item status' });
   }
 }
@@ -734,21 +640,18 @@ const adminOrders = async (req, res) => {
 
     res.render('admin/admin-orders', { orders, sortOption });
   } catch (error) {
-    console.error('Error fetching orders:', error);
     res.status(500).send('An error occurred while fetching orders');
   }
 }
 
 const adminFilterOrders = async(req, res)=>{
   const {Min, Max} = req.query;
-console.log('Min Max',Min, Max)
   const orders= await Order.find({totalPrice:{$gte:Min, $lte:Max}})
       .populate({
     path: 'user',
     select: 'username'}).populate({path: 'address',
     select: 'firstName lastName street city state postCode'}).populate({path: 'items.product',
     select: 'name'});
-   console.log('--------------------------------',orders)
   res.render('admin/admin-orders',{orders})
 }
 
