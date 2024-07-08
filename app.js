@@ -8,6 +8,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 const passport =require("passport");
 const session = require("express-session");
+const compression = require('compression');
 const db=require('./config/db/config')
 // const MongoDBStore = require("connect-mongodb-session")(session);
 require("./config/passport-config")(passport)
@@ -66,6 +67,8 @@ app.engine(
 );
 // const GoogleStrategy= require("passport-google-oauth20").Strategy;
 
+app.use(compression());
+
 
 app.use(session({
   secret:process.env.SECRET_KEY,
@@ -101,6 +104,17 @@ app.use((req, res, next) => {
   res.locals.isLoggedIn = req.session.user ? true : false;
   next();
 });
+
+
+app.use('/asset/images', (req, res, next) => {
+  if (path.join(__dirname, "/images")) {
+    res.setHeader('Cache-Control', 'public, max-age=31536000'); 
+    next();
+  } else {
+    next(new Error('Failed to load images'));
+  }
+}, express.static(path.join(__dirname, "/images")));
+
 
 app.use(logger('dev'));
 app.use(express.json());
