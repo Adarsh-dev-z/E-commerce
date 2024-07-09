@@ -1544,9 +1544,9 @@ const getCancelOrder = async (req, res) => {
           { _id: orderId },
           { $set: { orderStatus: 'canceled' } },
           { new: true }
-      );
+        );
       if (order) {
-          const user = await Users.findOne({ _id: userId });
+          const user = await User.findOne({ _id: userId });
           
           if(order.refund===false){
             user.walletAmount = parseFloat(order.totalPrice) + user.walletAmount;
