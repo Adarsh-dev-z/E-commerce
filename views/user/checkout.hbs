@@ -103,15 +103,19 @@
         <div id="have-coupon" class="collapse coupon-checkout-content">
     <div class="discount-coupon">
         <div id="coupon" class="coupon-dec tab-pane active">
-            <p class="margin-10px-bottom">Your discount code: <span id="coupon-code-text">{{coupon.code}}</span></p>
-            
+<p class="margin-10px-bottom">Your discount code:</p>
+        {{#each coupon}}
+        <div>
+            <input type="radio" id="coupon-{{@index}}" name="coupon" value="{{this.code}}" data-discount="{{this.discount}}" onclick="selectCoupon('{{this.code}}', {{this.discount}})">
+            <label for="coupon-{{@index}}">{{this.code}}, Discount: {{this.discount}}</label>
+        </div>
+        {{/each}}            
             <label class="required get" for="coupon-code"><span class="required-f">*</span> Coupon</label>
             <input id="coupon-code" required="" type="text" class="mb-3">
             <button class="coupon-btn btn" onclick="applyCoupon()">Apply Coupon</button>
             <button class="coupon-remove-btn btn btn-danger" onclick="removeCoupon()">Remove Coupon</button>
             
             <!-- New Copy Button -->
-            <button class="copy-btn btn btn-secondary" onclick="copyCouponCode()">Copy Code</button>
             
             <!-- New Section to Display Coupon Code and Discount -->
             <div id="coupon-info" class="mt-3" style="display:none;">
@@ -973,7 +977,6 @@ Swal.fire({
                     document.getElementById('new-total').innerText = result.discountedTotal;
                     document.getElementById('coupon-info').style.display = 'block';
                     
-                    // Update order summary
                     document.getElementById('coupon-row').style.display = '';
                     document.getElementById('coupon-discount').innerText = `-${result.discount}`;
                     document.getElementById('total-amount').innerText = `$${result.discountedTotal}`;
@@ -1014,7 +1017,6 @@ Swal.fire({
                 if (result.success) {
                     document.getElementById('coupon-info').style.display = 'none';
                     
-                    // Update order summary
                     document.getElementById('coupon-row').style.display = 'none';
                     document.getElementById('total-amount').innerText = `$${result.newTotal}`;
                     
@@ -1057,7 +1059,7 @@ Swal.fire({
             var url = '/remove-address/' + addressId;
 
             $.ajax({
-                type: 'GET', // Use POST for actions that change state on the server
+                type: 'GET', 
                 url: url,
                 success: function (response) {
                     if (response.success) {
@@ -1092,35 +1094,16 @@ Swal.fire({
 
 
 <script>
-function copyCouponCode() {
-    // Get the coupon code text
-    var couponCode = document.getElementById("coupon-code-text").innerText;
+    function selectCoupon(code, discount) {
+    document.getElementById('coupon-code').value = code;
+    document.getElementById('discount-amount').textContent = discount + '₹';
+    document.getElementById('coupon-info').style.display = 'block';
     
-    // Create a temporary input element to hold the coupon code
-    var tempInput = document.createElement("input");
-    tempInput.value = couponCode;
-    document.body.appendChild(tempInput);
-    
-    // Select the text in the temporary input element
-    tempInput.select();
-    tempInput.setSelectionRange(0, 99999); // For mobile devices
-    
-    // Copy the text to the clipboard
-    document.execCommand("copy");
-    
-    // Remove the temporary input element
-    document.body.removeChild(tempInput);
-    
-    // Alert the user that the code has been copied
-Swal.fire({
-        title: 'Success',
-        text: 'Coupon code copied: ' + couponCode,
-        icon: 'success',
-        confirmButtonText: 'Ok'
-    });    
+    let originalTotal = parseFloat(document.getElementById('original-total').textContent);
+    let newTotal = originalTotal - (originalTotal * (discount / 100));
+    document.getElementById('new-total').textContent = newTotal.toFixed(2);
 }
 </script>
-
 
 
 

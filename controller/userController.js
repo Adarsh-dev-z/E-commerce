@@ -35,20 +35,39 @@ const getLogin = function(req, res) {
   }
   };
 
-  const getProduct = async function(req, res) {
-  
-    const productId =req.query.id;
-    try {
-      const product =await findProduct(productId);
-      const review = await Reviews.find({product:product._id}).populate('user');
-      const relatedProducts =await Product.find({category:product.category}).limit(5);
-      const isLoggedIn = Boolean(req.session.user);
-
-      res.render('user/product', { product, relatedProducts, user:isLoggedIn});
-    } catch (error) {
-      res.status(500).send('Internal Server Error');
+const getProduct = async function(req, res) {
+  try {
+    const productId = req.query.id;
+    if (!productId) {
+      return res.status(400).send('Product ID is required');
     }
-  };
+
+    const product = await findProduct(productId);
+    if (!product) {
+      return res.status(404).send('Product not found');
+    }
+
+    const review = await Reviews.find({ product: product._id }).populate('user');
+    const relatedProducts = await Product.find({ category: product.category }).limit(5);
+    const isLoggedIn = Boolean(req.session.user);
+    let order;
+    if (req.session.user) {
+      order = await Order.find({ user: req.session.user._id });
+      const findProduct = order.find((orderItem) => orderItem.items.some((item) => item.product.toString() === productId));
+      console.log(findProduct,'find product')
+      let isProduct = true
+      if(!findProduct){
+        isProduct = false;
+      }
+      res.render('user/product', { product, relatedProducts, user: isLoggedIn, order, isProduct });
+    }
+    res.render('user/product', { product, relatedProducts, user: isLoggedIn, order });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).send('Internal Server Error');
+  }
+};
 
 //   const getShop = async function(req, res) {
     
@@ -633,11 +652,11 @@ const getProductCheckout = async (req, res) => {
     (total, item) => total + (item.totalPrice || 0),
     0
   );
-  const coupon = await Coupon.findOne({
+  const coupon = await Coupon.find({
     minPriceRange: { $lt: cartTotal },
     maxPriceRange: { $gt: cartTotal }
   });
-
+console.log(coupon,'coupon')
   res.render('user/checkout', {
     cart,
     cartTotal,
@@ -659,6 +678,9 @@ const getOrderSuccess = async(req, res)=>{
   // const order = await Order.findOne({stripeSessionId:sessionId}).populate('address').populate('items.product')
   const address=await Address.findById(session.metadata.addressId).lean()
   const userCart = await Cart.findOne({user:userId}).populate('items.product')
+  if(!userCart){
+      return res.status(400).redirect('/home');
+  }
   const order = new Order({
     user: userId,
     address: address._id,
@@ -1388,7 +1410,7 @@ const handleRazorpaySuccess = async (req, res) => {
 
     const cart = await Cart.findOne({ user: userId }).populate('items.product');
     if (!cart || !cart.items.length) {
-      return res.status(400).send({ error: 'Cart is empty' });
+      return res.status(400).redirect('/home');
     }
 
     const couponDiscount = 0;
