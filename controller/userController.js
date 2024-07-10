@@ -69,22 +69,7 @@ const getProduct = async function(req, res) {
   }
 };
 
-//   const getShop = async function(req, res) {
-    
-// let cart = {items: []};
-//       const product = await Product.find().skip(44)
-//       // console.log("the product:"+ product)
-//       if(req.session.user){
-//         cart = await Cart.findOne({ user: req.session.user._id }).populate("items.product");
-//         console.log(cart);
-//         const isLoggedIn=true
-//        return res.render('user/shop',{ Product:product, user:isLoggedIn, cart});
 
-//       }else{
-//        return res.render('user/shop',{ Product:product, cart});
-//       }
-
-//   };
 
 const getShop = async function(req, res) {
   setCacheControlHeaders(res);
@@ -1814,6 +1799,36 @@ const cartCount = async (req, res) => {
 
 
 
+const viewOrder = async (req, res) => {
+  const orderId = req.query.id;
+  if (!orderId) {
+    return res.status(400).send('Missing required query parameters');
+  }
+
+  const order = await Order.findOne({ _id: orderId }).populate('items.product');
+
+  if (!order) {
+    return res.status(404).send('Order not found');
+  }
+
+  const itemsWithMaxQuantityReached = order.items.map(item => {
+    const totalQuantity = item.quantity;
+    const totalReturnQuantity = order.returnItems
+      .filter(returnItem => returnItem.product.toString() === item.product._id.toString())
+      .reduce((acc, returnItem) => acc + returnItem.quantity, 0);
+    return {
+      ...item.toObject(),
+      maxQuantityReached: totalReturnQuantity >= totalQuantity
+    };
+  });
+
+  res.render('user/view-order', { order: { ...order.toObject(), items: itemsWithMaxQuantityReached }, orderId });
+}
+
+
+
+
+
 
 
 
@@ -1824,4 +1839,5 @@ const cartCount = async (req, res) => {
        getProductCheckout, getOrderSuccess, postApplyCoupon, postRemoveCoupon, createCheckoutSession, editAddress,
        postAddAddress, removeAddress, getForgotpassword, postResetPassLink, resetPassword, getUpdatePass, postUpdatePass,
        getSearch, changeAccountDetails, miniCart, checkoutRazorpay, handleRazorpaySuccess, getShopByCategory,
-       getCancelOrder, returnItems, returnEntireOrder, postReview, getReviews, createWithdrawl, verifyWithdrawal, cartCount  }
+       getCancelOrder, returnItems, returnEntireOrder, postReview, getReviews, createWithdrawl, verifyWithdrawal, cartCount,
+      viewOrder  }

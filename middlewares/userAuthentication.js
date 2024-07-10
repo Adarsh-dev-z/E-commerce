@@ -3,33 +3,6 @@
 
 
 
-// const express = require("express");
-
-
-// const AuthCheck = (req, res, next) => {
-//   if (req.session.user || req.session.admin) {
-//     req.user = req.session.user;
-//     req.admin = req.session.admin
-//     next();
-//   } else {
-//     res.redirect("/login");
-//   }
-// };
-
-
-
-
-
-// module.exports = {
-//   // userRegister,
-//   AuthCheck,
-  
-// };
-
-
-
-
-
 
 
 const userAuthCheck = (req, res, next) => {

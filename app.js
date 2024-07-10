@@ -1,8 +1,6 @@
 var createError = require('http-errors');
 var express = require('express');
-
 require("dotenv").config()
-
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
@@ -10,15 +8,12 @@ const passport =require("passport");
 const session = require("express-session");
 const compression = require('compression');
 const db=require('./config/db/config')
-// const MongoDBStore = require("connect-mongodb-session")(session);
 require("./config/passport-config")(passport)
 const hbs = require("express-handlebars");
 var app = express();
 const port=process.env.PORT || 3000;
-//****************************************
 const Handlebars = require('handlebars')
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
-//****************************************
 const flash = require('connect-flash');
 
 const hbsHelpers = {
@@ -38,11 +33,7 @@ const hbsHelpers = {
   and: function() {
     const args = Array.prototype.slice.call(arguments, 0, -1);
     return args.every(Boolean);
-},
-isProductReturned: function (productId, returnItems, options) {
-    const returned = returnItems.some(item => item.product.toString() === productId.toString() && !item.success);
-    return returned ? options.fn(this) : options.inverse(this);
-  }
+}
 };
 
 app.set('views', path.join(__dirname, 'views'));
@@ -55,21 +46,13 @@ app.engine(
     partialsDir: __dirname + "/views/user/partials/",
     layoutsDir: __dirname + '/views/user/layouts/',
     helpers: hbsHelpers,
-    //************************************************
     handlebars: allowInsecurePrototypeAccess(Handlebars)
-    //************************************************
-
-    //*******************************
     // protectedProperties: true
-   //*******************************
 
   })
 );
-// const GoogleStrategy= require("passport-google-oauth20").Strategy;
 
 app.use(compression());
-
-
 app.use(session({
   secret:process.env.SECRET_KEY,
   resave:false,
@@ -91,7 +74,6 @@ app.use((req, res, next) => {
 app.use(passport.initialize());
 app.use(passport.session());
 
-// app.get('/verify', require('./controller/userController').handleVerification);
 
 
 var adminRouter = require('./routes/admin');
@@ -131,16 +113,18 @@ app.use(function(req, res, next) {
 });
 
 
+app.use((req, res, next) => {
+  const err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
 
-// error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
+app.use((err, req, res, next) => {
   res.status(err.status || 500);
-  res.render('error');
+  res.render('error', {
+      message: err.message,
+      error: process.env.NODE_ENV === 'development' ? err : {}
+  });
 });
 
 

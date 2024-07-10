@@ -18,7 +18,8 @@ const { getLogin, getProduct, getShop, getAbout, getBlog,
   postReview,
   getReviews,
   createWithdrawl,
-  cartCount} = require('../controller/userController');
+  cartCount,
+  viewOrder} = require('../controller/userController');
 var router = express.Router();
 const passport=require("passport");
 const { AuthCheck, userAuthCheck } = require('../middlewares/userAuthentication');
@@ -34,6 +35,8 @@ const Order = require('../models/order')
 const Review=require('../models/review')
 const Address= require('../models/address')
 const Razorpay = require('razorpay')
+const Coupon = require('../models/coupon');
+const { setCacheControlHeaders } = require('../utils/cachClear');
 require('dotenv').config()
 router.get('/login', getLogin)
 router.get('/product', getProduct)
@@ -59,6 +62,7 @@ router.get('/', redirectHome)
 // console.log('my order',order)
 //   res.render('user/orders', { Order:order });
 // }); 
+
 router.get('/cancel-order/:id', userAuthCheck, getCancelOrder);
 
   
@@ -103,10 +107,6 @@ router.post('/remove-from-cart/:id', userAuthCheck, postRemoveCart);
 router.get('/clear-cart', userAuthCheck, getClearCart)
 
 
-
-const Coupon = require('../models/coupon');
-const { setCacheControlHeaders } = require('../utils/cachClear');
-// const { default: items } = require('razorpay/dist/types/items');
 router.get('/product-checkout', userAuthCheck, getProductCheckout)
 
 router.get('/userOrder-success', userAuthCheck, getOrderSuccess)
@@ -115,13 +115,9 @@ router.post('/apply-coupon', userAuthCheck, postApplyCoupon);
 
 router.post('/remove-coupon', userAuthCheck, postRemoveCoupon);
 
-
 router.post('/create-checkout-session', userAuthCheck, createCheckoutSession);
 
-// ------------------------------------PAYPAL--------------------------------------------------------------
 
-
-// ---------------------------------------PAYPAL-------------------------------------------------------------------
 router.get('/auth/google',
 passport.authenticate('google', {scope:['profile', 'email'], prompt:'select_account'}));
 
@@ -169,44 +165,13 @@ router.post('/razorpay-checkout', userAuthCheck, checkoutRazorpay);
 
 router.post('/razorpay-success', userAuthCheck, handleRazorpaySuccess); 
 
-
-router.get('/view-order', async (req, res) => {
-  const orderId = req.query.id;
-  if (!orderId) {
-    return res.status(400).send('Missing required query parameters');
-  }
-
-  const order = await Order.findOne({ _id: orderId }).populate('items.product');
-
-  if (!order) {
-    return res.status(404).send('Order not found');
-  }
-
-  const itemsWithMaxQuantityReached = order.items.map(item => {
-    const totalQuantity = item.quantity;
-    const totalReturnQuantity = order.returnItems
-      .filter(returnItem => returnItem.product.toString() === item.product._id.toString())
-      .reduce((acc, returnItem) => acc + returnItem.quantity, 0);
-    return {
-      ...item.toObject(),
-      maxQuantityReached: totalReturnQuantity >= totalQuantity
-    };
-  });
-
-  res.render('user/view-order', { order: { ...order.toObject(), items: itemsWithMaxQuantityReached }, orderId });
-});
-
-
+router.get('/view-order', viewOrder);
 
 router.get('/return-items', userAuthCheck, returnItems);
 
 router.get('/return-entire-order', userAuthCheck, returnEntireOrder);
 
-
-
-
 router.get('/shopby-category', userAuthCheck, getShopByCategory)
-
 
 router.post('/reviews',userAuthCheck, postReview);
 
