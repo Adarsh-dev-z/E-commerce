@@ -1708,7 +1708,7 @@ const postReview = async (req, res) => {
   const { product, user, comment, title, author } = req.body;
   const rating = Number(req.body.rating);
   try {
-      const review = await Review.create({
+      const review = await Reviews.create({
           product,
           user: userId,
           userEmail: user,
