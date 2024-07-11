@@ -19,7 +19,8 @@ const { getLogin, getProduct, getShop, getAbout, getBlog,
   getReviews,
   createWithdrawl,
   cartCount,
-  viewOrder} = require('../controller/userController');
+  viewOrder,
+  walletCheckout} = require('../controller/userController');
 var router = express.Router();
 const passport=require("passport");
 const { AuthCheck, userAuthCheck } = require('../middlewares/userAuthentication');
@@ -48,31 +49,13 @@ router.get('/collection', getCollection)
 router.get('/coming-soon', getComingSoon)
 router.get('/contact',userAuthCheck, getContact)
 router.get('/home', getHome)
-// router.get('/home/:username', getHome)
 router.get('/wishlist',userAuthCheck, getWishlist)
 router.get('/', redirectHome)
-
-// router.get('/orders/:id', userAuthCheck, async (req, res) => {
-//   const userId = req.user._id;
-//   const orderId = req.params.id;
-
-//   const order = await Order.find({ _id:orderId }).populate('items.product').lean()
-  
- 
-// console.log('my order',order)
-//   res.render('user/orders', { Order:order });
-// }); 
-
 router.get('/cancel-order/:id', userAuthCheck, getCancelOrder);
-
-  
 router.get('/register', getRegister);
-
-
 router.post('/register', userRegister, postRegister);
 router.get('/verify', handleVerification);
 router.post('/login', postLogin, userLogin)
-
 router.get("/logout", logOut)
 router.get('/order-success', (req, res) => {
   setCacheControlHeaders(res);
@@ -86,35 +69,16 @@ router.get('/razorpay-order-success', (req, res) => {
 })
 
 router.post('/add-to-wishlist', userAuthCheck, postAddToWishlist);
-
-
 router.get('/remove-wishlist', userAuthCheck, GetRemoveWishlist)
-
-
 router.get('/cart',userAuthCheck, getCart)
-
-
- 
 router.post('/add-to-cart/:id', userAuthCheck, postAddToCart);
-  
-
 router.post('/cart/update-quantity', userAuthCheck, updateCartQuantity)
-
-
 router.post('/remove-from-cart/:id', userAuthCheck, postRemoveCart);
-
-
 router.get('/clear-cart', userAuthCheck, getClearCart)
-
-
 router.get('/product-checkout', userAuthCheck, getProductCheckout)
-
 router.get('/userOrder-success', userAuthCheck, getOrderSuccess)
-
 router.post('/apply-coupon', userAuthCheck, postApplyCoupon);
-
 router.post('/remove-coupon', userAuthCheck, postRemoveCoupon);
-
 router.post('/create-checkout-session', userAuthCheck, createCheckoutSession);
 
 
@@ -128,16 +92,10 @@ passport.authenticate('google', {failureRedirect:'/'}),
 
 
 
- router.get("/userprofile", userAuthCheck, getUserProfile)
-
+router.get("/userprofile", userAuthCheck, getUserProfile)
 router.post('/edit-address/:id', userAuthCheck, editAddress)
-
 router.post('/add-address', userAuthCheck, postAddAddress)
-
 router.get('/remove-address/:id', userAuthCheck, removeAddress);
-
-
-
 router.get('/forgot-password', getForgotpassword)
 
 function generateToken() {
@@ -148,34 +106,28 @@ function generateToken() {
 
 
 router.post('/reset-link', postResetPassLink)
-
 router.get('/resetpass', resetPassword);
-
-  router.get('/update-password', getUpdatePass)
-
-  router.post('/update-password', postUpdatePass)
-
-
-  router.get('/search-product', getSearch)
-
-
-  router.post('/change-account-details', userAuthCheck, changeAccountDetails)
-  
+router.get('/update-password', getUpdatePass)
+router.post('/update-password', postUpdatePass)
+router.get('/search-product', getSearch)
+router.post('/change-account-details', userAuthCheck, changeAccountDetails)  
 router.post('/razorpay-checkout', userAuthCheck, checkoutRazorpay);
-
 router.post('/razorpay-success', userAuthCheck, handleRazorpaySuccess); 
-
 router.get('/view-order', viewOrder);
-
 router.get('/return-items', userAuthCheck, returnItems);
-
 router.get('/return-entire-order', userAuthCheck, returnEntireOrder);
-
 router.get('/shopby-category', userAuthCheck, getShopByCategory)
-
 router.post('/reviews',userAuthCheck, postReview);
-
 router.get('/reviews/product/:productId', getReviews);
+
+
+router.post('/wallet-checkout', userAuthCheck, walletCheckout);
+router.get('/wallet-order-success', userAuthCheck, (req, res) => {
+
+  setCacheControlHeaders(res);
+  
+  res.render('user/order-success');
+})
 
 const razorpay = new Razorpay({
   key_id: process.env.RAZORPAY_KEY_ID,
@@ -183,10 +135,6 @@ const razorpay = new Razorpay({
 });
 
 
--
-router.post('/create-withdrawal-order', userAuthCheck, createWithdrawl);
-
-router.post('/verify-withdrawal', userAuthCheck, );
 
 router.get('/cart-count', userAuthCheck, cartCount)
 

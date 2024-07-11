@@ -10,6 +10,7 @@ const compression = require('compression');
 const db=require('./config/db/config')
 require("./config/passport-config")(passport)
 const hbs = require("express-handlebars");
+const MongoDBStore = require("connect-mongodb-session")(session);
 var app = express();
 const port=process.env.PORT || 3000;
 const Handlebars = require('handlebars')
@@ -58,6 +59,8 @@ app.use(session({
   resave:false,
   saveUninitialized:false,
   cookie: { maxAge: 600000*24 },
+  store: new MongoDBStore({ mongooseConnection: db,})
+
 }));
 app.use(flash());
 
@@ -130,4 +133,3 @@ app.use((err, req, res, next) => {
 
 
 module.exports = app;
-

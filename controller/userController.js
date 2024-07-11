@@ -310,16 +310,18 @@ const getShop = async function(req, res) {
 
   }
 
-  const postRegister = function(req, res){
-    try{
+  const postRegister = (req, res) => {
+    try {
+      console.log('reached       uiuiu')
       const registeredUser = req.user;
-      req.session.user= req.user;
+      req.session.user = registeredUser;
       req.session.loggedIn = true;
-      res.redirect("home");
-    }catch(err){
-
+      res.redirect("/home");
+    } catch (err) {
+      console.error(err);
+      res.status(500).render('user/register', { errorMessage: 'An error occurred during the login process. Please try again.' });
     }
-  }
+  };
 
 
   const userLogin = (req, res) => {
@@ -345,11 +347,6 @@ const getShop = async function(req, res) {
   
   
   
-  
-  
-
-  
-
   const callbackUrl = (req, res)=>{
     res.redirect('/home')
   }
@@ -360,7 +357,6 @@ const getShop = async function(req, res) {
   }
 
 
-  //+++++++++++++++++++++++++++++++++++++++++
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -378,56 +374,70 @@ const getShop = async function(req, res) {
   
 
 
-async function userRegister(req, res, next) {
-  const {username, mobile, email, password} = req.body || {};
+  async function userRegister(req, res, next) {
+    console.log('2reached')
+    const { username, mobile, email, password, guestCart } = req.body || {};
+    let parsedGuestCart;
 
-  if (!username.trim() || !mobile.trim() || !email.trim() || !password.trim()) {
-    return res.render("user/register", { errorMessage: "all fields are required" });
-  }
-
-  if (mobile.length < 8 || mobile.length > 12) {
-    return res.render("user/register", { errorMessage: "phone number length should be between 8 to 12 digits" });
-  }
-
-  if (username.length < 3 || username.length > 20) {
-    return res.render('user/register', {errorMessage: 'user name should be 3 to 20 long'});
-  }
-
-  try {
-    const dbEmail = await User.findOne({ email });
-    if (dbEmail) {
-      return res.render("user/register", { errorMessage: "user already exist, kindly login" });
+    try {
+        parsedGuestCart = JSON.parse(guestCart || '[]');
+    } catch (error) {
+        return res.status(400).json({ errorMessage: "Invalid guest cart data" });
     }
 
-    const {token, expireTime} = generateToken();
+    if (!username?.trim() || !mobile?.trim() || !email?.trim() || !password?.trim()) {
+        return res.status(400).json({ errorMessage: "All fields are required" });
+    }
 
-    const verificationLink = `https://onlyshoes.site/verify?token=${token}`;
-    await transporter.sendMail({
-      from: 'adarsh7013a@gmail.com',
-      to: email,
-      subject: 'Email Verification',
-      html: `Hi, click <a href="${verificationLink}">here</a> to verify your email for only shoes.`
-    });
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+        return res.status(400).json({ errorMessage: "Invalid email address" });
+    }
 
-    const hashedPass = await bcrypt.hash(password, 10);
-    const data = {
-      username,
-      email,
-      phone: mobile,
-      password: hashedPass,
-      verificationToken: token,
-      tokenExpires: expireTime
-    };
-    const user = await createUser(data);
+    if (mobile.length < 8 || mobile.length > 12 || !/^\d+$/.test(mobile)) {
+        return res.status(400).json({ errorMessage: "Phone number length should be between 8 to 12 digits and numeric only" });
+    }
 
-    res.render('user/register',{ emailSent: true });
-  } catch (err) {
-    return res.status(500).send('Error sending email');
-  }
+    if (username.length < 3 || username.length > 20) {
+        return res.status(400).json({ errorMessage: "Username should be 3 to 20 characters long" });
+    }
+
+    try {
+        const dbEmail = await User.findOne({ email });
+        if (dbEmail) {
+            return res.status(400).json({ errorMessage: "User already exists, kindly login" });
+        }
+
+        const { token, expireTime } = generateToken();
+
+        const verificationLink = `${req.protocol}://${req.get('host')}/verify?token=${token}`;
+        await transporter.sendMail({
+            from: 'adarsh7013a@gmail.com',
+            to: email,
+            subject: 'Email Verification',
+            html: `Hi, click <a href="${verificationLink}">here</a> to verify your email for Only Shoes.`
+        });
+
+        const hashedPass = await bcrypt.hash(password, 10);
+        const data = {
+            username,
+            email,
+            phone: mobile,
+            password: hashedPass,
+            verificationToken: token,
+            tokenExpires: expireTime
+        };
+        const user = await createUser(data);
+        await addToCart(user._id, parsedGuestCart);
+
+        return res.json({ clearGuestCart: true });
+    } catch (err) {
+        return res.status(500).json({ errorMessage: "An error occurred during registration. Please try again." });
+    }
 }
 
 
-//++++++++++++++++++++++++++++++++++
+
 
 
 async function handleVerification(req, res) {
@@ -455,14 +465,12 @@ async function handleVerification(req, res) {
   return res.redirect('/home');
 }
 
-// --------------------------COMMENTED POST LOGIN MOD FOR GUST CART--------------------------------------------------
 
 
 const postLogin = async (req, res) => {
   try {
     
     const { email, password, guestCart } = req.body;
-    console.log(req.body)
     const parsedGuestCart = JSON.parse(guestCart || '[]');
 
     const user = await User.findOne({ email: email, role: 'user' });
@@ -594,7 +602,6 @@ const postRemoveCart = async (req, res) => {
   }
 }
 
-//+++++++++++++++++++++++++++++++++++++++
 
 const getClearCart = async (req, res) => {
   const userId = req.user._id;
@@ -641,7 +648,6 @@ const getProductCheckout = async (req, res) => {
     minPriceRange: { $lt: cartTotal },
     maxPriceRange: { $gt: cartTotal }
   });
-console.log(coupon,'coupon')
   res.render('user/checkout', {
     cart,
     cartTotal,
@@ -1827,6 +1833,109 @@ const viewOrder = async (req, res) => {
 
 
 
+const walletCheckout = async (req, res) => {
+  const userId = req.user._id;
+
+  const {
+      firstname,
+      lastname,
+      email,
+      telephone,
+      company,
+      address,
+      apartment,
+      city,
+      state,
+      postcode,
+      notes,
+      payment
+  } = req.body;
+
+  const existingAddress = await Address.findOne({
+      user: userId,
+      firstName: firstname,
+      lastName: lastname,
+      email: email,
+      telephone: telephone,
+      company: company,
+      address: address,
+      apartment: apartment,
+      city: city,
+      state: state,
+      postCode: postcode,
+  });
+
+  let userAddress;
+  if (existingAddress) {
+      userAddress = existingAddress;
+  } else {
+      const newAddress = new Address({
+          user: userId,
+          firstName: firstname,
+          lastName: lastname,
+          email,
+          telephone,
+          company,
+          address,
+          apartment,
+          city,
+          state,
+          postCode: postcode,
+          notes
+      });
+      userAddress = await newAddress.save();
+  }
+
+  try {
+      const cart = await Cart.findOne({ user: userId }).populate('items.product');
+      if (!cart || !cart.items || cart.items.length === 0) {
+          return res.json({ success: false, message: 'Cart is empty.' });
+      }
+
+      const cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+      let couponDiscount = 0;
+      if (req.session.couponDiscount) {
+          req.session.couponDiscount.forEach(discount => {
+              couponDiscount += discount.discount;
+          });
+      }
+      const newCartTotal = cartTotal - couponDiscount;
+      req.session.couponDiscount = [];
+const user = await User.findById(userId);
+     user.walletAmount = user.walletAmount - newCartTotal;
+     await user.save();
+     const formatedDate = new Date(Date.now() + 5 * 24 * 60 * 60 * 1000);
+
+      const userOrder = new Order({
+          user: userId,
+          address: userAddress._id,
+          orderID: `ORDER-${Date.now()}`,
+          payment: 'wallet',
+          items: cart.items,
+          totalPrice: newCartTotal,
+          discountAmount: couponDiscount,
+          deliveryExpectedDate: formatedDate,
+      });
+
+      await userOrder.save();
+
+      await Promise.all(cart.items.map(async (item) => {
+          const product = item.product;
+          product.stock -= item.quantity;
+          await product.save();
+      }));
+
+      userOrder.stockUpdated = true;
+      await userOrder.save();
+      cart.items = [];
+      cart.totalPrice = 0;
+      await cart.save();
+
+      res.json({ success: true });
+  } catch (error) {
+      res.status(500).send({ error: error.message });
+  }
+};
 
 
 
@@ -1840,4 +1949,4 @@ const viewOrder = async (req, res) => {
        postAddAddress, removeAddress, getForgotpassword, postResetPassLink, resetPassword, getUpdatePass, postUpdatePass,
        getSearch, changeAccountDetails, miniCart, checkoutRazorpay, handleRazorpaySuccess, getShopByCategory,
        getCancelOrder, returnItems, returnEntireOrder, postReview, getReviews, createWithdrawl, verifyWithdrawal, cartCount,
-      viewOrder  }
+      viewOrder, walletCheckout  }

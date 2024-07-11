@@ -2,6 +2,7 @@ const Cart = require('../models/cart');
 const Product = require('../models/product');
 
 const addToCart = async (userId, items) => {
+  console.log('user id',userId,'items',items);
   let cart = await Cart.findOne({ user: userId });
   if (!cart) {
     cart = new Cart({ user: userId, items: [] });

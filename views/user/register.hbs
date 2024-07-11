@@ -466,7 +466,9 @@
     <div class="row">
         <div class="col-12 col-sm-12 col-md-6 col-lg-6 main-col offset-md-3">
             <div class="mb-4">
-                <form method="post" action="/register" id="CustomerLoginForm" accept-charset="UTF-8" class="contact-form">
+                <form method="post" action="/register" id="registerForm" accept-charset="UTF-8" class="contact-form">
+                 <input type="hidden" name="guestCart" id="guestCartData">
+                         <input type="hidden" name="guestWishlist" id="guestWishlistData">
                     <div class="row">
                         <div class="col-12 col-sm-12 col-md-12 col-lg-12">
                             <div class="form-group">
@@ -639,7 +641,7 @@
 
 
 
-{{#if emailSent}}
+{{!-- {{#if emailSent}}
 <script>
   Swal.fire({
     title: 'Success!',
@@ -649,7 +651,52 @@
   })
   
 </script>
-{{/if}}
+{{/if}} --}}
+
+
+
+<script>
+$(document).ready(function() {
+    $('#registerForm').on('submit', function(event) {
+        event.preventDefault();
+        const form = document.getElementById('registerForm');
+        const formData = new FormData(form);
+        var guestCart = localStorage.getItem('guestCart');
+        $('#guestCartData').val(guestCart);
+
+        $.ajax({
+            url: '/register',
+            type: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.clearGuestCart) {
+                    localStorage.removeItem('guestCart');
+                }
+                swal.fire({
+                    title: 'Registration Successful!',
+                    text: 'Please check your email for verification.',
+                    confirmButtonColor: "#28a745"
+                }).then(() => {
+                    // Optionally redirect to another page
+                });
+            },
+            error: function(jqXHR) {
+                console.error('Error:', jqXHR.responseText);
+                let message = 'Internal server error';
+                if (jqXHR.responseJSON && jqXHR.responseJSON.errorMessage) {
+                    message = jqXHR.responseJSON.errorMessage;
+                }
+                swal.fire({
+                    title: 'Error',
+                    text: message,
+                    confirmButtonColor: "#dc3545"
+                });
+            }
+        });
+    });
+});
+</script>
+
 </body>
 
 <!-- belle/register.html   11 Nov 2019 12:22:27 GMT -->

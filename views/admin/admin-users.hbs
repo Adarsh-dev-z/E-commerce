@@ -361,7 +361,6 @@
 function confirmDeleteUser(userId) {
   const userConfirmed = confirm('Do you want to delete the user?');
   if (userConfirmed) {
-    // Redirect to the delete URL if the user confirms
     window.location.href = `/delete-user?id=${userId}`;
   }
 }

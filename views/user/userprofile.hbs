@@ -358,34 +358,9 @@
         <h5 class="mb-1">{{user.username}}</h5>
         <p>Balance: <strong>₹{{user.walletAmount}}</strong></p>
     </div>
-    <div class="lbl">
-        <!-- Add Money Button -->
-    <button id="withdraw-money-button" class="btn btn-primary">Withdraw Money</button>
-    </div>
 </div>
 
-<!-- Withdraw Money Modal -->
-<div id="withdraw-money-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Withdraw Money from Wallet</h5>
-                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form id="withdraw-money-form">
-                    <div class="form-group">
-                        <label for="withdraw-amount">Amount (INR):</label>
-                        <input type="number" id="withdraw-amount" class="form-control" name="amount" min="1" required />
-                    </div>
-                    <button type="submit" class="btn btn-primary mt-3">Withdraw Now</button>
-                </form>
-            </div>
-        </div>
-    </div>
-</div>
+
                                     </div>
                                     <div class="col-12 col-lg-6">
                                         <ul class="profile-order mt-3 mt-lg-0">

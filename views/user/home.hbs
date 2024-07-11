@@ -845,7 +845,7 @@ $(document).ready(function() {
         } else {
             var guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
             var itemIndex = guestCart.findIndex(item => item.productId === productId);
-
+            
             if (itemIndex > -1) {
                 guestCart[itemIndex].quantity += 1;
             } else {
@@ -853,6 +853,7 @@ $(document).ready(function() {
             }
 
             localStorage.setItem('guestCart', JSON.stringify(guestCart));
+            
             $('#cart-popup').fadeIn();
             setTimeout(function() {
                 $('#cart-popup').fadeOut();

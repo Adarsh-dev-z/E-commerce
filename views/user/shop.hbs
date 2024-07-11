@@ -656,7 +656,6 @@ body {
             var productName = link.getAttribute('data-name');
             var productPrice = link.getAttribute('data-price');
 
-            // Update modal content
             document.getElementById('quick-view-image').src = productImage;
             document.getElementById('quick-view-name').innerText = productName;
             document.getElementById('quick-view-price').innerText = productPrice;
@@ -679,7 +678,6 @@ $(document).ready(function() {
             data: { id: productId },
             success: function(response) {
                 if(response.success) {
-                    // Show the popup
                     $('#wishlist-popup').fadeIn();
                     setTimeout(function() {
                         $('#wishlist-popup').fadeOut();
@@ -749,7 +747,6 @@ swal.fire({
         var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
 
         if (isLoggedIn) {
-            // User is logged in, make an AJAX request
             $.ajax({
                 url: '/add-to-cart/' + productId,
                 type: 'POST',
@@ -775,7 +772,6 @@ swal.fire({
                 }
             });
         } else {
-            // User is not logged in, save to localStorage
             var guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
             var itemIndex = guestCart.findIndex(item => item.productId === productId);
 
