@@ -17,10 +17,12 @@ const { getLogin, getProduct, getShop, getAbout, getBlog,
   returnEntireOrder,
   postReview,
   getReviews,
-  createWithdrawl,
   cartCount,
   viewOrder,
-  walletCheckout} = require('../controller/userController');
+  walletCheckout,
+  renderOrderSuccess,
+  renderRazorpayOrderSuccess,
+  walletOrderSuccess} = require('../controller/userController');
 var router = express.Router();
 const passport=require("passport");
 const { AuthCheck, userAuthCheck } = require('../middlewares/userAuthentication');
@@ -57,17 +59,8 @@ router.post('/register', userRegister, postRegister);
 router.get('/verify', handleVerification);
 router.post('/login', postLogin, userLogin)
 router.get("/logout", logOut)
-router.get('/order-success', (req, res) => {
-  setCacheControlHeaders(res);
-
-  res.render('user/order-success');
-})
-router.get('/razorpay-order-success', (req, res) => { 
-     setCacheControlHeaders(res);
-
-  res.render('user/order-success');
-})
-
+router.get('/order-success', renderOrderSuccess)
+router.get('/razorpay-order-success', renderRazorpayOrderSuccess)
 router.post('/add-to-wishlist', userAuthCheck, postAddToWishlist);
 router.get('/remove-wishlist', userAuthCheck, GetRemoveWishlist)
 router.get('/cart',userAuthCheck, getCart)
@@ -80,31 +73,11 @@ router.get('/userOrder-success', userAuthCheck, getOrderSuccess)
 router.post('/apply-coupon', userAuthCheck, postApplyCoupon);
 router.post('/remove-coupon', userAuthCheck, postRemoveCoupon);
 router.post('/create-checkout-session', userAuthCheck, createCheckoutSession);
-
-
-router.get('/auth/google',
-passport.authenticate('google', {scope:['profile', 'email'], prompt:'select_account'}));
-
-router.get("/auth/google/callback",
-passport.authenticate('google', {failureRedirect:'/'}),
- callbackUrl);
-
-
-
-
 router.get("/userprofile", userAuthCheck, getUserProfile)
 router.post('/edit-address/:id', userAuthCheck, editAddress)
 router.post('/add-address', userAuthCheck, postAddAddress)
 router.get('/remove-address/:id', userAuthCheck, removeAddress);
 router.get('/forgot-password', getForgotpassword)
-
-function generateToken() {
-    const token = crypto.randomBytes(20).toString('hex');
-    const expireTime = Date.now()+ 3600000;
-    return {token, expireTime}
-  }
-
-
 router.post('/reset-link', postResetPassLink)
 router.get('/resetpass', resetPassword);
 router.get('/update-password', getUpdatePass)
@@ -119,23 +92,8 @@ router.get('/return-entire-order', userAuthCheck, returnEntireOrder);
 router.get('/shopby-category', userAuthCheck, getShopByCategory)
 router.post('/reviews',userAuthCheck, postReview);
 router.get('/reviews/product/:productId', getReviews);
-
-
 router.post('/wallet-checkout', userAuthCheck, walletCheckout);
-router.get('/wallet-order-success', userAuthCheck, (req, res) => {
-
-  setCacheControlHeaders(res);
-  
-  res.render('user/order-success');
-})
-
-const razorpay = new Razorpay({
-  key_id: process.env.RAZORPAY_KEY_ID,
-  key_secret: process.env.RAZORPAY_KEY_SECRET
-});
-
-
-
+router.get('/wallet-order-success', userAuthCheck, walletOrderSuccess)
 router.get('/cart-count', userAuthCheck, cartCount)
 
 

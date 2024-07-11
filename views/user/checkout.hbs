@@ -888,7 +888,7 @@ Swal.fire({
                                 icon: 'success',
                                 confirmButtonText: 'Ok'
                             }).then(() => {
-                                window.location.href = '/wallet-order-success';
+                                window.location.href = `/wallet-order-success?orderid=${data.orderid}`;
                             });
                         } else {
                             Swal.fire({

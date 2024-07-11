@@ -73,12 +73,18 @@ const getProduct = async function(req, res) {
 
 const getShop = async function(req, res) {
   setCacheControlHeaders(res);
+  const getFilteredProduct = async () => {
+    let excludeProduts = [0,1,2,3,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,24,26,30,34,40,41,23,27,28,33,35,37];
+    const allProducts = await Product.find();
+    const getFilteredProduct = allProducts.filter((product,index)=> !excludeProduts.includes(index));
+    return getFilteredProduct;
+  }
   try {
     let cart = {items: []};
     let product = [];
     const { category, minPrice, maxPrice } = req.query;
     if(!category && !minPrice && !maxPrice){
-      product = await Product.find();
+      product = await getFilteredProduct()
     } else if(minPrice && maxPrice){
       product = await Product.find({ price: { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) } }); 
     } else {
@@ -1549,6 +1555,12 @@ const getShopByCategory = async (req, res) => {
 };
 
 
+const renderRazorpayOrderSuccess = (req, res) => { 
+  setCacheControlHeaders(res);
+
+res.render('user/order-success');
+}
+
 const getCancelOrder = async (req, res) => {
   const userId = req.user._id;
   const orderId = req.params.id;
@@ -1708,6 +1720,11 @@ const returnEntireOrder = async (req, res) => {
   }
 }
 
+const renderOrderSuccess = (req, res) => {
+  setCacheControlHeaders(res);
+
+  res.render('user/order-success');
+}
 
 const postReview = async (req, res) => {
   const userId = req.user._id
@@ -1736,59 +1753,6 @@ const getReviews = async (req, res) => {
       res.json(reviews);
   } catch (error) {
       res.status(500).json({ message: error.message });
-  }
-}
-
-
-const createWithdrawl = async (req, res) => {
-  try {
-      const userId = req.user._id;
-      const amount = parseInt(req.body.amount) * 100; 
-      const maxWithdrawAmount = 200000 * 100; 
-      const user = await User.findOne({ _id: userId });
-      const userWalletAmount = user.walletAmount*100; 
-      if (amount > maxWithdrawAmount) {
-          return res.status(400).json({ error: 'Cannot withdraw more than ₹200,000 at once.' });
-      }
-
-      if (amount > userWalletAmount) {
-          return res.status(400).json({ error: 'Insufficient balance.' });
-      }
-
-      const options = {
-          amount: amount, 
-          currency: 'INR',
-          receipt: `receipt_${new Date().getTime()}`,
-          payment_capture: 1,
-      };
-
-      const order = await razorpay.orders.create(options);
-      res.json(order);
-
-  } catch (error) {
-      res.status(500).send('Internal Server Error');
-  }
-}
-
-
-
-const verifyWithdrawal = async (req, res) => {
-  const { payment_id, order_id, signature, amount } = req.body;
-
-  const crypto = require('crypto');
-  const hmac = crypto.createHmac('sha256', process.env.RAZORPAY_KEY_SECRET);
-  hmac.update(`${order_id}|${payment_id}`);
-  const generated_signature = hmac.digest('hex');
-
-  if (signature === generated_signature) {
-      const userId = req.user._id;
-      
-      const user = await Users.findByIdAndUpdate(userId, { $inc: { walletAmount: -amount } });
-      await user.save();
-      
-      res.send({ success: true });
-  } else {
-      res.status(400).send({ error: 'Withdrawal verification failed' });
   }
 }
 
@@ -1931,13 +1895,38 @@ const user = await User.findById(userId);
       cart.totalPrice = 0;
       await cart.save();
 
-      res.json({ success: true });
+      res.json({ success: true, orderid:userOrder.id });
   } catch (error) {
       res.status(500).send({ error: error.message });
   }
 };
 
+const walletOrderSuccess = async(req, res) => {
 
+  setCacheControlHeaders(res);
+  const orderid = req.query.orderid;
+
+  if (!orderid) {
+    return res.status(400).send({ error: 'Order ID is required' });
+  }
+
+  const order = await Order.findOne({ _id: orderid }).populate('address').populate('items.product')
+  console.log('order',order)
+  if (!order) {
+    return res.status(404).send({ error: 'Order not found' });
+  }
+
+  
+  const subtotal = order.totalPrice - order.discountAmount;
+  res.render('user/order-success', {order:order,
+    address: order.address,
+    items:order.items,
+    total:order.totalPrice,
+   subtotal:subtotal,
+   currency:'inr',
+   deliveryExpectedDate:order.deliveryExpectedDate,
+   discountAmount:order.discountAmount,});
+}
 
 
 
@@ -1948,5 +1937,5 @@ const user = await User.findById(userId);
        getProductCheckout, getOrderSuccess, postApplyCoupon, postRemoveCoupon, createCheckoutSession, editAddress,
        postAddAddress, removeAddress, getForgotpassword, postResetPassLink, resetPassword, getUpdatePass, postUpdatePass,
        getSearch, changeAccountDetails, miniCart, checkoutRazorpay, handleRazorpaySuccess, getShopByCategory,
-       getCancelOrder, returnItems, returnEntireOrder, postReview, getReviews, createWithdrawl, verifyWithdrawal, cartCount,
-      viewOrder, walletCheckout  }
+       getCancelOrder, returnItems, returnEntireOrder, postReview, getReviews, cartCount,
+      viewOrder, walletCheckout, renderOrderSuccess, renderRazorpayOrderSuccess, walletOrderSuccess  }
