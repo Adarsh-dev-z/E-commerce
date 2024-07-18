@@ -1,7 +1,7 @@
 <!--Minicart Popup-->
                         <div id="header-cart" class="block block-cart">
+                            <div id="1234567"></div>
                         	<ul class="mini-products-list">
-                                {{#if isLoggedIn}}
                                 {{#if cart.items.length}}
                                 {{#each cart.items}}
                                 <li class="item">
@@ -32,10 +32,6 @@
                                 {{else}}
                                 <p>Cart is empty</p>
                                  {{/if}}
-                                {{else}}
-                               
-                                <p>Please log in to View</p>
-                                {{/if}}
                                 
                                 
                             </ul>
@@ -53,4 +49,23 @@
                             </div>
                         </div>
                         <!--End Minicart Popup-->
+
+                        {{!-- <script>
+document.addEventListener('productAdded', function() {
+    updateMiniCart();
+});
+
+function updateMiniCart() {
+    $.ajax({
+        url: '/cart', // Replace with your actual API endpoint
+        method: 'GET',
+        success: function(data) {
+        location.reload();            
+        },
+        error: function(error) {
+            console.error('Error updating minicart:', error);
+        }
+    });
+}
+</script> --}}
                         

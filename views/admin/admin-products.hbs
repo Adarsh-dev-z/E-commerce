@@ -32,7 +32,31 @@
         .action-icons {
           cursor: pointer;
         }
-        
+        .description, .tooltip {
+  position: top;
+  cursor: pointer;
+}
+
+.description::after, .tooltip::after {
+  content: attr(data-full-description);
+  position: absolute;
+  left: 0;
+  background-color: #333;
+  color: #fff;
+  padding: 5px;
+  border-radius: 5px;
+  white-space: pre-wrap;
+  display: none;
+  width: 700px; /* Adjust as needed */
+  z-index: 1;
+  margin-left: 100px;
+  font-size: 10px;
+}
+
+.description:hover::after, .tooltip:hover::after {
+  display: block;
+}
+
       </style>
 
 </head>
@@ -236,30 +260,38 @@
                             <th scope="col">Actions</th>
                         </tr>
                     </thead>
-                    <tbody id="tableBody">
-                      {{#if products.length}}
-                        {{#each products}}
-                        <tr>
-                            <td><input type="checkbox" class="selectRow" data-id="{{this._id}}"></td>
-                            <td>{{this.name}}</td>
-                            <td>{{this.brand}}</td>
-                            <td>{{this.price}}</td>
-                            <td>{{this.category}}</td>
-                            <td>{{this.description}}</td>
-                            <td>{{this.stock}}</td>
-                            <td>{{this.expireDate}}</td>
-                            <td>
-                                <a href="/edit-product?id={{this._id}}"><i class="fas fa-edit action-icons"></i></a>
-                                <a href="/delete-product/{{this._id}}"><i class="fas fa-trash action-icons"></i></a>
-                            </td>
-                        </tr>
-                        {{/each}}
-                        {{else}}
-                        <tr>
-                            <td colspan="9">No products found.</td>
-                        </tr>
-                        {{/if}}
-                    </tbody>
+                  <tbody id="tableBody">
+  {{#if products.length}}
+    {{#each products}}
+    <tr>
+      <td><input type="checkbox" class="selectRow" data-id="{{this._id}}"></td>
+      <td>{{this.name}}</td>
+      <td>{{this.brand}}</td>
+      <td>{{this.price}}</td>
+      <td>{{this.category}}</td>
+      <td>
+        <span class="description" data-full-description="{{this.description}}">
+          {{truncate this.description 20}}
+        </span>
+      </td>
+      <td>{{this.stock}}</td>
+      <td>
+          {{this.expireDate}}
+      </td>
+      <td>
+        <a href="/edit-product?id={{this._id}}"><i class="fas fa-edit action-icons"></i></a>
+        <a href="/delete-product/{{this._id}}"><i class="fas fa-trash action-icons"></i></a>
+      </td>
+    </tr>
+    {{/each}}
+  {{else}}
+    <tr>
+      <td colspan="9">No products found.</td>
+    </tr>
+  {{/if}}
+</tbody>
+
+
                 </table>
             </div>
         </div>

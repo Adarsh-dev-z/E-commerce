@@ -136,6 +136,7 @@
         <p>Your cart is empty</p>
         <a href="/shop" class="btn btn-secondary btn--small cart-continue">Continue shopping</a>
     </div>
+    
 {{/if}}
                         </div>
                     </div>
@@ -307,59 +308,60 @@ Swal.fire({
      </script>
 <script>
 $(document).ready(function() {
-    $('.qtyBtn.plus').on('click', function(event) {
-        event.preventDefault();
-        const productId = $(this).data('id');
-        updateQuantity(productId, 'increase');
-    });
+  $('.qtyBtn.plus').on('click', function(event) {
+    event.preventDefault();
+    const productId = $(this).data('id');
+    updateQuantity(productId, 'increase');
+  });
 
-    $('.qtyBtn.minus').on('click', function(event) {
-        event.preventDefault();
-        const productId = $(this).data('id');
-        updateQuantity(productId, 'decrease');
-    });
+  $('.qtyBtn.minus').on('click', function(event) {
+    event.preventDefault();
+    const productId = $(this).data('id');
+    updateQuantity(productId, 'decrease');
+  });
 
-    function updateQuantity(productId, action) {
-        $.ajax({
-            url: '/cart/update-quantity',
-            type: 'POST',
-            data: JSON.stringify({ productId, action }),
-            contentType: 'application/json',
-            success: function(data) {
-                if (data.success) {
-                    $('#qty-' + productId).val(data.quantity);
-                    $('#totalPrice-' + productId).text('₹' + data.totalPrice);
-                    $('#cartTotal').text("₹"+ data.cartTotal);
-                    $('#cartTotal-grand').text('₹'+data.cartTotal)
-                } else {
- Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: data.message,
-        background: '#f9f9f9',
-        iconColor: '#dc3545',
-        customClass: {
-            popup: 'swal2-custom-popup'
-        }
-    });                }
-            },
-            error: function(jqXHR, textStatus, errorThrown) {
-                 Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Error updating quantity',
-        background: '#f9f9f9',
-        iconColor: '#dc3545',
-        customClass: {
-            popup: 'swal2-custom-popup'
-        }
-    });
-                
+  function updateQuantity(productId, action) {
+    $.ajax({
+      url: '/cart/update-quantity',
+      type: 'POST',
+      data: JSON.stringify({ productId, action }),
+      contentType: 'application/json',
+      success: function(data) {
+        if (data.success) {
+          $('#qty-' + productId).val(data.quantity);
+          $('#totalPrice-' + productId).text('₹' + data.totalPrice);
+          $('#cartTotal').text("₹" + data.cartTotal);
+          $('#cartTotal-grand').text('₹' + data.cartTotal);
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: data.message,
+            background: '#f9f9f9',
+            iconColor: '#dc3545',
+            customClass: {
+              popup: 'swal2-custom-popup'
             }
+          });
+        }
+      },
+      error: function(jqXHR, textStatus, errorThrown) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error updating quantity',
+          background: '#f9f9f9',
+          iconColor: '#dc3545',
+          customClass: {
+            popup: 'swal2-custom-popup'
+          }
         });
-    }
+      }
+    });
+  }
 });
 </script>
+
      
 
      <script>
@@ -373,6 +375,8 @@ $(document).ready(function() {
       url: `/remove-from-cart/${productId}`,
       type: 'POST',
       success: function(response) {
+           document.dispatchEvent(new Event('productAdded'));
+
         $(`#product-${productId}`).remove();
 
         if ($('#cartItems .cart__row').length === 0) {

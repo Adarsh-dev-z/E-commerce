@@ -711,61 +711,95 @@
         });
         </script>
  
-      <script>
+
+
+
+    <script>
     $(document).ready(function() {
-    $('.btn.product-form__cart-submit').on('click', function(event) {
-        event.preventDefault();
-        var productId = $(this).closest('form').find('input[name="id"]').val();
-        var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
+        $('.btn.product-form__cart-submit').on('click', function(event) {
+            event.preventDefault();
+            var productId = $(this).closest('form').find('input[name="id"]').val();
+            var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
+            console.log('productId: ' + productId);
 
-        if (isLoggedIn) {
-            // User is logged in, make an AJAX request
-            $.ajax({
-                url: '/add-to-cart/' + productId,
-                type: 'POST',
-                success: function(response) {
-                    console.log(response)
-                    if (response.success) {
-                        $('#cart-popup').fadeIn();
-                        setTimeout(function() {
-                            $('#cart-popup').fadeOut();
-                        }, 2000);
-                        console.log('added to cart successfully');
-                    } else {
-                        console.log('error adding to cart');
+            if (isLoggedIn) {
+                $.ajax({
+                    url: `/add-to-cart?productId=${productId}`,
+                    type: 'POST',
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                                  document.dispatchEvent(new Event('productAdded'));
+
+                            $('#cart-popup').fadeIn();
+                            setTimeout(function() {
+                                $('#cart-popup').fadeOut();
+                            }, 2000);
+                            console.log('added to cart successfully');
+                        } else {
+                            console.log('error adding to cart');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Internal Server Error',
+                            text: 'Something went wrong on the server.',
+                        });
                     }
-                },
-                error: function() {
-                    swal.fire({
-  title: "Error",
-  text: "Internal server error",
-  icon: "error",
-  confirmButtonColor: "#dc3545"
-});
-                }
-            });
-        } else {
-            // User is not logged in, save to localStorage
-            var guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
-            var itemIndex = guestCart.findIndex(item => item.productId === productId);
-
-            if (itemIndex > -1) {
-                guestCart[itemIndex].quantity += 1;
+                });
             } else {
-                guestCart.push({ productId: productId, quantity: 1 });
+                var guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
+                var itemIndex = guestCart.findIndex(item => item.productId === productId);
+
+                if (itemIndex > -1) {
+                    guestCart[itemIndex].quantity += 1;
+                } else {
+                    guestCart.push({ productId: productId, quantity: 1 });
+                }
+
+                localStorage.setItem('guestCart', JSON.stringify(guestCart));
+                guestCart = JSON.parse(localStorage.getItem('guestCart'));
+
+                console.log(guestCart,'guestcart');
+
+                $.ajax({
+                    url: '/add-to-cart',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ guestCart: guestCart }),
+                    success: function(response) {
+                        console.log(response);
+                        if (response.success) {
+                                  document.dispatchEvent(new Event('productAdded'));
+
+                            if(response.clearGuestCart){
+                             localStorage.removeItem('guestCart');
+                            $('#cart-popup').fadeIn();
+                            setTimeout(function() {
+                                $('#cart-popup').fadeOut();
+                            }, 2000);
+                            console.log('added to guest cart successfully');
+                            }
+                        } else {
+                            console.log('error adding to guest cart');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Internal Server Error',
+                            text: 'Something went wrong on the server.',
+                        });
+                    }
+                });
             }
-
-            localStorage.setItem('guestCart', JSON.stringify(guestCart));
-            $('#cart-popup').fadeIn();
-            setTimeout(function() {
-                $('#cart-popup').fadeOut();
-            }, 2000);
-            console.log('added to guest cart successfully');
-        }
+        });
     });
-});
-
 </script>
+
+
+
 
 <script>
   $(document).ready(function() {

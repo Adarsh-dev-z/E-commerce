@@ -301,9 +301,9 @@
             {{/each}}
         </tbody>
         <tfoot class="font-weight-600">
-            <tr id="coupon-row" style="display: none;">
+            <tr id="coupon-row" style="{{#if appliedCoupon}}display: table-row;{{else}}display: none;{{/if}}">
                 <td colspan="3" class="text-right">Coupon</td>
-                <td id="coupon-discount">-₹{{coupon.discount}}</td>
+                <td id="coupon-discount">-₹{{appliedCoupon.discount}}</td>
             </tr>
             <tr>
                 <td colspan="3" class="text-right">Shipping </td>
@@ -326,44 +326,11 @@
                             <div class="container mt-5">
                                 <div class="payment-section">
                                     <form id="payment-form">
-                                        {{!-- <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="payment"
-                                                id="cash on delivery" value="cash on delivery">
-                                            <label class="form-check-label" for="cash on delivery">Cash On
-                                                Delivery</label>
-                                        </div> --}}
+                                        
                                         <div id="bankTransferContent" class="payment-content">
                                             <p class="no-margin font-15"></p>
                                         </div>
-{{!-- 
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="payment" id="stripe"
-                                                value="stripe">
-                                            <label class="form-check-label" for="stripe">Stripe</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="payment" id="razorpay"
-                                                value="razorpay">
-                                            <label class="form-check-label" for="razorpay">Razorpay</label>
-                                        </div>
-                                        <div class="form-check">
-                                            <input class="form-check-input" type="radio" name="wallet" id="wallet"
-                                                value="wallet">
-                                            <label class="form-check-label" for="wallet">Wallet</label>
-                                        </div>
 
-
-                                        <div id="paypalContent" class="payment-content">
-                                            <p class="no-margin font-15"></p>
-                                        </div>
-
-                                    </form>
-                                </div>
-
-                                <div class="order-button-payment" class="payment-content">
-                                    <button class="btn" id="checkout-button" value="Place order" type="submit">Place
-                                        order</button>
-                                </div> --}}
                                 <form id="checkout-form">
     <div class="form-check">
         <input class="form-check-input" type="radio" name="payment" id="stripe" value="stripe">
@@ -373,10 +340,18 @@
         <input class="form-check-input" type="radio" name="payment" id="razorpay" value="razorpay">
         <label class="form-check-label" for="razorpay">Razorpay</label>
     </div>
+   {{#if insufficientBalance}}
+    <div class="form-check">
+        <input class="form-check-input" type="radio" name="payment" id="wallet" value="wallet" disabled>
+        <label class="form-check-label" for="wallet">Wallet</label>
+    </div>
+    <p class="text-danger">Insufficient balance in your wallet. Please select another payment method.</p>
+{{else}}
     <div class="form-check">
         <input class="form-check-input" type="radio" name="payment" id="wallet" value="wallet">
         <label class="form-check-label" for="wallet">Wallet</label>
     </div>
+{{/if}}
     <div id="paypalContent" class="payment-content">
         <p class="no-margin font-15"></p>
     </div>
@@ -626,7 +601,7 @@ Swal.fire({
             });
 
             if (!valid) {
-                return; // Exit if validation fails
+                return; 
             }
 
             if (!paymentMethod) {
@@ -911,6 +886,30 @@ Swal.fire({
   {{!-- --------------------------------COUPON SETUP-------------------------- --}}
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script>
+    function updateWalletAvailability(insufficientBalance) {
+        console.log(insufficientBalance, 'insufffii')
+        const walletInput = document.getElementById('wallet');
+        const walletLabel = document.querySelector('label[for="wallet"]');
+        const warningMessage = document.querySelector('.text-danger');
+
+        if (insufficientBalance) {
+            walletInput.disabled = true;
+            walletLabel.classList.add('text-muted');
+            if (!warningMessage) {
+                const message = document.createElement('p');
+                message.classList.add('text-danger');
+                message.innerText = 'Insufficient balance in your wallet. Please select another payment method.';
+                walletLabel.parentNode.appendChild(message);
+            }
+        } else {
+            walletInput.disabled = false;
+            walletLabel.classList.remove('text-muted');
+            if (warningMessage) {
+                warningMessage.remove();
+            }
+        }
+    }
+
     function applyCoupon() {
         const couponCode = document.getElementById('coupon-code').value;
 
@@ -924,20 +923,18 @@ Swal.fire({
                     document.getElementById('discount-amount').innerText = result.discount;
                     document.getElementById('new-total').innerText = result.discountedTotal;
                     document.getElementById('coupon-info').style.display = 'block';
-                    
                     document.getElementById('coupon-row').style.display = '';
                     document.getElementById('coupon-discount').innerText = `-${result.discount}`;
                     document.getElementById('total-amount').innerText = `$${result.discountedTotal}`;
-                    
- Swal.fire({
+                    updateWalletAvailability(result.insufficientBalance);
+                    Swal.fire({
                         title: 'Success',
                         text: 'Coupon applied successfully!',
                         icon: 'success',
                         confirmButtonText: 'Ok'
                     });                    
                 } else {
-
-Swal.fire({
+                    Swal.fire({
                         title: 'Error',
                         text: result.message,
                         icon: 'error',
@@ -946,7 +943,7 @@ Swal.fire({
                 }
             },
             error: function(xhr, status, error) {
-Swal.fire({
+                Swal.fire({
                     title: 'Error',
                     text: 'An error occurred while applying the coupon.',
                     icon: 'error',
@@ -964,32 +961,31 @@ Swal.fire({
             success: function(result) {
                 if (result.success) {
                     document.getElementById('coupon-info').style.display = 'none';
-                    
                     document.getElementById('coupon-row').style.display = 'none';
                     document.getElementById('total-amount').innerText = `$${result.newTotal}`;
-                    
- Swal.fire({
+                    updateWalletAvailability(result.insufficientBalance);
+                    Swal.fire({
                         title: 'Success',
                         text: 'Coupon removed successfully!',
                         icon: 'success',
                         confirmButtonText: 'Ok'
                     });                    
                 } else {
- Swal.fire({
-        title: 'Error',
-        text: result.message,
-        icon: 'error',
-        confirmButtonText: 'Ok'
-    });                    
+                    Swal.fire({
+                        title: 'Error',
+                        text: result.message,
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });                    
                 }
             },
             error: function(xhr, status, error) {
-Swal.fire({
-        title: 'Error',
-        text: 'An error occurred while removing the coupon.',
-        icon: 'error',
-        confirmButtonText: 'Ok'
-    });                
+                Swal.fire({
+                    title: 'Error',
+                    text: 'An error occurred while removing the coupon.',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });                
             }
         });
     }

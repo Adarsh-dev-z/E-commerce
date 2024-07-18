@@ -1709,6 +1709,7 @@ label {
   border: 0px solid #e5eaef;
   background-color: rgba(255, 255, 255, 0.2);
   color: #fff !important;
+  margin: 5px;
 }
 
 .form-control:focus{

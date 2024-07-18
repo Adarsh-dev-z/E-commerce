@@ -442,7 +442,6 @@ body {
                                 {{#if Product.length}}
                                 {{#each Product}}
                                 <div class="col-6 col-sm-6 col-md-4 col-lg-3 item">
-                                    <!-- start product image -->
                                     <div class="product-image">
                                         <!-- start product image -->
                                         <a href="/product?id={{this._id}}">
@@ -451,13 +450,7 @@ body {
                                             <!-- End image -->
                                             <!-- Hover image -->
                                             <img class="hover blur-up lazyload" data-src="/{{this.productImage.[4]}}" src="/{{this.productImage.[2]}}" alt="image" title="product" />
-                                            <!-- End hover image -->
-                                            <!-- product label -->
-                                            <!-- End product label -->
                                         </a>
-                                        <!-- end product image -->
-
-                                        <!-- Start product button -->
                                         <form class="variants add" action="/add-to-cart/{{this._id}}" method="post">
     <input type="hidden" name="id" value="{{this._id}}">
     <button class="btn btn-addto-cart" type="submit">Add to cart</button>
@@ -741,56 +734,84 @@ swal.fire({
 
 <script>
     $(document).ready(function() {
-    $('.btn-addto-cart').on('click', function(event) {
-        event.preventDefault();
-        var productId = $(this).closest('form').find('input[name="id"]').val();
-        var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
+        $('.btn-addto-cart').on('click', function(event) {
+            event.preventDefault();
+            var productId = $(this).closest('form').find('input[name="id"]').val();
+            var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
+            console.log('productId: ' + productId);
 
-        if (isLoggedIn) {
-            $.ajax({
-                url: '/add-to-cart/' + productId,
-                type: 'POST',
-                success: function(response) {
-                    console.log(response)
-                    if (response.success) {
-                        $('#cart-popup').fadeIn();
-                        setTimeout(function() {
-                            $('#cart-popup').fadeOut();
-                        }, 2000);
-                        console.log('added to cart successfully');
-                    } else {
-                        console.log('error adding to cart');
+            if (isLoggedIn) {
+                $.ajax({
+                    url: `/add-to-cart?productId=${productId}`,
+                    type: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                                  document.dispatchEvent(new Event('productAdded'));
+
+                            $('#cart-popup').fadeIn();
+                            setTimeout(function() {
+                                $('#cart-popup').fadeOut();
+                            }, 2000);
+                            console.log('added to cart successfully');
+                        } else {
+                            console.log('error adding to cart');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Internal Server Error',
+                            text: 'Something went wrong on the server.',
+                        });
                     }
-                },
-                error: function() {
-                    swal.fire({
-  title: "Error",
-  text: "Internal server error",
-  icon: "error",
-  confirmButtonColor: "#dc3545"
-});
-                }
-            });
-        } else {
-            var guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
-            var itemIndex = guestCart.findIndex(item => item.productId === productId);
-
-            if (itemIndex > -1) {
-                guestCart[itemIndex].quantity += 1;
+                });
             } else {
-                guestCart.push({ productId: productId, quantity: 1 });
+                var guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
+                var itemIndex = guestCart.findIndex(item => item.productId === productId);
+
+                if (itemIndex > -1) {
+                    guestCart[itemIndex].quantity += 1;
+                } else {
+                    guestCart.push({ productId: productId, quantity: 1 });
+                }
+
+                localStorage.setItem('guestCart', JSON.stringify(guestCart));
+                guestCart = JSON.parse(localStorage.getItem('guestCart'));
+
+                console.log(guestCart,'guestcart');
+
+                $.ajax({
+                    url: '/add-to-cart',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ guestCart: guestCart }),
+                    success: function(response) {
+                        if (response.success) {
+                                  document.dispatchEvent(new Event('productAdded'));
+
+                            if(response.clearGuestCart){
+                             localStorage.removeItem('guestCart');
+                            $('#cart-popup').fadeIn();
+                            setTimeout(function() {
+                                $('#cart-popup').fadeOut();
+                            }, 2000);
+                            console.log('added to guest cart successfully');
+                            }
+                        } else {
+                            console.log('error adding to guest cart');
+                        }
+                    },
+                    error: function() {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Internal Server Error',
+                            text: 'Something went wrong on the server.',
+                        });
+                    }
+                });
             }
-
-            localStorage.setItem('guestCart', JSON.stringify(guestCart));
-            $('#cart-popup').fadeIn();
-            setTimeout(function() {
-                $('#cart-popup').fadeOut();
-            }, 2000);
-            console.log('added to guest cart successfully');
-        }
+        });
     });
-});
-
 </script>
 
  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

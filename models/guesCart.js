@@ -1,13 +1,10 @@
 const mongoose= require("mongoose")
 const user = require("./user")
 
-const cartSchema= mongoose.Schema({
-    user:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:"Users",
-    },
+const guestCartSchema= mongoose.Schema({
     guestCartId:{
         type:String,
+        required:true
     },
     items:[
         {
@@ -36,4 +33,4 @@ const cartSchema= mongoose.Schema({
     
 })
 
-module.exports=mongoose.model("Cart",cartSchema)
+module.exports=mongoose.model("guestCart",guestCartSchema)

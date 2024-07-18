@@ -7,8 +7,8 @@ var logger = require('morgan');
 const passport =require("passport");
 const session = require("express-session");
 const compression = require('compression');
-const db=require('./config/db/config')
-require("./config/passport-config")(passport)
+const db=require('./config/db/config');
+const MongoDBStore = require("connect-mongodb-session")(session);
 const hbs = require("express-handlebars");
 var app = express();
 const port=process.env.PORT || 3000;
@@ -33,6 +33,12 @@ const hbsHelpers = {
   and: function() {
     const args = Array.prototype.slice.call(arguments, 0, -1);
     return args.every(Boolean);
+},
+truncate: (str, len) => {
+  if (str.length > len) {
+    return str.substring(0, len) + '...';
+  }
+  return str;
 }
 };
 
@@ -58,6 +64,7 @@ app.use(session({
   resave:false,
   saveUninitialized:false,
   cookie: { maxAge: 600000*24 },
+  store: new MongoDBStore({ mongooseConnection: db,})
 
 }));
 app.use(flash());
