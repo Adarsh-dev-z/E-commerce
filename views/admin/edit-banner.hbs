@@ -203,7 +203,7 @@
         <label for="input-6">Banner Image</label>
         <div class="input-group">
             <div class="custom-file">
-                <input type="file" name="bannerImage" id="bannerImage" class="custom-file-input" id="input-6" aria-describedby="input-6-addon" multiple>
+                <input type="file" name="Image" id="Image" class="custom-file-input" id="input-6" aria-describedby="input-6-addon" multiple>
                 <label class="custom-file-label" for="input-6">Choose file</label>
             </div>
         </div>
@@ -309,7 +309,7 @@
   <script>
     function validateForm() {
         var title = document.getElementById('title').value;
-        var bannerImage = document.getElementById('bannerImage').value;
+        var bannerImage = document.getElementById('Image').value;
 
         if (!title.trim()) {
  Swal.fire({

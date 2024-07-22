@@ -18,28 +18,72 @@ const flash = require('connect-flash');
 
 const hbsHelpers = {
   eq: function (a, b) {
-      return a === b;
+    return a === b;
   },
   or: function () {
-      const args = Array.prototype.slice.call(arguments, 0, -1);
-      return args.some(Boolean);
+    const args = Array.prototype.slice.call(arguments, 0, -1);
+    return args.some(Boolean);
   },
   json: function (context) {
-      return JSON.stringify(context);
+    return JSON.stringify(context);
   },
   not: function(value) {
-      return !value;
+    return !value;
   },
   and: function() {
     const args = Array.prototype.slice.call(arguments, 0, -1);
     return args.every(Boolean);
-},
-truncate: (str, len) => {
-  if (str.length > len) {
-    return str.substring(0, len) + '...';
+  },
+  truncate: (str, len) => {
+    if (str.length > len) {
+      return str.substring(0, len) + '...';
+    }
+    return str;
+  },
+
+  add: function (a, b) {
+    return a + b;
+  },
+  subtract: function (a, b) {
+    return a - b;
+  },
+  range: function(start, end) {
+    const result = [];
+    for (let i = start; i <= end; i++) {
+      result.push(i);
+    }
+    return result;
+  },
+  paginationRange: function(currentPage, totalPages) {
+    const delta = 2;
+    const range = [];
+    const rangeWithDots = [];
+    let l;
+
+    range.push(1);
+
+    for (let i = currentPage - delta; i <= currentPage + delta; i++) {
+      if (i < totalPages && i > 1) {
+        range.push(i);
+      }
+    }
+
+    range.push(totalPages);
+
+    for (let i of range) {
+      if (l) {
+        if (i - l === 2) {
+          rangeWithDots.push(l + 1);
+        } else if (i - l !== 1) {
+          rangeWithDots.push('ellipsis');
+        }
+      }
+      rangeWithDots.push(i);
+      l = i;
+    }
+
+    return rangeWithDots;
   }
-  return str;
-}
 };
 
 app.set('views', path.join(__dirname, 'views'));

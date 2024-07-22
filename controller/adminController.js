@@ -10,7 +10,8 @@ const Coupon = require('../models/coupon')
 const { Users, DeletedUser } = require('../models/user');
 const { AuthCheck, adminAuthCheck } = require('../middlewares/userAuthentication');
 const Banner = require('../models/banner');
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcrypt');
+const Category = require('../models/category');
 const Order = require('../models/order');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -193,26 +194,44 @@ const editProduct = async (req, res) => {
 
 const adminProducts = async (req, res) => {
   try {
-      const categories = await product.distinct('category');
-      const filterCategory = req.query.category;
-      const searchQuery = req.query.search;
-      let query = {};
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const categories = await product.distinct('category');
+    const filterCategory = req.query.category;
+    const searchQuery = req.query.search;
+    let query = {};
 
-      if (filterCategory) {
-          query.category = filterCategory;
-      }
+    if (filterCategory) {
+      query.category = filterCategory;
+    }
 
-      if (searchQuery) {
-          query.$or = [
-              { name: { $regex: searchQuery, $options: 'i' } },
-              { brand: { $regex: searchQuery, $options: 'i' } },
-          ];
-      }
+    if (searchQuery) {
+      query.$or = [
+        { name: { $regex: searchQuery, $options: 'i' } },
+        { brand: { $regex: searchQuery, $options: 'i' } },
+      ];
+    }
 
-      const products = await product.find(query);
-      res.render('admin/admin-products', { products, categories });
+    const totalProducts = await product.countDocuments(query);
+    const totalPages = Math.ceil(totalProducts / limit);
+    const skip = (page - 1) * limit;
+
+    const products = await product.find(query)
+      .skip(skip)
+      .limit(limit);
+
+    res.render('admin/admin-products', { 
+      products, 
+      categories,
+      currentPage: page,
+      totalPages,
+      limit,
+      filterCategory,
+      searchQuery
+    });
   } catch (err) {
-      res.status(500).send('Error fetching products');
+    console.error('Error in adminProducts:', err);
+    res.status(500).send('Error fetching products');
   }
 };
 
@@ -220,8 +239,10 @@ const adminProducts = async (req, res) => {
 
 const adminUsers = async (req, res) => {
   try {
-    const searchTerm = req.query.search || ''; 
-    const searchRegex = new RegExp(searchTerm, 'i'); 
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const searchTerm = req.query.search || '';
+    const searchRegex = new RegExp(searchTerm, 'i');
     const isBlockedFilter = req.query.isBlocked ? req.query.isBlocked === 'true' : null;
 
     const filter = {
@@ -233,24 +254,34 @@ const adminUsers = async (req, res) => {
       filter.isBlocked = isBlockedFilter;
     }
 
-    const users = await Users.find(filter);
+    const totalUsers = await Users.countDocuments(filter);
+    const totalPages = Math.ceil(totalUsers / limit);
+    const skip = (page - 1) * limit;
 
-    res.render('admin/admin-users', { 
+    const users = await Users.find(filter)
+      .skip(skip)
+      .limit(limit);
+
+    res.render('admin/admin-users', {
       users,
       searchTerm,
-      isBlockedFilter: req.query.isBlocked 
+      isBlockedFilter: req.query.isBlocked,
+      currentPage: page,
+      totalPages,
+      limit
     });
   } catch (err) {
-    res.status(500).send('server error');
+    console.error(err);
+    res.status(500).send('Server error');
   }
 };
 
 
 
-
-const getAddProduct = (req, res) => {
-
-  res.render('admin/add-product');
+const getAddProduct = async(req, res) => {
+  const categories = await Category.find();
+  console.log(categories)
+  res.render('admin/add-product',{categories});
 }
 
 
@@ -614,7 +645,12 @@ const updateReturnStatus = async (req, res) => {
 
 const adminOrders = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
     const sortOption = req.query.sort || 'date_desc';
+    const amountFilter = parseInt(req.query.amountFilter) || 100000;
+
+    console.log('Received amountFilter:', amountFilter); // Debug log
 
     let sortCriteria;
     if (sortOption === 'date_asc') {
@@ -623,7 +659,19 @@ const adminOrders = async (req, res) => {
       sortCriteria = { deliveryExpectedDate: -1 };
     }
 
-    const orders = await Order.find()
+    const query = {
+      totalPrice: { $lte: amountFilter }
+    };
+
+    console.log('Query:', JSON.stringify(query)); // Debug log
+
+    const totalOrders = await Order.countDocuments(query);
+    console.log('Total orders matching query:', totalOrders); // Debug log
+
+    const totalPages = Math.ceil(totalOrders / limit);
+    const skip = (page - 1) * limit;
+
+    const orders = await Order.find(query)
       .populate({
         path: 'user',
         select: 'username'
@@ -636,13 +684,25 @@ const adminOrders = async (req, res) => {
         path: 'items.product',
         select: 'name'
       })
-      .sort(sortCriteria);
+      .sort(sortCriteria)
+      .skip(skip)
+      .limit(limit);
 
-    res.render('admin/admin-orders', { orders, sortOption });
+    console.log('Filtered orders:', orders.length); // Debug log
+
+    res.render('admin/admin-orders', {
+      orders,
+      sortOption,
+      currentPage: page,
+      totalPages,
+      limit,
+      amountFilter
+    });
   } catch (error) {
+    console.error('Error in adminOrders:', error);
     res.status(500).send('An error occurred while fetching orders');
   }
-}
+};
 
 const adminFilterOrders = async(req, res)=>{
   const {Min, Max} = req.query;

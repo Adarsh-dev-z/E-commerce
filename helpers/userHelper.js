@@ -2,6 +2,7 @@ const {Users} = require('../models/user')
 const Product = require('../models/product')
 const Cart = require('../models/cart')
 const Wishlist = require('../models/wishlist')
+const Reviews = require('../models/review')
 module.exports={
     createUser:async(data)=>{
         try {
@@ -46,8 +47,24 @@ module.exports={
           console.error('Error retrieving wishlist:', error);
           throw error;
         }
-      }
-    
-    
+    },
+    findProductReviews: async function (productId) {
+        try {
+          const reviews = await Reviews.find({ product: productId }).populate('user');
+          return reviews;
+        } catch (error) {
+          console.log(error);
+        }
+      },
+      findRelatedProducts: async function (product) {
+        try {
+          const relatedProducts = await Product.find({ category: product.category }).limit(5);
+          return relatedProducts;
+        } catch (error) {
+          console.log(error);
+        }
+      },
+
+
     
 }

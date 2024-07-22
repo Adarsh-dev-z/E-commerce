@@ -55,37 +55,30 @@
 
 /* Additional Styles */
 .wishlist-popup {
-    /* Add your additional styles here */
-    /* For example, you can adjust the font size, padding, and background color */
+   
     font-size: 18px;
     padding: 20px 30px;
     background-color: #333;
 }
 
 .wishlist-popup a {
-    /* Add your additional styles here */
-    /* For example, you can adjust the font size and color */
+   
     font-size: 16px;
     color: #0fc4a5;
 }
 
 .wishlist-popup p {
-    /* Add your additional styles here */
-    /* For example, you can adjust the font size and color */
+   
     font-size: 20px;
     color: #fff;
 }
 
 .loader {
-    /* Add your additional styles here */
-    /* For example, you can adjust the size and color */
+   
     width: 30px;
     height: 30px;
     border-top-color: #0fc4a5;
 }
-
-
-/* Loader Styles */
 .loader {
  position: relative;
  width: 200px;
@@ -168,13 +161,11 @@
     </div>
 </div>
 <!--- *************************************Popup Notification****************************************************** -->
-{{!-- ----------------------------------------------------welcome user---------------------------------------------------------- --}}
 {{#if showWelcomeMessage}}
 <div id="welcome-box">
 		hi <span id="username">{{userName}}</span>, welcome to OnlyShoes!
 	</div>
 {{/if}}
-{{!-- ----------------------------------------------------welcome user---------------------------------------------------------- --}}
 
 
 	<!--End Mobile Menu-->
@@ -276,18 +267,9 @@
                                         {{!-- <span class="old-price">${{this}}</span> --}}
                                         <span class="price">₹{{this.price}}</span>
                                     </div>
-                                    <!-- End product price -->
-                                    
-                                    <!-- product button -->
+                                  
                                     <div class="button-set">
-                                        {{!-- <a href="javascript:void(0)" title="Quick View" class="quick-view-popup quick-view" data-toggle="modal" data-target="#content_quickview">
-                                            <i class="icon anm anm-search-plus-r"></i>
-                                        </a> --}}
-                                        <!-- Start product button -->
-
-                                        {{!-- <form class="variants add" action="#" onclick="window.location.href='cart.html'"method="post">
-                                            <button class="btn cartIcon btn-addto-cart" type="button" tabindex="0"><i class="icon anm anm-bag-l"></i></button>
-                                        </form> --}}
+                                      
 {{!-- -------------------------------------------------------------------------------------------------------------------- --}}
 <form class="variants add" action="/add-to-cart/{{this._id}}" method="post">
     <input type="hidden" name="id" value="{{this._id}}">
@@ -729,17 +711,25 @@
     </div>
 	<!-- End Newsletter Popup -->
     
-     <!-- Including Jquery -->
-     <script src="assets/js/vendor/jquery-3.3.1.min.js"></script>
-     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
-     <script src="assets/js/vendor/jquery.cookie.js"></script>
-     <script src="assets/js/vendor/wow.min.js"></script>
-     <!-- Including Javascript -->
-     <script src="assets/js/bootstrap.min.js"></script>
-     <script src="assets/js/plugins.js"></script>
-     <script src="assets/js/popper.min.js"></script>
-     <script src="assets/js/lazysizes.js"></script>
-     <script src="assets/js/main.js"></script>
+    <!-- Including jQuery -->
+ <script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
+    <script>
+        console.log("jQuery version:", jQuery.fn.jquery); // Verify jQuery is loaded
+    </script>
+    <!-- Include Modernizr -->
+    <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
+    <!-- Include the jQuery Cookie plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+   
+    <!-- Other vendor scripts -->
+    <script src="assets/js/vendor/wow.min.js"></script>
+    <!-- Including Javascript -->
+    <script src="assets/js/bootstrap.min.js"></script>
+    <script src="assets/js/plugins.js"></script>
+    <script src="assets/js/popper.min.js"></script>
+    <script src="assets/js/lazysizes.js"></script>
+    <script src="assets/js/main.js"></script>
+
      <!--For Newsletter Popup-->
      <script>
 		jQuery(document).ready(function(){  
@@ -812,87 +802,135 @@ $(document).ready(function() {
 </script>
 
 <script>
-    $(document).ready(function() {
-        $('.btn-addto-cart').on('click', function(event) {
-            event.preventDefault();
-            var productId = $(this).closest('form').find('input[name="id"]').val();
-            var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
-            console.log('productId: ' + productId);
+$(document).ready(function() {
+    function updateMinicart() {
+        $.ajax({
+            url: '/get-minicart',
+            type: 'GET',
+            success: function(html) {
+                $('#minicart-container').html(html);
+            },
+            error: function(error) {
+                console.error('Error updating minicart:', error);
+            }
+        });
+    }
 
-            if (isLoggedIn) {
-                $.ajax({
-                    url: `/add-to-cart?productId=${productId}`,
-                    type: 'POST',
-                    success: function(response) {
-                        console.log(response);
-                        if (response.success) {
+    function updateCartCount(count) {
+        $('#CartCount').text(count);
+    }
+
+    $('.btn-addto-cart').on('click', function(event) {
+        event.preventDefault();
+        var productId = $(this).closest('form').find('input[name="id"]').val();
+        var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
+        console.log('productId: ' + productId);
+
+        if (isLoggedIn) {
+            $.ajax({
+                url: `/add-to-cart?productId=${productId}`,
+                type: 'POST',
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
                         document.dispatchEvent(new Event('productAdded'));
+                        updateMinicart();
+                        updateCartCount(response.itemCount);
 
-                            $('#cart-popup').fadeIn();
-                            setTimeout(function() {
-                                $('#cart-popup').fadeOut();
-                            }, 2000);
-                            console.log('added to cart successfully');
-                        } else {
-                            console.log('error adding to cart');
-                        }
-                    },
-                    error: function() {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Internal Server Error',
-                            text: 'Something went wrong on the server.',
-                        });
+                        $('#cart-popup').fadeIn();
+                        setTimeout(function() {
+                            $('#cart-popup').fadeOut();
+                        }, 2000);
+                        console.log('added to cart successfully');
+                    } else {
+                        console.log('error adding to cart');
                     }
-                });
-            } else {
-                var guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
-                var itemIndex = guestCart.findIndex(item => item.productId === productId);
-
-                if (itemIndex > -1) {
-                    guestCart[itemIndex].quantity += 1;
-                } else {
-                    guestCart.push({ productId: productId, quantity: 1 });
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Internal Server Error',
+                        text: 'Something went wrong on the server.',
+                    });
                 }
+            });
+        } else {
+            var guestCart = JSON.parse(localStorage.getItem('guestCart')) || [];
+            var itemIndex = guestCart.findIndex(item => item.productId === productId);
 
-                localStorage.setItem('guestCart', JSON.stringify(guestCart));
-                guestCart = JSON.parse(localStorage.getItem('guestCart'));
+            if (itemIndex > -1) {
+                guestCart[itemIndex].quantity += 1;
+            } else {
+                guestCart.push({ productId: productId, quantity: 1 });
+            }
 
-                console.log(guestCart,'guestcart');
+            localStorage.setItem('guestCart', JSON.stringify(guestCart));
+            guestCart = JSON.parse(localStorage.getItem('guestCart'));
 
-                $.ajax({
-                    url: '/add-to-cart',
-                    type: 'POST',
-                    contentType: 'application/json',
-                    data: JSON.stringify({ guestCart: guestCart }),
-                    success: function(response) {
-                        console.log(response);
-                        if (response.success) {
-                                  document.dispatchEvent(new Event('productAdded'));
+            console.log(guestCart,'guestcart');
 
-                            if(response.clearGuestCart){
-                             localStorage.removeItem('guestCart');
-                            $('#cart-popup').fadeIn();
-                            setTimeout(function() {
-                                $('#cart-popup').fadeOut();
-                            }, 2000);
-                            console.log('added to guest cart successfully');
-                            }
-                        } else {
-                            console.log('error adding to guest cart');
+            $.ajax({
+                url: '/add-to-cart',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ guestCart: guestCart }),
+                success: function(response) {
+                    console.log(response);
+                    if (response.success) {
+                        document.dispatchEvent(new Event('productAdded'));
+                        updateMinicart();
+                        updateCartCount(response.itemCount);
+
+                        if(response.clearGuestCart){
+                            localStorage.removeItem('guestCart');
                         }
-                    },
-                    error: function() {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'Internal Server Error',
-                            text: 'Something went wrong on the server.',
-                        });
+                        $('#cart-popup').fadeIn();
+                        setTimeout(function() {
+                            $('#cart-popup').fadeOut();
+                        }, 2000);
+                        console.log('added to guest cart successfully');
+                    } else {
+                        console.log('error adding to guest cart');
                     }
+                },
+                error: function() {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Internal Server Error',
+                        text: 'Something went wrong on the server.',
+                    });
+                }
+            });
+        }
+    });
+
+    // Add event listener for removing items from cart
+    $(document).on('click', '.remove-from-cart', function(event) {
+        event.preventDefault();
+        var productId = $(this).data('product-id');
+
+        $.ajax({
+            url: `/remove-from-cart/${productId}`,
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    updateMinicart();
+                    updateCartCount(response.itemCount);
+                    console.log('removed from cart successfully');
+                } else {
+                    console.log('error removing from cart');
+                }
+            },
+            error: function() {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Internal Server Error',
+                    text: 'Something went wrong on the server.',
                 });
             }
         });
     });
+});
 </script>
 
 

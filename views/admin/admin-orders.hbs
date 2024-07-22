@@ -77,6 +77,38 @@
       background-color: #4CAF50;
       color: white;
     }
+
+
+     .pagination {
+    overflow: hidden;
+  }
+  .page-item:first-child .page-link,
+  .page-item:last-child .page-link {
+    border-radius: 0;
+  }
+  .page-link {
+    color: #333;
+    border: none;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+  }
+  .page-item.active .page-link {
+    background-color: #007bff;
+    color: white;
+  }
+  .page-link:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+  }
+  .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #dddddd;
+  }
+
+  li.page-item {
+    height: 30px;
+}
     
   </style>
 
@@ -243,114 +275,133 @@
 
        
 <!-- Filter Section -->
-<div class="form-group">
-    <label for="filterAmountMin">Min Amount</label>
-    <input type="number" id="filterAmountMin" name="filterAmountMin" class="form-control" placeholder="Enter minimum amount">
+<!-- Filter Section -->
+<form id="filterForm" action="/admin-orders" method="GET">
+  <div class="filter-section">
+    <label for="amountFilter">Filter by Amount (₹):</label>
+    <input type="range" id="amountFilter" name="amountFilter" min="5000" max="100000" step="5000" value="{{amountFilter}}">
+    <span id="amountFilterValue">{{amountFilter}}</span>
+    
+    <button type="submit">Filter</button>
+  </div>
 
-    <label for="filterAmountMax">Max Amount</label>
-    <input type="number" id="filterAmountMax" name="filterAmountMax" class="form-control" placeholder="Enter maximum amount">
-<br>
-    <a href="#" type="button" id="filterButton" class="btn btn-light px-5" onclick="filterOrders()">Filter</a>
-    <button type="button" id="refreshButton" class="btn btn-light px-3"><i class="zmdi zmdi-refresh" onclick="refreshOrders()"></i></button>
-
-</div>
-
-
-        <div class="row">
-            {{!-- <div class="form-group">
-    <!-- Add Product and Delete Selected buttons -->
-    <a href="/add-product" class="btn btn-light px-5"> Add Product</a>
-    <button type="submit" id="deleteSelected" class="btn btn-light px-5"> Delete Selected</button>
-</div> --}}
-
-          <div class="col-12 col-lg-12">
-            <div class="card">
-              <div class="card-header">Recent Order Tables
-                <div class="card-action">
-                 <div class="form-group">
-  <label for="sortOrders">Sort by Date</label>
-  <select id="sortOrders" class="form-control" onchange="sortOrders()">
-    <option value="date_desc" {{#if (eq sortOption 'date_desc')}}selected{{/if}}>Newest First</option>
-    <option value="date_asc" {{#if (eq sortOption 'date_asc')}}selected{{/if}}>Oldest First</option>
-  </select>
-</div>
-                  
-                </div>
-              </div>
-              <div class="table-responsive">
-                <table class="table align-items-center table-flush table-borderless">
-                  <thead>
-
-                    <tr>
-                      <th>Order ID</th>
-                      <th>Address</th>
-                      <th>Payment</th>
-                      <th>Items</th>
-                      <th>Amount</th>
-                      <th>Delivery Date</th>
-                      <th>Status</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {{#if orders.length}}
-                   {{#each orders}}
-<tr>
-  <td>{{this.orderID}}</td>
-  <td>
-    {{this.address.firstName}} {{this.address.lastName}},
-    {{this.address.street}},
-    {{this.address.city}},
-    {{this.address.state}},
-    {{this.address.postCode}}
-  </td>
-  <td>{{this.payment}}</td>
-  <td>
-  <ul>
-  {{#each this.items}}
-    <li>{{this.product.name}} - Quantity: {{this.quantity}}</li>
-  {{/each}}
-</ul>
-  </td>
-  <td>{{this.totalPrice}}₹</td>
-<td>{{this.deliveryExpectedDate}}</td>
-{{!-- <td>
-  <select class="form-control order-status" data-order-id="{{this._id}}">
-    <option value="pending" {{#if (eq this.status 'pending')}}selected{{/if}}>Pending</option>
-    <option value="processing" {{#if (eq this.status 'processing')}}selected{{/if}}>Processing</option>
-    <option value="shipped" {{#if (eq this.status 'shipped')}}selected{{/if}}>Shipped</option>
-    <option value="delivered" {{#if (eq this.status 'delivered')}}selected{{/if}}>Delivered</option>
-    <option value="canceled" {{#if (eq this.status 'canceled')}}selected{{/if}}>Canceled</option>
-  </select>
-</td> --}}
- <td>
-      <select class="form-control order-status" data-order-id="{{this._id}}" data-orderStatus="{{this.orderStatus}}">
-        <option value="pending" {{#if (eq this.orderStatus 'pending')}}selected{{/if}}>Pending</option>
-        <option value="processing" {{#if (eq this.orderStatus 'processing')}}selected{{/if}}>Processing</option>
-        <option value="shipped" {{#if (eq this.orderStatus 'shipped')}}selected{{/if}}>Shipped</option>
-        <option value="delivered" {{#if (eq this.orderStatus 'delivered')}}selected{{/if}}>Delivered</option>
-        <option value="canceled" {{#if (eq this.orderStatus 'canceled')}}selected{{/if}}>Canceled</option>
-      </select>
-    </td>
-
-
-</tr>
-{{/each}}
-{{else}}
-<tr>
-  <td colspan="7" class="text-center">
-    <h3 class="text">No orders found</h3>
-  </td>
-</tr>
-{{/if}}
-
-
-                  </tbody>
-                </table>
-              </div>
+  <div class="row">
+    <div class="col-12 col-lg-12">
+      <div class="card">
+        <div class="card-header">
+          Recent Order Tables
+          <div class="card-action">
+            <div class="form-group">
+              <label for="sortOrders">Sort by Date</label>
+              <select id="sortOrders" name="sort" class="form-control">
+                <option value="date_desc" {{#if (eq sortOption 'date_desc')}}selected{{/if}}>Newest First</option>
+                <option value="date_asc" {{#if (eq sortOption 'date_asc')}}selected{{/if}}>Oldest First</option>
+              </select>
             </div>
           </div>
-        </div><!--End Row-->
+        </div>
+        <div class="table-responsive">
+          <table class="table align-items-center table-flush table-borderless">
+            <thead>
+              <tr>
+                <th>Order ID</th>
+                <th>Address</th>
+                <th>Payment</th>
+                <th>Items</th>
+                <th>Amount</th>
+                <th>Delivery Date</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {{#if orders.length}}
+                {{#each orders}}
+                  <tr>
+                    <td>{{this.orderID}}</td>
+                    <td>
+                      {{this.address.firstName}} {{this.address.lastName}},
+                      {{this.address.street}},
+                      {{this.address.city}},
+                      {{this.address.state}},
+                      {{this.address.postCode}}
+                    </td>
+                    <td>{{this.payment}}</td>
+                    <td>
+                      <ul>
+                        {{#each this.items}}
+                          <li>{{this.product.name}} - Quantity: {{this.quantity}}</li>
+                        {{/each}}
+                      </ul>
+                    </td>
+                    <td>{{this.totalPrice}}₹</td>
+                    <td>{{this.deliveryExpectedDate}}</td>
+                    <td>
+                      <select class="form-control order-status" data-order-id="{{this._id}}" data-orderStatus="{{this.orderStatus}}">
+                        <option value="pending" {{#if (eq this.orderStatus 'pending')}}selected{{/if}}>Pending</option>
+                        <option value="processing" {{#if (eq this.orderStatus 'processing')}}selected{{/if}}>Processing</option>
+                        <option value="shipped" {{#if (eq this.orderStatus 'shipped')}}selected{{/if}}>Shipped</option>
+                        <option value="delivered" {{#if (eq this.orderStatus 'delivered')}}selected{{/if}}>Delivered</option>
+                        <option value="canceled" {{#if (eq this.orderStatus 'canceled')}}selected{{/if}}>Canceled</option>
+                      </select>
+                    </td>
+                  </tr>
+                {{/each}}
+              {{else}}
+                <tr>
+                  <td colspan="7" class="text-center">
+                    <h3 class="text">No orders found</h3>
+                  </td>
+                </tr>
+              {{/if}}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
 
+        <!--End Row-->
+
+        {{#if totalPages}}
+  <nav aria-label="Page navigation" class="my-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item {{#if (eq currentPage 1)}}disabled{{/if}}">
+        <a class="page-link" href="?page=1&limit={{limit}}&sort={{sortOption}}" aria-label="First">
+          <span aria-hidden="true">&laquo;&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item {{#if (eq currentPage 1)}}disabled{{/if}}">
+        <a class="page-link" href="?page={{subtract currentPage 1}}&limit={{limit}}&sort={{sortOption}}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+
+      {{#each (paginationRange currentPage totalPages)}}
+        {{#if (eq this 'ellipsis')}}
+          <li class="page-item disabled">
+            <span class="page-link">...</span>
+          </li>
+        {{else}}
+          <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}">
+            <a class="page-link" href="?page={{this}}&limit={{../limit}}&sort={{../sortOption}}">{{this}}</a>
+          </li>
+        {{/if}}
+      {{/each}}
+
+      <li class="page-item {{#if (eq currentPage totalPages)}}disabled{{/if}}">
+        <a class="page-link" href="?page={{add currentPage 1}}&limit={{limit}}&sort={{sortOption}}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      <li class="page-item {{#if (eq currentPage totalPages)}}disabled{{/if}}">
+        <a class="page-link" href="?page={{totalPages}}&limit={{limit}}&sort={{sortOption}}" aria-label="Last">
+          <span aria-hidden="true">&raquo;&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+{{/if}}
         <!--End Dashboard Content-->
 
         <!--start overlay-->
@@ -676,6 +727,38 @@ function fetchOrderStatus(orderId) {
   function refreshOrders(){
     window.location.href = '/admin-orders';
   }
+</script>
+
+<script>
+  function sortOrders() {
+  const sortOption = document.getElementById('sortOrders').value;
+  const currentUrl = new URL(window.location.href);
+  currentUrl.searchParams.set('sort', sortOption);
+  currentUrl.searchParams.set('page', '1'); // Reset to first page when sorting
+  window.location.href = currentUrl.toString();
+}
+</script>
+
+<script>
+  const amountFilter = document.getElementById('amountFilter');
+  const amountFilterValue = document.getElementById('amountFilterValue');
+
+  amountFilter.addEventListener('input', function() {
+    let value = this.value;
+    amountFilterValue.textContent = value == 100000 ? "₹100000+" : "₹" + value;
+  });
+
+  document.getElementById('filterForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const sort = document.getElementById('sortOrders').value;
+    const amount = amountFilter.value;
+    window.location.href = `/admin-orders?amountFilter=${amount}&sort=${sort}`;
+  });
+
+  // Trigger the form submission when sorting option changes
+  document.getElementById('sortOrders').addEventListener('change', function() {
+    document.getElementById('filterForm').submit();
+  });
 </script>
 </body>
 

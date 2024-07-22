@@ -32,6 +32,33 @@
         .action-icons {
           cursor: pointer;
         }
+
+        .pagination {
+    overflow: hidden;
+  }
+  .page-item:first-child .page-link,
+  .page-item:last-child .page-link {
+    border-radius: 0;
+  }
+  .page-link {
+    color: #333;
+    border: none;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+  }
+  .page-item.active .page-link {
+    background-color: #007bff;
+    color: white;
+  }
+  .page-link:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+  }
+  .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #dddddd;
+  }
       </style>
 
 </head>
@@ -231,40 +258,80 @@
     </thead>
     <tbody id="tableBody">
       {{#if users.length}}
-      {{#each users}}
-      <tr>
-        <td><input type="checkbox" class="selectRow"></td>
-        <td>{{this.username}}</td>
-        <td>{{this.email}}</td>
-        <td>{{this.phone}}</td>
-        <td>{{this.status}}</td>
-        <td>{{this.isVerifyed}}</td>
-        <td>{{this.isBlocked}}</td>
-        {{#if this.isBlocked}}
-        <td>
-          <a href="/unblock-user?id={{this._id}}"><i class="fas fa-check action-icons" title="Unblock"></i></a>
-          <a href="javascript:void(0);" onclick="confirmDeleteUser('{{this._id}}')">
-            <i class="fas fa-trash action-icons ml-2" title="Delete"></i>
-          </a>
-        </td>
-        {{else}}
-        <td>
-          <a href="/block-user?id={{this._id}}"><i class="fas fa-ban action-icons" title="Block"></i></a>
-          <a href="javascript:void(0);" onclick="confirmDeleteUser('{{this._id}}')">
-            <i class="fas fa-trash action-icons ml-2" title="Delete"></i>
-          </a>
-        </td>
-        {{/if}}
-      </tr>
-      {{/each}}
+        {{#each users}}
+          <tr>
+            <td><input type="checkbox" class="selectRow"></td>
+            <td>{{this.username}}</td>
+            <td>{{this.email}}</td>
+            <td>{{this.phone}}</td>
+            <td>{{this.status}}</td>
+            <td>{{this.isVerifyed}}</td>
+            <td>{{this.isBlocked}}</td>
+            {{#if this.isBlocked}}
+              <td>
+                <a href="/unblock-user?id={{this._id}}"><i class="fas fa-check action-icons" title="Unblock"></i></a>
+                <a href="javascript:void(0);" onclick="confirmDeleteUser('{{this._id}}')">
+                  <i class="fas fa-trash action-icons ml-2" title="Delete"></i>
+                </a>
+              </td>
+            {{else}}
+              <td>
+                <a href="/block-user?id={{this._id}}"><i class="fas fa-ban action-icons" title="Block"></i></a>
+                <a href="javascript:void(0);" onclick="confirmDeleteUser('{{this._id}}')">
+                  <i class="fas fa-trash action-icons ml-2" title="Delete"></i>
+                </a>
+              </td>
+            {{/if}}
+          </tr>
+        {{/each}}
       {{else}}
-      <tr>
-        <td colspan="8">No users found</td>
-      </tr>
+        <tr>
+          <td colspan="8">No users found</td>
+        </tr>
       {{/if}}
     </tbody>
   </table>
 </div>
+
+{{#if totalPages}}
+  <nav aria-label="Page navigation" class="my-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item {{#if (eq currentPage 1)}}disabled{{/if}}">
+        <a class="page-link" href="?page=1&limit={{limit}}&search={{searchTerm}}&isBlocked={{isBlockedFilter}}" aria-label="First">
+          <span aria-hidden="true">&laquo;&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item {{#if (eq currentPage 1)}}disabled{{/if}}">
+        <a class="page-link" href="?page={{subtract currentPage 1}}&limit={{limit}}&search={{searchTerm}}&isBlocked={{isBlockedFilter}}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+      
+      {{#each (paginationRange currentPage totalPages)}}
+        {{#if (eq this 'ellipsis')}}
+          <li class="page-item disabled">
+            <span class="page-link">...</span>
+          </li>
+        {{else}}
+          <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}">
+            <a class="page-link" href="?page={{this}}&limit={{../limit}}&search={{../searchTerm}}&isBlocked={{../isBlockedFilter}}">{{this}}</a>
+          </li>
+        {{/if}}
+      {{/each}}
+      
+      <li class="page-item {{#if (eq currentPage totalPages)}}disabled{{/if}}">
+        <a class="page-link" href="?page={{add currentPage 1}}&limit={{limit}}&search={{searchTerm}}&isBlocked={{isBlockedFilter}}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      <li class="page-item {{#if (eq currentPage totalPages)}}disabled{{/if}}">
+        <a class="page-link" href="?page={{totalPages}}&limit={{limit}}&search={{searchTerm}}&isBlocked={{isBlockedFilter}}" aria-label="Last">
+          <span aria-hidden="true">&raquo;&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+{{/if}}
                       </div>
                     </div>
                   </div>

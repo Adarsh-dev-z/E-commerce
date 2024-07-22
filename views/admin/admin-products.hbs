@@ -57,6 +57,109 @@
   display: block;
 }
 
+
+
+
+
+  .btn-light {
+        background-color: rgba(255, 255, 255, 0.2);
+        border: none;
+        color: white;
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    .btn-light:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        color: white;
+    }
+    #categoryFilter {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+    }
+    #categoryFilter option {
+    }
+    .modal-backdrop {
+        background-color: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(5px);
+    }
+    .modal-content {
+        background-color: transparent;
+        backdrop-filter: blur(10px);
+        border: none;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+    .modal-header {
+        border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .close {
+        color: white;
+    }
+    .modal-body {
+        color: white;
+    }
+    .list-group-item {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+        margin-bottom: 5px;
+        transition: background-color 0.3s ease;
+    }
+    .list-group-item:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+    }
+    .remove-category {
+        color: white;
+        cursor: pointer;
+    }
+    .form-control {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: none;
+    }
+    .form-control::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+    }
+    .btn-outline-secondary {
+        color: white;
+        border-color: white;
+    }
+    .btn-outline-secondary:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: white;
+    }
+
+
+       .pagination {
+    overflow: hidden;
+  }
+  .page-item:first-child .page-link,
+  .page-item:last-child .page-link {
+    border-radius: 0;
+  }
+  .page-link {
+    color: #333;
+    border: none;
+    padding: 0.75rem 1rem;
+    transition: all 0.3s ease;
+  }
+  .page-item.active .page-link {
+    background-color: #007bff;
+    color: white;
+  }
+  .page-link:hover {
+    background-color: #f8f9fa;
+    color: #007bff;
+  }
+  .page-item.disabled .page-link {
+    color: #6c757d;
+    pointer-events: none;
+    background-color: #dddddd;
+  }
+
+  li.page-item {
+    height: 30px;
+}
       </style>
 
 </head>
@@ -229,21 +332,46 @@
     <div class="card">
         <div class="card-body">
             <h5 class="card-title">Products</h5>
-            <div class="form-group d-flex align-items-center">
-                <!-- Add Product and Delete Selected buttons -->
-                <a href="/add-product" class="btn btn-light px-5 mr-2">Add Product</a>
-                <button type="submit" id="deleteSelected" class="btn btn-light px-5 mr-2">Delete Selected</button>
+            <div class="form-group d-flex align-items-center flex-wrap">
+            <a href="/add-product" class="btn btn-light px-5 mr-2 mb-2">Add Product</a>
+            <button type="submit" id="deleteSelected" class="btn btn-light px-5 mr-2 mb-2">Delete Selected</button>
+            <select id="categoryFilter" class="btn btn-light px-8 mr-2 mb-2" style="width: 200px;">
+                <option value="">All Categories</option>
+                {{#each categories}}
+                <option value="{{this}}">{{this}}</option>
+                {{/each}}
+            </select>
+            <button type="button" id="refreshButton" class="btn btn-light px-3 mr-2 mb-2"><i class="zmdi zmdi-refresh" onclick="refreshOrders()"></i></button>
+            <button type="button" id="addCategory" class="btn btn-light px-5 mr-2 mb-2">Add Category</button>
+        </div>
 
-                <!-- Category Filter Dropdown -->
-                <select id="categoryFilter" class="btn btn-light px-8 mr-2" style="width: 200px;">
-                    <option value="">All Categories</option>
-                    {{#each categories}}
-                    <option value="{{this}}">{{this}}</option>
-                    {{/each}}
-                </select>
-                    <button type="button" id="refreshButton" class="btn btn-light px-3"><i class="zmdi zmdi-refresh" onclick="refreshOrders()"></i></button>
 
+  <!-- Category Modal -->
+<div class="modal fade" id="categoryModal" tabindex="-1" role="dialog" aria-labelledby="categoryModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="categoryModalLabel">Manage Categories</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
             </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <input type="text" id="newCategoryInput" class="form-control" placeholder="New category name">
+                    <div class="input-group-append">
+                        <button class="btn btn-outline-secondary" type="button" id="addNewCategoryBtn">Add</button>
+                    </div>
+                </div>
+                <ul id="categoryList" class="list-group">
+                    <!-- Categories will be dynamically added here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 
             <div class="table-responsive">
                 <table class="table">
@@ -294,6 +422,47 @@
 
                 </table>
             </div>
+
+            {{#if totalPages}}
+  <nav aria-label="Page navigation" class="my-4">
+    <ul class="pagination justify-content-center">
+      <li class="page-item {{#if (eq currentPage 1)}}disabled{{/if}}">
+        <a class="page-link" href="?page=1&limit={{limit}}&category={{filterCategory}}&search={{searchQuery}}" aria-label="First">
+          <span aria-hidden="true">&laquo;&laquo;</span>
+        </a>
+      </li>
+      <li class="page-item {{#if (eq currentPage 1)}}disabled{{/if}}">
+        <a class="page-link" href="?page={{subtract currentPage 1}}&limit={{limit}}&category={{filterCategory}}&search={{searchQuery}}" aria-label="Previous">
+          <span aria-hidden="true">&laquo;</span>
+        </a>
+      </li>
+
+      {{#each (paginationRange currentPage totalPages)}}
+        {{#if (eq this 'ellipsis')}}
+          <li class="page-item disabled">
+            <span class="page-link">...</span>
+          </li>
+        {{else}}
+          <li class="page-item {{#if (eq this ../currentPage)}}active{{/if}}">
+            <a class="page-link" href="?page={{this}}&limit={{../limit}}&category={{../filterCategory}}&search={{../searchQuery}}">{{this}}</a>
+          </li>
+        {{/if}}
+      {{/each}}
+
+      <li class="page-item {{#if (eq currentPage totalPages)}}disabled{{/if}}">
+        <a class="page-link" href="?page={{add currentPage 1}}&limit={{limit}}&category={{filterCategory}}&search={{searchQuery}}" aria-label="Next">
+          <span aria-hidden="true">&raquo;</span>
+        </a>
+      </li>
+      <li class="page-item {{#if (eq currentPage totalPages)}}disabled{{/if}}">
+        <a class="page-link" href="?page={{totalPages}}&limit={{limit}}&category={{filterCategory}}&search={{searchQuery}}" aria-label="Last">
+          <span aria-hidden="true">&raquo;&raquo;</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+{{/if}}
+
         </div>
     </div>
 </div>
@@ -450,7 +619,6 @@ Swal.fire({
       function editRow(icon) {
         const row = icon.closest('tr');
         alert('Edit functionality not implemented yet.');
-        // Implement your edit functionality here
       }
   
       function deleteRow(icon) {
@@ -534,6 +702,132 @@ Swal.fire({
   function refreshOrders(){
     window.location.href = '/admin-products';
   }
+</script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const addCategoryBtn = document.getElementById('addCategory');
+    const categoryModal = new bootstrap.Modal(document.getElementById('categoryModal'));
+    const addNewCategoryBtn = document.getElementById('addNewCategoryBtn');
+    const newCategoryInput = document.getElementById('newCategoryInput');
+    const categoryList = document.getElementById('categoryList');
+    const categoryFilter = document.getElementById('categoryFilter');
+
+    addCategoryBtn.addEventListener('click', function() {
+        loadCategories();
+        categoryModal.show();
+        document.body.classList.add('modal-open');
+    });
+
+    document.getElementById('categoryModal').addEventListener('hidden.bs.modal', function () {
+        document.body.classList.remove('modal-open');
+    });
+
+    addNewCategoryBtn.addEventListener('click', addNewCategory);
+
+    function loadCategories() {
+        // Fetch categories from the server and populate the list
+        fetch('/categories')
+            .then(response => response.json())
+            .then(categories => {
+                categoryList.innerHTML = '';
+                categories.forEach(category => {
+                    addCategoryToList(category);
+                });
+            });
+    }
+
+    function addNewCategory() {
+        const categoryName = newCategoryInput.value.trim();
+        if (categoryName) {
+            fetch('/categories', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ name: categoryName }),
+            })
+            .then(response => response.json())
+            .then(category => {
+                addCategoryToList(category);
+                newCategoryInput.value = '';
+                const option = document.createElement('option');
+                option.value = category.name;
+                option.textContent = category.name;
+                categoryFilter.appendChild(option);
+            });
+        }
+    }
+
+    function addCategoryToList(category) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item d-flex justify-content-between align-items-center';
+        li.textContent = category.name;
+        const removeBtn = document.createElement('span');
+        removeBtn.className = 'remove-category';
+        removeBtn.innerHTML = '&times;';
+        removeBtn.onclick = function() { removeCategory(category._id, li); };
+        li.appendChild(removeBtn);
+        categoryList.appendChild(li);
+    }
+
+    function removeCategory(categoryId, listItem) {
+        fetch(`/categories/${categoryId}`, { method: 'DELETE' })
+            .then(response => {
+                if (response.ok) {
+                    listItem.remove();
+                    Array.from(categoryFilter.options).forEach(option => {
+                        if (option.value === listItem.textContent.trim()) {
+                            option.remove();
+                        }
+                    });
+                }
+            });
+    }
+
+    function updateModalStyles() {
+        const computedStyle = getComputedStyle(document.body);
+        const backgroundColor = computedStyle.backgroundColor;
+        const textColor = computedStyle.color;
+
+        const modalContent = document.querySelector('.modal-content');
+        modalContent.style.backgroundColor = `${backgroundColor.replace(')', ', 0.8)')}`;
+        modalContent.style.color = textColor;
+
+        const listItems = document.querySelectorAll('.list-group-item');
+        listItems.forEach(item => {
+            item.style.backgroundColor = `${backgroundColor.replace(')', ', 0.2)')}`;
+            item.style.color = textColor;
+        });
+    }
+    document.getElementById('categoryModal').addEventListener('shown.bs.modal', updateModalStyles);
+
+  
+});
+</script>
+
+<script>
+  function filterProducts() {
+  const category = document.getElementById('categoryFilter').value;
+  const searchQuery = document.getElementById('searchInput').value;
+  const currentUrl = new URL(window.location.href);
+  
+  currentUrl.searchParams.set('category', category);
+  currentUrl.searchParams.set('search', searchQuery);
+  currentUrl.searchParams.set('page', '1'); 
+  
+  window.location.href = currentUrl.toString();
+}
+
+function searchProducts() {
+  const searchQuery = document.getElementById('searchInput').value;
+  const currentUrl = new URL(window.location.href);
+  
+  currentUrl.searchParams.set('search', searchQuery);
+  currentUrl.searchParams.set('page', '1'); 
+  
+  window.location.href = currentUrl.toString();
+}
 </script>
 </body>
 

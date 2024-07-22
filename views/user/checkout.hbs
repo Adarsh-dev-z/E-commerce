@@ -18,6 +18,56 @@
 }
 
 
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.5);
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+    overflow-y: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.modal {
+    background-color: rgba(0,0,0,0.4);
+}
+.modal-backdrop {
+    display: none;
+}
+.modal-dialog {
+    margin: 1.75rem auto;
+    max-width: 500px;
+}
 
    </style>
    
@@ -44,51 +94,52 @@
         <div class="row">
           <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-3">
     <div class="customer-box returning-customer">
-        <h3>
-            <i class="icon anm anm-user-al"></i> HEY ‘{{USER.username}}’, order {{orderCount}}! More for less!
-            <a href="#customer-login" id="customer" class="text-white text-decoration-underline" data-toggle="collapse">click here</a>
-        </h3>
-        <div id="customer-login" class="collapse customer-content">
-            <div class="customer-info">
-                <p class="coupon-text">Please select your preferred shipping address from the options below.</p>
-              <form id="address-form">
-    {{#if address.length}}
-    {{#each address}}
-    <div class="form-check address-container" data-id="{{this._id}}">
-        <input class="form-check-input" type="radio" name="address" id="address-{{@index}}" value="{{this._id}}" data-address="{{json this}}">
-        <label class="form-check-label" for="address-{{@index}}">
-            <strong>{{this.firstName}} {{this.lastName}}</strong><br>
-            {{this.company}} 
-            {{this.street}} 
-            {{this.address}}, {{this.apartment}} 
-            {{this.city}}, {{this.state}}, {{this.postCode}} 
-            {{this.telephone}} 
-            {{this.email}} 
-            {{#if this.notes}}<em>Notes: {{this.notes}}</em>{{/if}}
-        </label>
-        <a href="#" type="button" class="btn btn-link delete-address" data-id="{{this._id}}" aria-label="Delete">
-            <i class="fa fa-times"></i>
-        </a>
-    </div>
-    <hr>
-    {{/each}}
-    <div class="row">
-        <div class="col-md-12">
-            <button type="button" class="btn btn-primary mt-3" id="use-selected-address">Use Selected Address</button>
-        </div>
-    </div>
-    {{else}}
-    <p>No address</p>
-    <div class="row">
-        <div class="col-md-12">
-            <button type="button" class="btn btn-dark mt-3" id="use-selected-address" disabled>No Address</button>
-        </div>
-    </div>
-    {{/if}}
-</form>
+       {{!-- <h3>
+    <i class="icon anm anm-user-al"></i> HEY '{{USER.username}}', order {{orderCount}}! More for less!
+</h3> --}}
+<div id="customer-address-section">
+    <div class="customer-info">
+        <p class="coupon-text">Please select your preferred shipping address from the options below.</p>
+        <form id="address-form">
+            {{#if address.length}}
+                {{#each address}}
+                <div class="form-check address-container" data-id="{{this._id}}">
+                    <input class="form-check-input" type="radio" name="address" id="address-{{@index}}" value="{{this._id}}" data-address="{{json this}}">
+                    <label class="form-check-label" for="address-{{@index}}">
+                        <strong>{{this.firstName}} {{this.lastName}}</strong><br>
+                        {{this.company}} 
+                        {{this.street}} 
+                        {{this.address}}, {{this.apartment}} 
+                        {{this.city}}, {{this.state}}, {{this.postCode}} 
+                        {{this.telephone}} 
+                        {{this.email}} 
+                        {{#if this.notes}}<em>Notes: {{this.notes}}</em>{{/if}}
+                    </label>
+                    <a href="#" type="button" class="btn btn-link delete-address" data-id="{{this._id}}" aria-label="Delete">
+                        <i class="fa fa-times"></i>
+                    </a>
+                </div>
+                <hr>
+                {{/each}}
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-primary mt-3" id="use-selected-address">Use Selected Address</button>
+<button type="button" class="btn btn-primary mt-3" id="add-address-btn">Add Address</button>
+                    </div>
+                    
 
-            </div>
-        </div>
+                </div>
+            {{else}}
+                <p>No address</p>
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-dark mt-3" id="use-selected-address" disabled>No Address</button>
+                    </div>
+                </div>
+            {{/if}}
+        </form>
+    </div>
+</div>
     </div>
 </div>
 
@@ -96,57 +147,56 @@
               {{#if coupon}}
 <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-3">
     <div class="customer-box customer-coupon">
-        <h3 class="font-15 xs-font-13">
-            <i class="icon anm anm-gift-l"></i> You got a coupon!! 
-            <a href="#have-coupon" class="text-white text-decoration-underline" data-toggle="collapse">Click here to get code</a>
-        </h3>
-        <div id="have-coupon" class="collapse coupon-checkout-content">
-    <div class="discount-coupon">
-        <div id="coupon" class="coupon-dec tab-pane active">
-<p class="margin-10px-bottom">Your discount code:</p>
-        {{#each coupon}}
-        <div>
-            <input type="radio" id="coupon-{{@index}}" name="coupon" value="{{this.code}}" data-discount="{{this.discount}}" onclick="selectCoupon('{{this.code}}', {{this.discount}})">
-            <label for="coupon-{{@index}}">{{this.code}}, Discount: {{this.discount}}</label>
-        </div>
-        {{/each}}            
-            <label class="required get" for="coupon-code"><span class="required-f">*</span> Coupon</label>
-            <input id="coupon-code" required="" type="text" class="mb-3">
-            <button class="coupon-btn btn" onclick="applyCoupon()">Apply Coupon</button>
-            <button class="coupon-remove-btn btn btn-danger" onclick="removeCoupon()">Remove Coupon</button>
-            
-            <!-- New Copy Button -->
-            
-            <!-- New Section to Display Coupon Code and Discount -->
-            <div id="coupon-info" class="mt-3" style="display:none;">
-                <p>Discount Applied: <span id="discount-amount"></span></p>
-                <p>New Total: <span id="new-total"></span></p>
+        {{!-- <h3 class="font-15 xs-font-13">
+            <i class="icon anm anm-gift-l"></i> You got a coupon!!
+        </h3> --}}
+        <div id="coupon-content" class="coupon-checkout-content">
+            <div class="discount-coupon">
+                <div id="coupon" class="coupon-dec">
+                    <p class="margin-10px-bottom">Your discount code:</p>
+                    <div id="coupon-list">
+                        {{#each coupon}}
+                        <div class="coupon-item">
+                            <input type="radio" id="coupon-{{@index}}" name="coupon" value="{{this.code}}" data-discount="{{this.discount}}" onclick="selectCoupon('{{this.code}}', {{this.discount}})">
+                            <label for="coupon-{{@index}}">{{this.code}}, Discount: {{this.discount}}</label>
+                        </div>
+                        {{/each}}
+                    </div>
+                    <div class="mt-3">
+                        <label class="required get" for="coupon-code"><span class="required-f">*</span> Coupon</label>
+                        <input id="coupon-code" required="" type="text" class="mb-3">
+                        <button class="coupon-btn btn" onclick="applyCoupon()">Apply Coupon</button>
+                        <button class="coupon-remove-btn btn btn-danger" onclick="removeCoupon()">Remove Coupon</button>
+                    </div>
+                    <div id="coupon-info" class="mt-3" style="display:none;">
+                        <p>Discount Applied: <span id="discount-amount"></span></p>
+                        <p>New Total: <span id="new-total"></span></p>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
     </div>
 </div>
 {{else}}
 
-             <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-3">
-                <div class="customer-box customer-coupon">
-                    <h3 class="font-15 xs-font-13"><i class="icon anm anm-gift-l"></i> Have a coupon? <a
-                            href="#have-coupon" class="text-white text-decoration-underline"
-                            data-toggle="collapse">Click here to enter your code</a></h3>
-                    <div id="have-coupon" class="collapse coupon-checkout-content">
-                        <div class="discount-coupon">
-                            <div id="coupon" class="coupon-dec tab-pane active">
-                                <p class="margin-10px-bottom">Enter your coupon code if you have one.</p>
-                                <label class="required get" for="coupon-code"><span class="required-f">*</span>
-                                    Coupon</label>
-                                <input id="coupon-code" required="" type="text" class="mb-3">
-                                <button class="coupon-btn btn" type="submit">Apply Coupon</button>
-                            </div>
-                        </div>
-                    </div>
+            <div class="col-xl-6 col-lg-6 col-md-6 col-sm-12 mb-3">
+    <div class="customer-box customer-coupon">
+        <h3 class="font-15 xs-font-13">
+            <i class="icon anm anm-gift-l"></i> Have a coupon? 
+            <a href="#" id="toggleCoupon" class="text-white text-decoration-underline">Click here to enter your code</a>
+        </h3>
+        <div id="couponContent" class="coupon-checkout-content" style="display: none;">
+            <div class="discount-coupon">
+                <div id="coupon" class="coupon-dec tab-pane active">
+                    <p class="margin-10px-bottom">Enter your coupon code if you have one.</p>
+                    <label class="required get" for="coupon-code"><span class="required-f">*</span> Coupon</label>
+                    <input id="coupon-code" required="" type="text" class="mb-3">
+                    <button class="coupon-btn btn" type="button" onclick="applyCoupon()">Apply Coupon</button>
                 </div>
             </div>
+        </div>
+    </div>
+</div>
             {{/if}}
         </div>
 
@@ -368,6 +418,147 @@
         </div>
 
     </div>
+    {{!-- modal  --}}
+   <div class="modal fade" id="addressModal" tabindex="-1" role="dialog" aria-labelledby="addressModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addressModalLabel">Add New Address</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+    <form id="modal-form">
+                        <fieldset>
+                            <h2 class="login-title mb-3">Billing details</h2>
+                            <div class="row">
+                                <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
+                                    <label for="input-firstName">First Name <span class="required-f">*</span></label>
+                                    <input name="firstname" value="" id="input-firstname" type="text">
+                                </div>
+                                <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
+                                    <label for="input-lastname">Last Name <span class="required-f">*</span></label>
+                                    <input name="lastname" value="" id="input-lastname" type="text">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
+                                    <label for="input-email">E-Mail <span class="required-f">*</span></label>
+                                    <input name="email" value="" id="input-email" type="email">
+                                </div>
+                                <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
+                                    <label for="input-telephone">Telephone <span class="required-f">*</span></label>
+                                    <input name="telephone" value="" id="input-telephone" type="tel">
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <div class="row">
+                                <div class="form-group col-md-6 col-lg-6 col-xl-6">
+                                    <label for="input-company">Company</label>
+                                    <input name="company" value="" id="input-company" type="text">
+                                </div>
+                                <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
+                                    <label for="input-address-1">Address <span class="required-f">*</span></label>
+                                    <input name="address" value="" id="input-address-1" type="text">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-6 col-lg-6 col-xl-6">
+                                    <label for="input-apartment">Apartment <span class="required-f">*</span></label>
+                                    <input name="apartment" value="" id="input-apartment" type="text">
+                                </div>
+                                <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
+                                    <label for="input-city">City <span class="required-f">*</span></label>
+                                    <input name="city" value="" id="input-city" type="text">
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
+                                    <label for="input-postCode">Post Code <span class="required-f">*</span></label>
+                                    <input name="postcode" value="" id="input-postcode" type="text">
+                                </div>
+                                <div class="form-group col-md-6 col-lg-6 col-xl-6 required">
+                                    <label for="input-zone">Region / State <span class="required-f">*</span></label>
+                                    <select name="state" id="input-zone">
+                                        {{!-- <option value=""> --- Please Select --- </option>
+                                        <option value="Aberdeen">Aberdeen</option>
+                                        <option value="Aberdeenshire">Aberdeenshire</option>
+                                        <option value="Anglesey">Anglesey</option>
+                                        <option value="Angus">Angus</option> --}}
+                                         <option value="Andaman and Nicobar Islands">Andaman and Nicobar Islands</option>
+                                                                        <option value="Andhra Pradesh">Andhra Pradesh</option>
+                                                                        <option value="Arunachal Pradesh">Arunachal Pradesh</option>
+                                                                        <option value="Assam">Assam</option>
+                                                                        <option value="Bihar">Bihar</option>
+                                                                        <option value="Chandigarh">Chandigarh</option>
+                                                                        <option value="Chhattisgarh">Chhattisgarh</option>
+                                                                        <option value="Dadar and Nagar Haveli">Dadar and Nagar Haveli</option>
+                                                                        <option value="Daman and Diu">Daman and Diu</option>
+                                                                        <option value="Delhi">Delhi</option>
+                                                                        <option value="Goa">Goa</option>
+                                                                        <option value="Gujarat">Gujarat</option>
+                                                                        <option value="Haryana">Haryana</option>
+                                                                        <option value="Himachal Pradesh">Himachal Pradesh</option>
+                                                                        <option value="Jammu and Kashmir">Jammu and Kashmir</option>
+                                                                        <option value="Jharkhand">Jharkhand</option>
+                                                                        <option value="Karnataka">Karnataka</option>
+                                                                        <option value="Kerala">Kerala</option>
+                                                                        <option value="Ladakh">Ladakh</option>
+                                                                        <option value="Lakshadweep">Lakshadweep</option>
+                                                                        <option value="Madhya Pradesh">Madhya Pradesh</option>
+                                                                        <option value="Maharashtra">Maharashtra</option>
+                                                                        <option value="Manipur">Manipur</option>
+                                                                        <option value="Meghalaya">Meghalaya</option>
+                                                                        <option value="Mizoram">Mizoram</option>
+                                                                        <option value="Nagaland">Nagaland</option>
+                                                                        <option value="Odisha">Odisha</option>
+                                                                        <option value="Puducherry">Puducherry</option>
+                                                                        <option value="Punjab">Punjab</option>
+                                                                        <option value="Rajasthan">Rajasthan</option>
+                                                                        <option value="Sikkim">Sikkim</option>
+                                                                        <option value="Tamil Nadu">Tamil Nadu</option>
+                                                                        <option value="Telangana">Telangana</option>
+                                                                        <option value="Tripura">Tripura</option>
+                                                                        <option value="Uttar Pradesh">Uttar Pradesh</option>
+                                                                        <option value="Uttarakhand">Uttarakhand</option>
+                                                                        <option value="West Bengal">West Bengal</option>
+                                    </select>
+                                </div>
+
+                            </div>
+                            <div class="row">
+
+                            </div>
+                        </fieldset>
+
+                        <fieldset>
+                            <div class="row">
+                                <div class="form-group form-check col-md-12 col-lg-12 col-xl-12">
+                                    {{!-- <label class="form-check-label padding-15px-left">
+                                        <input type="checkbox" class="form-check-input" value=""><strong>Create an
+                                            account ?</strong>
+                                    </label> --}}
+                                </div>
+                            </div>
+                        </fieldset>
+
+
+
+                </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="save-address">Save Address</button>
+            </div>
+            </div>
+            </form>
+             </div>
+        </div>
+    </div>
+</div>
+            {{!-- modal --}}
     <!--End Body Content-->
 
     <!--Footer-->
@@ -528,34 +719,7 @@
     <script src="assets/js/main.js"></script>
 
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('use-selected-address').addEventListener('click', function() {
-        var selectedAddress = document.querySelector('input[name="address"]:checked');
-        if (selectedAddress) {
-            var addressData = JSON.parse(selectedAddress.getAttribute('data-address'));
-            console.log(addressData);
 
-            document.getElementById('input-firstname').value = addressData.firstName;
-            document.getElementById('input-lastname').value = addressData.lastName;
-            document.getElementById('input-email').value = addressData.email;
-            document.getElementById('input-telephone').value = addressData.telephone;
-            document.getElementById('input-company').value = addressData.company;
-            document.getElementById('input-address-1').value = addressData.address;
-            document.getElementById('input-apartment').value = addressData.apartment;
-            document.getElementById('input-city').value = addressData.city;
-            document.getElementById('input-postcode').value = addressData.postCode;
-            document.getElementById('input-zone').value = addressData.state;
-        } else {
-Swal.fire({
-    title: 'Error',
-    text: 'Please select an address.',
-    icon: 'error',
-    confirmButtonText: 'Ok'
-});        }
-    });
-});
-</script>
 
 
 
@@ -993,48 +1157,7 @@ Swal.fire({
 
 
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-   <script>
-    $(document).ready(function () {
-        $('.delete-address').on('click', function (event) {
-            event.preventDefault();
-
-            var addressId = $(this).data('id');
-            var addressContainer = $(this).closest('.address-container');
-            var url = '/remove-address/' + addressId;
-
-            $.ajax({
-                type: 'GET', 
-                url: url,
-                success: function (response) {
-                    if (response.success) {
-                        addressContainer.remove();
-Swal.fire({
-                        title: 'Success',
-                        text: 'Address removed successfully',
-                        icon: 'success',
-                        confirmButtonText: 'Ok'
-                    });                         
-                    } else {
- Swal.fire({
-                        title: 'Error',
-                        text: response.message,
-                        icon: 'error',
-                        confirmButtonText: 'Ok'
-                    });                          
-                    }
-                },
-                error: function (xhr, status, error) {
-Swal.fire({
-                    title: 'Error',
-                    text: 'Error removing address: ' + xhr.responseText,
-                    icon: 'error',
-                    confirmButtonText: 'Ok'
-                });                     
-                }
-            });
-        });
-    });
-</script>
+  
 
 
 <script>
@@ -1059,9 +1182,246 @@ Swal.fire({
 });
 </script>
 
+   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+    var addAddressBtn = document.getElementById('add-address-btn');
+    var addressModal = document.getElementById('addressModal');
+    var saveAddressBtn = document.getElementById('save-address');
+
+    addAddressBtn.addEventListener('click', function() {
+        var modal = new bootstrap.Modal(addressModal);
+        modal.show();
+    });
+
+    saveAddressBtn.addEventListener('click', function() {
+        // Handle saving the address here
+        var modal = bootstrap.Modal.getInstance(addressModal);
+        modal.hide();
+    });
+});
+  </script>
 
 
 
+{{!-- addaddress --}}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const saveAddressBtn = document.getElementById('save-address');
+    const addAddressBtn = document.getElementById('add-address-btn');
+    const modalForm = document.getElementById('modal-form');
+    const customerAddressSection = document.getElementById('customer-address-section');
+
+    saveAddressBtn.addEventListener('click', function(e) {
+        e.preventDefault();
+        const formData = new FormData(modalForm);
+        const addressData = Object.fromEntries(formData.entries());
+        console.log('form data', formData);
+        console.log('Address data:', addressData);
+
+        fetch('/add-address', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(addressData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                // Close the modal
+                $('#addressModal').modal('hide');
+                
+                // Refresh the address list
+                fetchAddresses();
+                
+                // Show success message
+                Swal.fire({
+                    title: 'Success',
+                    text: data.message,
+                    icon: 'success',
+                    confirmButtonText: 'Ok'
+                });
+            } else {
+                Swal.fire({
+                    title: 'Error',
+                    text: data.message,
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire({
+                title: 'Error',
+                text: 'An error occurred while saving the address',
+                icon: 'error',
+                confirmButtonText: 'Ok'
+            });
+        });
+    });
+
+    function fetchAddresses() {
+        fetch('/get-addresses')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                updateAddressList(data.addresses);
+            } else {
+                console.error('Failed to fetch addresses:', data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    }
+
+    function updateAddressList(addresses) {
+        const addressForm = document.getElementById('address-form');
+        addressForm.innerHTML = '';
+
+        if (addresses.length > 0) {
+            addresses.forEach((address, index) => {
+                const addressHtml = `
+                    <div class="form-check address-container" data-id="${address._id}">
+                        <input class="form-check-input" type="radio" name="address" id="address-${index}" value="${address._id}" data-address='${JSON.stringify(address)}'>
+                        <label class="form-check-label" for="address-${index}">
+                            <strong>${address.firstName} ${address.lastName}</strong><br>
+                            ${address.company} 
+                            ${address.street} 
+                            ${address.address}, ${address.apartment} 
+                            ${address.city}, ${address.state}, ${address.postCode} 
+                            ${address.telephone} 
+                            ${address.email} 
+                            ${address.notes ? `<em>Notes: ${address.notes}</em>` : ''}
+                        </label>
+                        <a href="#" type="button" class="btn btn-link delete-address" data-id="${address._id}" aria-label="Delete">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                    <hr>
+                `;
+                addressForm.insertAdjacentHTML('beforeend', addressHtml);
+            });
+
+            const buttonsHtml = `
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-primary mt-3" id="use-selected-address">Use Selected Address</button>
+                        <button type="button" class="btn btn-primary mt-3" id="add-address-btn">Add Address</button>
+                    </div>
+                </div>
+            `;
+            addressForm.insertAdjacentHTML('beforeend', buttonsHtml);
+        } else {
+            addressForm.innerHTML = `
+                <p>No address</p>
+                <div class="row">
+                    <div class="col-md-12">
+                        <button type="button" class="btn btn-dark mt-3" id="use-selected-address" disabled>No Address</button>
+                        <button type="button" class="btn btn-primary mt-3" id="add-address-btn">Add Address</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        attachEventListeners();
+    }
+
+    function attachEventListeners() {
+        const deleteButtons = document.querySelectorAll('.delete-address');
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function(event) {
+                event.preventDefault();
+                const addressId = this.getAttribute('data-id');
+                const addressContainer = this.closest('.address-container');
+                const url = '/remove-address/' + addressId;
+
+                $.ajax({
+                    type: 'GET',
+                    url: url,
+                    success: function (response) {
+                        if (response.success) {
+                            addressContainer.remove();
+                            Swal.fire({
+                                title: 'Success',
+                                text: 'Address removed successfully',
+                                icon: 'success',
+                                confirmButtonText: 'Ok'
+                            });
+                        } else {
+                            Swal.fire({
+                                title: 'Error',
+                                text: response.message,
+                                icon: 'error',
+                                confirmButtonText: 'Ok'
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        Swal.fire({
+                            title: 'Error',
+                            text: 'Error removing address: ' + xhr.responseText,
+                            icon: 'error',
+                            confirmButtonText: 'Ok'
+                        });
+                    }
+                });
+            });
+        });
+
+        const addAddressBtn = document.getElementById('add-address-btn');
+        if (addAddressBtn) {
+            addAddressBtn.addEventListener('click', function() {
+                $('#addressModal').modal('show');
+            });
+        }
+
+        const useSelectedAddressBtn = document.getElementById('use-selected-address');
+        if (useSelectedAddressBtn) {
+            useSelectedAddressBtn.addEventListener('click', function() {
+                const selectedAddress = document.querySelector('input[name="address"]:checked');
+                if (selectedAddress) {
+                    const addressData = JSON.parse(selectedAddress.getAttribute('data-address'));
+                    console.log(addressData);
+
+                    document.getElementById('input-firstname').value = addressData.firstName;
+                    document.getElementById('input-lastname').value = addressData.lastName;
+                    document.getElementById('input-email').value = addressData.email;
+                    document.getElementById('input-telephone').value = addressData.telephone;
+                    document.getElementById('input-company').value = addressData.company;
+                    document.getElementById('input-address-1').value = addressData.address;
+                    document.getElementById('input-apartment').value = addressData.apartment;
+                    document.getElementById('input-city').value = addressData.city;
+                    document.getElementById('input-postcode').value = addressData.postCode;
+                    document.getElementById('input-zone').value = addressData.state;
+
+                    Swal.fire({
+                        title: 'Success',
+                        text: 'Address details populated in the form',
+                        icon: 'success',
+                        confirmButtonText: 'Ok'
+                    });
+                } else {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Please select an address.',
+                        icon: 'error',
+                        confirmButtonText: 'Ok'
+                    });
+                }
+            });
+        }
+    }
+
+    fetchAddresses();
+});
+</script>
 </div>
 </body>
 

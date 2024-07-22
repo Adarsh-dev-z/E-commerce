@@ -730,7 +730,7 @@
                         console.log(response);
                         if (response.success) {
                                   document.dispatchEvent(new Event('productAdded'));
-
+                                updateMinicart()
                             $('#cart-popup').fadeIn();
                             setTimeout(function() {
                                 $('#cart-popup').fadeOut();
@@ -772,7 +772,7 @@
                         console.log(response);
                         if (response.success) {
                                   document.dispatchEvent(new Event('productAdded'));
-
+                                updateMinicart()
                             if(response.clearGuestCart){
                              localStorage.removeItem('guestCart');
                             $('#cart-popup').fadeIn();
@@ -795,6 +795,19 @@
                 });
             }
         });
+
+        function updateMinicart() {
+        $.ajax({
+            url: '/get-minicart',
+            type: 'GET',
+            success: function(html) {
+                $('#minicart-container').html(html);
+            },
+            error: function(error) {
+                console.error('Error updating minicart:', error);
+            }
+        });
+    }
     });
 </script>
 

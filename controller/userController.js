@@ -10,7 +10,7 @@ const Order = require('../models/order')
 const Address = require('../models/address')
 const Banner = require('../models/banner')
 const crypto=require('crypto')
-const { createUser, findToken, findProduct, findcart } = require("../helpers/userHelper");
+const { createUser, findToken, findProduct, findcart, findRelatedProducts, findProductReviews } = require("../helpers/userHelper");
 const { addToCart } = require('../utils/cartUtils');
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 const Coupon = require('../models/coupon');
@@ -46,8 +46,8 @@ const getProduct = async function(req, res) {
       return res.status(404).send('Product not found');
     }
 
-    const review = await Reviews.find({ product: product._id }).populate('user');
-    const relatedProducts = await Product.find({ category: product.category }).limit(5);
+    const review = await findProductReviews(product._id);
+    const relatedProducts = await findRelatedProducts(product)
     const isLoggedIn = Boolean(req.session.user);
     let order;
     if (req.session.user) {
@@ -207,27 +207,55 @@ const getShop = async function(req, res) {
 
 
 
-  const miniCart = async function(req, res) {
-   
-    const userId = req.user._id;
-    try{
+const getMinicart = async function(req, res) {
+  try {
+    let cart;
+    let cartTotal = 0;
 
-      const cart = await Cart.findOne({user:userId}).populate("items.product")
-  
-      if(!cart){
-
-        return res.render('user/partials/minicart', {cart: {items:[]}, cartTotal:0})
-      }
-      const cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-      // const subTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-
-
+    if (req.session.user) {
+      const userId = req.session.user._id;
+      cart = await Cart.findOne({user: userId}).populate("items.product");
       
-      res.render('user/partials/minicart', {cart, cartTotal});
-    } catch(err){
-      res.status(500).send('server error')
+      if (cart) {
+        cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+      } else {
+        cart = { items: [] };
+      }
+    } else if (req.session.guestCart) {
+      cart = req.session.guestCart;
+
+      const productIds = cart.items.map(item => item.product);
+
+      console.log('productIds', productIds);
+
+      const productsInCart = await Product.find({ _id: { $in: productIds } });
+
+      console.log('productsInCart', productsInCart);
+
+      const updatedGuestCart = {
+          items: cart.items.map(item => {
+              const product = productsInCart.find(p => p._id.toString() === item.product.toString());
+              return {
+                  ...item,
+                  product: product
+              };
+          })
+      };
+
+      console.log('updatedGuestCart', updatedGuestCart);
+
+      cart = updatedGuestCart;
+
+      cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
+    } else {
+      cart = { items: [] };
     }
-  };
+
+    res.render('user/partials/minicart', { cart, cartTotal, layout: false });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
 
   const updateCartQuantity = async function(req, res) {
     if(req.session.user){
@@ -596,12 +624,10 @@ const getShop = async function(req, res) {
 
 
   async function userRegister(req, res, next) {
-    console.log('2reached')
-    const { username, mobile, email, password, guestCart } = req.body || {};
-    let parsedGuestCart;
+    const { username, mobile, email, password } = req.body || {};
 
     try {
-        parsedGuestCart = JSON.parse(guestCart || '[]');
+
     } catch (error) {
         return res.status(400).json({ errorMessage: "Invalid guest cart data" });
     }
@@ -649,7 +675,6 @@ const getShop = async function(req, res) {
             tokenExpires: expireTime
         };
         const user = await createUser(data);
-        await addToCart(user._id, parsedGuestCart);
 
         return res.json({ clearGuestCart: true });
     } catch (err) {
@@ -682,63 +707,16 @@ async function handleVerification(req, res) {
 
   req.session.user = user;
   req.session.loggedIn = true;
+  if(req.session.guestCart){
+    await addToCart(user._id, req.session.guestCart)
+  
+  }
 
   return res.redirect('/home');
 }
 
 
 
-// const postLogin = async (req, res) => {
-//   try {
-    
-//     const { email, password, guestCart } = req.body;
-//     const parsedGuestCart = JSON.parse(guestCart || '[]');
-
-//     const user = await User.findOne({ email: email, role: 'user' });
-//     const admin = await User.findOne({ email: email, role: 'admin' });
-//     const currentUser = user || admin;
-
-//     if (!currentUser) {
-//       return res.status(404).json({ success: false, message: 'User not found' });
-//     }
-//     if(currentUser.isBlocked){
-//       return res.status(403).json({ success: false, message: 'User is blocked' });
-//     }
-//     if (currentUser.isVerifyed !== 'true') {
-//       return res.status(403).json({ success: false, message: `${currentUser.role} not verified` });
-//     }
-
-//     const passwordMatch = await bcrypt.compare(password, currentUser.password);
-//     if (!passwordMatch) {
-//       return res.status(401).json({ success: false, message: 'Invalid password' });
-//     }
-
-//    await addToCart(currentUser._id, parsedGuestCart)
-
-//     // req.session.userId = user._id;
-//     req.session.role = currentUser.role;
-//     req.session.user = user ? currentUser : null;
-//     req.session.admin = admin ? currentUser : null;
-
-//     req.session.save((err) => {
-//       if (err) {
-//         return res.status(500).json({ success: false, message: 'Internal server error' });
-//       }
-
-//       let redirectUrl;
-//       if (req.session.user) {
-//         redirectUrl = '/home';
-//       } else if (req.session.admin) {
-//         redirectUrl = '/admin';
-//       }
-
-//       res.json({ success: true, clearGuestCart: true, redirectUrl, role: currentUser.role });
-//     });
-
-//   } catch (error) {
-//     return res.status(500).json({ success: false, message: 'Internal server error' });
-//   }
-// };
 
 const postLogin = async (req, res) => {
   try {
@@ -760,6 +738,7 @@ const postLogin = async (req, res) => {
     }
 
     const passwordMatch = await bcrypt.compare(password, currentUser.password);
+    
     if (!passwordMatch) {
       return res.status(401).json({ success: false, message: 'Invalid password' });
     }
@@ -863,7 +842,6 @@ const postAddToCart = async (req, res) => {
       }
   } else {
       const guestCartItems = req.body.guestCart || [];
-      // console.log(guestCartItems, 'guestCartItems');
 
       let guestCart = req.session.guestCart || { items: [] };
       req.session.guestCart = guestCart;
@@ -871,7 +849,6 @@ const postAddToCart = async (req, res) => {
       try {
           const productIds = guestCartItems.map(p => p.productId);
           const findProducts = await Product.find({ _id: { $in: productIds } });
-          // console.log('findProducts', findProducts);
 
           if (!findProducts || findProducts.length === 0) {
               return res.status(404).send('Products not found');
@@ -883,12 +860,9 @@ const postAddToCart = async (req, res) => {
 
           guestCartItems.forEach(item => {
               const { productId, quantity } = item;
-              // console.log(item,'itemsssssssssssssssssssssm')
               const product = findProducts.find(p => p._id.toString() === productId);
-            // console.log(product,'prrrrrrroduct')
               if (product) {
                   const itemIndex = guestCart.items.findIndex(cartItem => cartItem.product.toString() === productId);
-                // console.log('item index: ' + itemIndex)
                   if (itemIndex > -1) {
                       guestCart.items[itemIndex].quantity += quantity;
                       guestCart.items[itemIndex].totalPrice = guestCart.items[itemIndex].quantity * product.price;
@@ -1356,6 +1330,17 @@ const createCheckoutSession = async (req, res) => {
 }
 
 
+const getAddresses = async (req, res) => {
+  try {
+      const userId = req.user._id;
+      const addresses = await Address.find({ user: userId });
+      res.status(200).json({ success: true, addresses });
+  } catch (err) {
+      console.error(err);
+      res.status(500).json({ success: false, message: 'Error fetching addresses' });
+  }
+};
+
 
 const editAddress = async(req, res)=>{
   const addressId = req.params.id
@@ -1396,7 +1381,7 @@ const editAddress = async(req, res)=>{
 const postAddAddress = async(req, res)=>{
   const userId = req.user._id;
   const { firstname,lastname, email, telephone, company, address, apartment, city, postcode, street, state } = req.body
-  if(!firstname.trim() || !lastname.trim() || !email.trim() || !telephone.trim() || !company.trim() || !address.trim() || !city.trim() || !postcode.trim() || !street.trim() || !state.trim()){
+  if(!firstname.trim() || !lastname.trim() || !email.trim() || !telephone.trim() || !company.trim() || !address.trim() || !city.trim() || !postcode.trim() || !state.trim()){
       return res.status(400).json({success:false, message:'Please provide all required fields'})
   }
   if (!firstname || !lastname || !/^[a-zA-Z]+$/.test(firstname) || !/^[a-zA-Z]+$/.test(lastname)) {
@@ -2155,7 +2140,7 @@ const viewOrder = async (req, res) => {
   }
 
   const order = await Order.findOne({ _id: orderId }).populate('items.product');
-
+  console.log('order', order)
   if (!order) {
     return res.status(404).send('Order not found');
   }
@@ -2171,6 +2156,8 @@ const viewOrder = async (req, res) => {
     };
   });
 
+  console.log(itemsWithMaxQuantityReached,'itemsawithmaxquantityreached')
+  
   res.render('user/view-order', { order: { ...order.toObject(), items: itemsWithMaxQuantityReached }, orderId });
 }
 
@@ -2330,6 +2317,6 @@ const walletOrderSuccess = async(req, res) => {
        postLogin, updateCartQuantity, postAddToWishlist, GetRemoveWishlist, postAddToCart, postRemoveCart, getClearCart,
        getProductCheckout, getOrderSuccess, postApplyCoupon, postRemoveCoupon, createCheckoutSession, editAddress,
        postAddAddress, removeAddress, getForgotpassword, postResetPassLink, resetPassword, getUpdatePass, postUpdatePass,
-       getSearch, changeAccountDetails, miniCart, checkoutRazorpay, handleRazorpaySuccess, getShopByCategory,
+       getSearch, changeAccountDetails, getMinicart, checkoutRazorpay, handleRazorpaySuccess, getShopByCategory,
        getCancelOrder, returnItems, returnEntireOrder, postReview, getReviews, cartCount,
-      viewOrder, walletCheckout, renderOrderSuccess, renderRazorpayOrderSuccess, walletOrderSuccess  }
+      viewOrder, walletCheckout, renderOrderSuccess, renderRazorpayOrderSuccess, walletOrderSuccess, getAddresses  }

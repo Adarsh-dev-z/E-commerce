@@ -376,7 +376,7 @@ $(document).ready(function() {
       type: 'POST',
       success: function(response) {
            document.dispatchEvent(new Event('productAdded'));
-
+    updateMinicart()
         $(`#product-${productId}`).remove();
 
         if ($('#cartItems .cart__row').length === 0) {
@@ -413,6 +413,19 @@ $(document).ready(function() {
       }
     });
   });
+
+  function updateMinicart() {
+        $.ajax({
+            url: '/get-minicart',
+            type: 'GET',
+            success: function(html) {
+                $('#minicart-container').html(html);
+            },
+            error: function(error) {
+                console.error('Error updating minicart:', error);
+            }
+        });
+    }
 });
 </script>
 

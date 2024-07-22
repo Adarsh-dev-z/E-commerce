@@ -23,7 +23,9 @@ const { getLogin, getProduct, getShop, getAbout, getBlog,
   renderOrderSuccess,
   renderRazorpayOrderSuccess,
   walletOrderSuccess,
-  miniCart} = require('../controller/userController');
+  miniCart,
+  getAddresses,
+  getMinicart} = require('../controller/userController');
 var router = express.Router();
 const passport=require("passport");
 const { AuthCheck, userAuthCheck } = require('../middlewares/userAuthentication');
@@ -67,6 +69,7 @@ router.post('/add-to-wishlist', userAuthCheck, postAddToWishlist);
 router.get('/remove-wishlist', userAuthCheck, GetRemoveWishlist)
 router.get('/cart', getCart)
 router.post('/add-to-cart', postAddToCart);
+router.get('/get-minicart', getMinicart);
 router.post('/guest-cart', (req, res) => {
     const guestCart = req.body.guestCart || [];
     req.session.guestCartItems = guestCart; 
@@ -85,6 +88,7 @@ router.get("/userprofile", userAuthCheck, getUserProfile)
 router.post('/edit-address/:id', userAuthCheck, editAddress)
 router.post('/add-address', userAuthCheck, postAddAddress)
 router.get('/remove-address/:id', userAuthCheck, removeAddress);
+router.get('/get-addresses', userAuthCheck, getAddresses);
 router.get('/forgot-password', getForgotpassword)
 router.post('/reset-link', postResetPassLink)
 router.get('/resetpass', resetPassword);
