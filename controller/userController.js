@@ -1534,7 +1534,7 @@ const changeAccountDetails = async (req, res) => {
       password: hashedPassword
     };
 
-    const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+    const updatedUser = await userHelper.updateUserDetails(userId, updateData)
     if (!updatedUser) {
       throw new Error('Error updating user details');
     }
@@ -1815,7 +1815,7 @@ const getShopByCategory = async (req, res) => {
     return res.status(400).send('Category is required');
   }
   try {
-    const products = await Product.find({ category });
+    const products = await userHelper.findProductsByCategory(category)
     return res.render('user/shop', { Product: products });
   } catch (error) {
     return res.status(500).send('Internal Server Error');
@@ -1839,7 +1839,7 @@ const getCancelOrder = async (req, res) => {
           { new: true }
         );
       if (order) {
-          const user = await User.findOne({ _id: userId });
+          const user = await userHelper.findUser(userId)
           
           if(order.refund===false){
             user.walletAmount = parseFloat(order.totalPrice) + user.walletAmount;
@@ -1865,7 +1865,7 @@ const returnItems = async (req, res) => {
       return res.status(400).send('Missing required query parameters');
     }
 
-    const order = await Order.findById(orderId).populate('items.product');
+    const order = await userHelper.findOrderWithOrderId(orderId)
     if (!order) {
       return res.status(404).send('Order not found');
     }
@@ -1934,14 +1934,13 @@ const returnEntireOrder = async (req, res) => {
   try {
     const orderId = req.query.id;
     const reason = req.query.reason;
-    const order = await Order.findById(orderId).populate('items.product');
+    const order = await userHelper.findOrderWithOrderId(orderId);
 
     if (!order) {
       return res.status(404).send('Order not found');
     }
 
     const adjustedItems = order.items.map(item => {
-      // const returnItem = order.returnItems.find(returnItem => returnItem.product.toString() === item.product._id.toString() && !returnItem.success);
       const returnItem = order.returnItems.find(returnItem => returnItem.product.toString() === item.product._id.toString());
 
       if (returnItem) {
@@ -1960,7 +1959,6 @@ const returnEntireOrder = async (req, res) => {
         return res.status(400).send('Invalid return request: more items returned than ordered');
       }
 
-      // const existingReturnItem = order.returnItems.find(returnItem => returnItem.product.toString() === item.product._id.toString() && returnItem.success);
       const existingReturnItem = order.returnItems.find(returnItem => returnItem.product.toString() === item.product._id.toString());
       if (existingReturnItem) {
         existingReturnItem.quantity += item.quantity;
@@ -1998,26 +1996,20 @@ const postReview = async (req, res) => {
   const userId = req.user._id
   const { product, user, comment, title, author } = req.body;
   const rating = Number(req.body.rating);
-  try {
-      const review = await Reviews.create({
-          product,
-          user: userId,
-          userEmail: user,
-          rating,
-          comment,
-          title,
-          author
-      });
-      res.status(201).json(review);
-  } catch (error) {
-      res.status(400).json({ message: error.message });
+  try{
+
+    const review = await userHelper.createReview({ userId, user, product, rating, comment, title, author });
+    res.status(201).json(review);
+  }catch(err){
+
   }
+  
 }
 
 
 const getReviews = async (req, res) => {
   try {
-      const reviews = await Reviews.find({ product: req.params.productId }).populate('product');
+      const reviews = await userHelper.getReviews(req.params.productId);
       res.json(reviews);
   } catch (error) {
       res.status(500).json({ message: error.message });
@@ -2030,7 +2022,7 @@ const cartCount = async (req, res) => {
     if (req.session.user) {
       const userInSession = req.session.user;
       const userId = userInSession._id;
-      const cart = await Cart.findOne({ user: userId });
+      const cart = await userHelper.getCartCount(userId)
       if (!cart || !cart.items) {
         return res.json({ count: 0 });
       }
@@ -2057,8 +2049,7 @@ const viewOrder = async (req, res) => {
     return res.status(400).send('Missing required query parameters');
   }
 
-  const order = await Order.findOne({ _id: orderId }).populate('items.product');
-  console.log('order', order)
+  const order = await userHelper.findOrderWithOrderId(orderId)
   if (!order) {
     return res.status(404).send('Order not found');
   }
@@ -2074,7 +2065,6 @@ const viewOrder = async (req, res) => {
     };
   });
 
-  console.log(itemsWithMaxQuantityReached,'itemsawithmaxquantityreached')
   
   res.render('user/view-order', { order: { ...order.toObject(), items: itemsWithMaxQuantityReached }, orderId });
 }
@@ -2099,19 +2089,20 @@ const walletCheckout = async (req, res) => {
       payment
   } = req.body;
 
-  const existingAddress = await Address.findOne({
-      user: userId,
-      firstName: firstname,
-      lastName: lastname,
-      email: email,
-      telephone: telephone,
-      company: company,
-      address: address,
-      apartment: apartment,
-      city: city,
-      state: state,
-      postCode: postcode,
-  });
+  const existingAddress = await userHelper.findExistingAddress(
+      userId,
+      firstname,
+      lastname,
+      email,
+      telephone,
+      company,
+      address,
+      apartment,
+      city,
+      state,
+      postcode,
+  );
+
 
   let userAddress;
   if (existingAddress) {
@@ -2135,33 +2126,24 @@ const walletCheckout = async (req, res) => {
   }
 
   try {
-      const cart = await Cart.findOne({ user: userId }).populate('items.product');
+      const cart = await userHelper.getCart(userId)
       if (!cart || !cart.items || cart.items.length === 0) {
           return res.json({ success: false, message: 'Cart is empty.' });
       }
 
       const cartTotal = cart.items.reduce((total, item) => total + item.totalPrice, 0);
-      console.log('reached 1')
       let appliedCoupon = 0;
-      console.log('reached 2')
 
       if (req.session.appliedCoupon) {
-        console.log('reached 3')
-
-        console.log(req.session.appliedCoupon);
           let availableCoupon=req.session.appliedCoupon;
               appliedCoupon += availableCoupon.discount;
           
       }
-      console.log('reached 4')
 
       const newCartTotal = cartTotal - appliedCoupon;
-      console.log('appliedcoupon:',appliedCoupon,'newcarttotal:',newCartTotal,'carttotal',cartTotal)
       delete req.session.appliedCoupon
-      console.log('reached 5')
 
-const user = await User.findById(userId);
-console.log('reached 7')
+const user = await userHelper.findUser(userId);
 
      user.walletAmount = user.walletAmount - newCartTotal;
      await user.save();
@@ -2208,8 +2190,7 @@ const walletOrderSuccess = async(req, res) => {
     return res.status(400).send({ error: 'Order ID is required' });
   }
 
-  const order = await Order.findOne({ _id: orderid }).populate('address').populate('items.product')
-  console.log('order',order)
+  const order = await userHelper.getOrderDetailsById(orderid);
   if (!order) {
     return res.status(404).send({ error: 'Order not found' });
   }

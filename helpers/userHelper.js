@@ -398,7 +398,105 @@ module.exports={
       catch(err){
 
       }
-    }
+    },
+
+    updateUserDetails:async({userId, updateData})=>{
+      try{
+        const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+        return updatedUser;
+      }
+      catch(err){
+
+      }
+    },
+
+    findOrderWithOrderId:async(orderId)=>{
+      try{
+        const order = await Order.findById(orderId).populate('items.product');
+        return order;
+      }
+      catch(err){
+
+      }
+    },
 
     
+    createReview:async({userId, user, product, rating, comment, title, author})=>{
+      try{
+        const review = await Reviews.create({
+          product,
+          user: userId,
+          userEmail: user,
+          rating,
+          comment,
+          title,
+          author
+        });
+        return review
+      }
+      catch(err){
+
+      }
+    },
+
+    
+    getReviews:async(productId)=>{
+      try{
+        const reviews = await Reviews.find({product:productId}).populate('product');
+        return reviews;
+      }
+      catch(err){
+        throw err;
+      }
+    },
+
+    
+    getCartCount:async(userId)=>{
+      try{
+        const cart = await Cart.findOne({user:userId});
+        if(!cart || !cart.items){
+          return 0;
+        }
+        return cart.items.length;
+      }
+      catch(err){
+        throw err;
+      }
+    },
+
+    
+    findExistingAddress:async(userId,firstname,lastname,email,telephone,company,address,apartment,city,state,postcode)=>{
+      try{
+        const existingAddress = await Address.findOne({
+          user: userId,
+          firstName: firstname,
+          lastName: lastname,
+          email: email,
+          telephone: telephone,
+          company: company,
+          address: address,
+          apartment: apartment,
+          city: city,
+          state: state,
+          postCode: postcode,
+        });
+        return existingAddress;
+      }
+      catch(err){
+
+      }
+    },
+    
+    
+    getOrderDetailsById:async(orderId)=>{
+      try{
+        const order = await Order.findOne({_id:orderId}).populate('address').populate('items.product');
+        return order;
+      }
+      catch(err){
+
+      }
+    },
+
+
 }
