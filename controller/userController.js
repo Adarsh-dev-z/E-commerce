@@ -1711,7 +1711,7 @@ const handleRazorpaySuccess = async (req, res) => {
       if (product.stock <= 0) {
         product.isOutOfStock = true;
       }
-      await product.save();
+      // await product.save();
     }));
 
     userOrder.stockUpdated = true;

@@ -3,6 +3,9 @@ const Product = require('../models/product')
 const Cart = require('../models/cart')
 const Wishlist = require('../models/wishlist')
 const Reviews = require('../models/review')
+const Address = require('../models/address')
+const Banner = require('../models/banner')
+const Coupon = require('../models/coupon')
 const { getAddresses, removeAddress, editAddress } = require('../controller/userController')
 const { token } = require('morgan')
 module.exports={
@@ -213,7 +216,7 @@ module.exports={
     }, 
     findUserByEmail: async (email) => {
         try {
-            const user = await User.findOne({ email });
+            const user = await Users.findOne({ email });
             return user;
         } catch (error) {
             console.log(error);
@@ -221,7 +224,7 @@ module.exports={
     },
     findRoleUser: async (email) => {
         try {
-          const user = await User.findOne({ email: email, role: 'user' });
+          const user = await Users.findOne({ email: email, role: 'user' });
           return user;
         } catch (error) {
             console.log(error);
@@ -230,7 +233,7 @@ module.exports={
       },
       findRoleAdmin:async(email)=>{
         try{
-          const admin = await User.findOne({ email: email, role: 'admin' });
+          const admin = await Users.findOne({ email: email, role: 'admin' });
           return admin;
         }catch(error){
           console.log(error);
@@ -345,7 +348,7 @@ module.exports={
     },
     findUserByToken: async(token)=>{
       try{
-        const user = await User.findOne({verificationToken:token});
+        const user = await Users.findOne({verificationToken:token});
         return user;
       }
       catch(err){
@@ -380,7 +383,7 @@ module.exports={
 
     updateUserPassword: async({email, hashedPassword})=>{
       try{
-        const user = await User.findOneAndUpdate({email:email}, {
+        const user = await Users.findOneAndUpdate({email:email}, {
           password: hashedPassword
         }, {new: true});
         return user;
@@ -402,7 +405,7 @@ module.exports={
 
     updateUserDetails:async({userId, updateData})=>{
       try{
-        const updatedUser = await User.findByIdAndUpdate(userId, updateData, { new: true });
+        const updatedUser = await Users.findByIdAndUpdate(userId, updateData, { new: true });
         return updatedUser;
       }
       catch(err){
@@ -454,10 +457,7 @@ module.exports={
     getCartCount:async(userId)=>{
       try{
         const cart = await Cart.findOne({user:userId});
-        if(!cart || !cart.items){
-          return 0;
-        }
-        return cart.items.length;
+        return cart
       }
       catch(err){
         throw err;
