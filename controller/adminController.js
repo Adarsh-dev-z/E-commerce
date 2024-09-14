@@ -13,6 +13,7 @@ const Banner = require('../models/banner');
 const bcrypt = require('bcrypt');
 const Category = require('../models/category');
 const Order = require('../models/order');
+const adminHelper = require('../helpers/adminHelper');
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
       cb(null, 'public/asset/images');
@@ -28,34 +29,11 @@ const storage = multer.diskStorage({
   const getAdmin = async (req, res) => {
     try {
 
-      const topCategory = await Order.aggregate([
-        { $unwind: '$items' },
-        {
-            $lookup: {
-                from: 'products',
-                localField: 'items.product',
-                foreignField: '_id',
-                as: 'productDetails'
-            }
-        },
-        { $unwind: '$productDetails' },
-        {
-            $group: {
-                _id: '$productDetails.category',
-                totalBought: { $sum: '$items.quantity' },
-            }
-        },
-        { $sort: { totalBought: -1 } }
-    ]);
+      const topCategory = await adminHelper.getTopCategory();
     
       const currentYear = new Date().getFullYear();
       
-      const chartOrders = await Order.find({
-          datePlaced: {
-              $gte: new Date(`${currentYear}-01-01`),
-              $lt: new Date(`${currentYear + 1}-01-01`)
-          }
-      });
+      const chartOrders = await adminHelper.getChartOrders(currentYear);
 
       const ordersPerMonth = new Array(12).fill(0);
       chartOrders.forEach(order => {
@@ -63,61 +41,21 @@ const storage = multer.diskStorage({
           ordersPerMonth[month] += 1;
       });
       
-      const orders = await Order.find()
-        .populate({
-          path: 'user',
-          select: 'username'}).populate({path: 'address',
-          select: 'firstName lastName street city state postCode'}).populate({path: 'items.product',
-          select: 'name'});
+      const orders = await adminHelper.getAllOrders();
   
-      const latestUpdates = await Order.find()
-        .populate({
-          path: 'user',
-          select: 'username'}).populate({
-          path: 'address',
-          select: 'firstName lastName street city state postCode'}).populate({
-          path: 'items.product',
-          select: 'name'}).sort({ createdAt: 1 }).limit(10);
+      const latestUpdates = await adminHelper.getLatestUpdates();
   
-      const users = await Users.find()
-        .sort({ createdAt: -1 })
-        .limit(10);
+      const users = await adminHelper.getLatestUsers();
   
-  
-  
-      const totalOrders = await Order.countDocuments()
-      const totalRevenue = await Order.aggregate([
-        {
-          $group: {
-            _id: null,
-            totalRevenue: { $sum: '$totalPrice' }
-          }
-        }
-      ]);
-      const totalProducts = await product.countDocuments()
-      const totalUsers = await Users.countDocuments()
+      const totalOrders = await Order.countDocuments();
 
-      const topProducts = await Order.aggregate([
-        { $unwind: '$items' },
-        { $group: {
-            _id: '$items.product',
-            totalQuantity: { $sum: '$items.quantity' }
-        }},
-        { $sort: { totalQuantity: -1 } },
-        { $limit: 4 },
-        { $lookup: {
-            from: 'products',
-            localField: '_id',
-            foreignField: '_id',
-            as: 'productDetails'
-        }},
-        { $unwind: '$productDetails' },
-        { $project: {
-            _id: 0,
-            productName: '$productDetails.name',
-            totalQuantity: 1
-        }}
-    ]);
+      const totalRevenue = await adminHelper.getTotalRevenue();
+
+      const totalProducts = await product.countDocuments();
+
+      const totalUsers = await Users.countDocuments();
+
+      const topProducts = await adminHelper.getTopProducts();
   
       res.render('admin/index', { orders, users, latestUpdates, totalOrders, totalRevenue, totalProducts,topCategory,topProducts, totalUsers, 
                    ordersPerMonth: JSON.stringify(ordersPerMonth)
@@ -135,7 +73,7 @@ const storage = multer.diskStorage({
 const updateOrderStatus = async (req, res) => {
   const { orderId, status } = req.body;
   try {
-    const order = await Order.findOne({ _id: orderId });
+    const order = await adminHelper.getOrderById(orderId);
     if (!order) {
       return res.status(404).send('Order not found');
     }
@@ -182,7 +120,7 @@ const updateOrderStatus = async (req, res) => {
 const editProduct = async (req, res) => {
   try {
     const productId = req.query.id;
-    const selectedProduct = await product.findById(productId);
+    const selectedProduct = await adminHelper.getProductById(productId);
     if (!selectedProduct) {
       return res.render('admin/edit-product',{errorMesage:'Product not found'});
     }
@@ -216,9 +154,7 @@ const adminProducts = async (req, res) => {
     const totalPages = Math.ceil(totalProducts / limit);
     const skip = (page - 1) * limit;
 
-    const products = await product.find(query)
-      .skip(skip)
-      .limit(limit);
+    const products = await adminHelper.getProductsWithQSL(query, skip, limit);
 
     res.render('admin/admin-products', { 
       products, 

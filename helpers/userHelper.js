@@ -6,6 +6,7 @@ const Reviews = require('../models/review')
 const Address = require('../models/address')
 const Banner = require('../models/banner')
 const Coupon = require('../models/coupon')
+const Order = require('../models/order')
 const { getAddresses, removeAddress, editAddress } = require('../controller/userController')
 const { token } = require('morgan')
 module.exports={
