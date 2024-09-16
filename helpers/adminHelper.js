@@ -224,10 +224,31 @@ module.exports = {
         return updateCoupon;
     },
 
+    deleteCoupon: async (couponId) => {
+        const deleteCoupon = await Coupon.findByIdAndDelete({_id:couponId});
+        return deleteCoupon;
+    },
+
+    deleteMultipleCoupons: async (couponIds) => {
+        const deletedCoupons = await Coupon.deleteMany({ _id: { $in: couponIds } });
+        return deletedCoupons;
+    },
+
+    getAllBanners: async () => {
+        const banner = await Banner.find();
+        return banner;
+    },
+
+    findBannerById: async (bannerId) => {
+        const selectedBanner = await Banner.findById(bannerId);
+        return selectedBanner;
+    },
 
 
-
-
+    deleteBannerById: async (bannerId) => {
+        const deleteBanner = await Banner.findByIdAndDelete(bannerId);
+        return deleteBanner;
+    },
 
 
 }

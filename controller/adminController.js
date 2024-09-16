@@ -377,7 +377,8 @@ const deleteCoupon = async(req, res)=>{
 
     
     const couponId = req.query.id;
-    const deleteCoupon = await Coupon.findByIdAndDelete({_id:couponId})
+    const deleteCoupon = await adminHelper.deleteCoupon(couponId)
+    
     if(deleteCoupon){
       res.redirect('/admin-coupon')
     }else{
@@ -396,8 +397,7 @@ const deleteCoupons= async (req, res) => {
       return res.status(400).send('Invalid request body');
     }
 
-    const deletedCoupons = await Coupon.deleteMany({ _id: { $in: couponIds } });
-
+    const deletedCoupons = await adminHelper.deleteMultipleCoupons(couponIds);
     res.status(200).send({ message: 'Coupons deleted successfully', deletedCoupons });
   } catch (err) {
     res.status(500).send('An error occurred while deleting coupons');
@@ -407,7 +407,8 @@ const deleteCoupons= async (req, res) => {
 
 const adminBanner = async (req, res) => {
   try {
-    const banner = await Banner.find();
+    const banner = await adminHelper.getAllBanners();
+
     res.render('admin/admin-banner', { banner });
   } catch (error) {
     res.status(500).send('An error occurred while fetching the banner.');
@@ -426,7 +427,8 @@ const getEditBanner = async (req, res) => {
       return res.status(400).render('admin/edit-banner',{error:'Banner id is required'});
     }
 
-    const selectedBanner = await Banner.findById(bannerId);
+    const selectedBanner = await adminHelper.findBannerById(bannerId);
+
     if (!selectedBanner) {
       return res.status(404).render('admin/edit-banner', { error: 'Banner not found' });
     }
@@ -440,7 +442,8 @@ const getEditBanner = async (req, res) => {
 
 const deleteBanner = async(req, res)=>{
   const bannerId= req.params.id
-  const deleteBanner = await Banner.findByIdAndDelete(bannerId);
+  const deleteBanner = await adminHelper.deleteBannerById(bannerId);
+
   if(deleteBanner){
     return res.redirect('/admin-banner')
   }else{
