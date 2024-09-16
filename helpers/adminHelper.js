@@ -132,6 +132,100 @@ module.exports = {
     },
 
 
+    getUsersWithQSL: async (query, skip, limit) => {
+        const users = await Users.find(query)
+            .skip(skip)
+            .limit(limit);
+        return users;
+    },
+
+
+
+    getAllCategories: async () => {
+        const categories = await Category.find();
+        return categories;
+    },
+
+
+
+    
+    deleteProductById: async (productId) => {
+        await product.findByIdAndDelete(productId);
+    },
+
+
+
+    deleteProductsByIds: async (productIds) => {
+        const deletedproducts = await product.deleteMany({ _id: { $in: productIds } });
+        return deletedproducts;
+    },
+
+
+    
+    blockUserById: async (userId) => {
+        await Users.findByIdAndUpdate(userId, { isBlocked: true });
+    },
+
+
+    
+    unblockUserById: async (userId) => {
+        await Users.findByIdAndUpdate(userId, { isBlocked: false });
+    },
+
+
+    
+
+
+    findUserById: async (userId) => {
+        const deletingUser = await Users.findById(userId);
+        return deletingUser;
+    },
+
+
+    
+
+
+    softDeleteUser: async (deletingUser) => {
+        const softdelete = await DeletedUser.create({
+            username: deletingUser.username,
+            email: deletingUser.email,
+            phone: deletingUser.phone,
+            address: deletingUser.address,
+            password: deletingUser.password
+        });
+        return softdelete;
+    },
+
+    deleteUser: async (userId) => {
+        await Users.findByIdAndDelete(userId);
+
+    },
+
+
+    checkCouponExistence: async (code) => {
+        const existingCoupon = await Coupon.findOne({ code: code });
+        return existingCoupon;
+    },
+
+
+    getAllCoupons: async () => {
+        const coupon = await Coupon.find();
+        return coupon;
+    },
+
+
+    findCouponById: async (couponId) => {
+        const selectedCoupon = await Coupon.findById({_id: couponId});
+        return selectedCoupon;
+    },
+
+    updateCoupon: async (couponId, couponData) => {
+        const updateCoupon = await Coupon.findByIdAndUpdate(couponId, couponData, {new:true});
+        return updateCoupon;
+    },
+
+
+
 
 
 

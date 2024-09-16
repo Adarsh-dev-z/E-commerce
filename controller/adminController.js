@@ -194,9 +194,7 @@ const adminUsers = async (req, res) => {
     const totalPages = Math.ceil(totalUsers / limit);
     const skip = (page - 1) * limit;
 
-    const users = await Users.find(filter)
-      .skip(skip)
-      .limit(limit);
+    const users = await adminHelper.getUsersWithQSL(filter, skip, limit);
 
     res.render('admin/admin-users', {
       users,
@@ -215,8 +213,7 @@ const adminUsers = async (req, res) => {
 
 
 const getAddProduct = async(req, res) => {
-  const categories = await Category.find();
-  console.log(categories)
+  const categories = await adminHelper.getAllCategories();
   res.render('admin/add-product',{categories});
 }
 
@@ -224,8 +221,8 @@ const getAddProduct = async(req, res) => {
 const deleteProduct=async (req, res)=>{
   const productId = req.params.id;
   try {
-      await product.findByIdAndDelete(productId)
-      res.redirect('/admin-products')
+      await adminHelper.deleteProductById(productId);
+      res.redirect('/admin-products');
   } catch(err){
       res.status(500).send('error deleting product')
   }
@@ -239,8 +236,7 @@ const deleteProducts = async (req, res) => {
       return res.status(400).send('Invalid request body');
     }
 
-    const deletedproducts = await product.deleteMany({ _id: { $in: productIds } });
-
+    const deletedproducts = await adminHelper.deleteProductsByIds(productIds);
     res.status(200).send({ message: 'products deleted successfully', deletedproducts });
   } catch (err) {
     res.status(500).send('An error occurred while deleting coupons');
@@ -250,7 +246,8 @@ const deleteProducts = async (req, res) => {
 const blockUser = async (req, res) => {
   try {
     const userId = req.query.id;
-    await Users.findByIdAndUpdate(userId, { isBlocked: true });
+    await adminHelper.blockUserById(userId);
+
     res.redirect('/admin-users');
   } catch (err) {
     res.status(500).send('Server error');
@@ -260,7 +257,7 @@ const blockUser = async (req, res) => {
 const unblockUser = async (req, res) => {
   try {
     const userId = req.query.id;
-    await Users.findByIdAndUpdate(userId, { isBlocked: false });
+    await adminHelper.unblockUserById(userId);
     res.redirect('/admin-users');
   } catch (err) {
     res.status(500).send('Server error');
@@ -270,18 +267,13 @@ const unblockUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
       const userId = req.query.id;
-      const deletingUser = await Users.findById(userId);
+      const deletingUser = await adminHelper.findUserById(userId);
       
       if (deletingUser) {
         
-         const softdelete = await DeletedUser.create({
-              username: deletingUser.username,
-              email: deletingUser.email,
-              phone: deletingUser.phone,
-              address: deletingUser.address,
-              password: deletingUser.password
-          });
-          await Users.findByIdAndDelete(userId);
+         await adminHelper.softDeleteUser(deletingUser);
+          await adminHelper.deleteUser(userId);
+
           res.redirect('/admin-users');
       } else {
           res.status(404).send('User not found');
@@ -305,7 +297,8 @@ const postAddCoupon = async (req, res) => {
   }
 
   try {
-    const existingCoupon = await Coupon.findOne({ code: code });
+    const existingCoupon = await adminHelper.findCouponByCode(code);
+
     if (existingCoupon) {
       res.status(409).render('admin/add-coupon', { error: 'Coupon already exists' });
       return;
@@ -332,7 +325,8 @@ const postAddCoupon = async (req, res) => {
 
 const adminCoupon = async (req, res)=>{
   try {
-    const coupon = await Coupon.find();
+    const coupon = await adminHelper.getCoupons();
+    
     res.render('admin/admin-coupon', {coupon});
   } catch (err) {
     res.status(500).render('admin/admin-coupon', { error: 'Failed to fetch coupons' });
@@ -343,8 +337,7 @@ const adminCoupon = async (req, res)=>{
 const getEditCoupon = async (req, res)=>{
   const couponId = req.query.id
   
-  const selectedCoupon = await Coupon.findById({_id: couponId})
-
+  const selectedCoupon = await adminHelper.findCouponById(couponId);
 
   res.render("admin/edit-coupon", {coupon: selectedCoupon})
 }
@@ -356,7 +349,7 @@ const postEditCoupon = async(req, res)=>{
 
     let { code, discount, minPriceRange, maxPriceRange, usageCount, expireDate }= req.body;
     const couponId = req.params.id
-    const coupon = await Coupon.findById({_id:couponId})
+    const coupon = await adminHelper.findCouponById(couponId)
     if(!expireDate){
       expireDate = coupon.expireDate
     }
@@ -369,7 +362,8 @@ const postEditCoupon = async(req, res)=>{
       expireDate:expireDate
     }
   
-    const updateCoupon = await Coupon.findByIdAndUpdate(couponId, couponData, {new:true})
+    const updateCoupon = await adminHelper.updateCoupon(couponId, couponData)
+    
   res.redirect('/admin-coupon')
 
   }catch(err){
