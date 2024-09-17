@@ -183,8 +183,6 @@ module.exports = {
 
 
     
-
-
     softDeleteUser: async (deletingUser) => {
         const softdelete = await DeletedUser.create({
             username: deletingUser.username,
@@ -249,6 +247,82 @@ module.exports = {
         const deleteBanner = await Banner.findByIdAndDelete(bannerId);
         return deleteBanner;
     },
+
+
+    deleteMultipleBanners: async (bannerIds) => {
+        const deletedBanners = await Banner.deleteMany({ _id: { $in: bannerIds } });
+        return deletedBanners;
+    },
+
+
+    findAdminById: async (adminId) => {
+        const admin = await Users.findById(adminId);
+        return admin;
+    },
+
+
+    getAllReturnOrders: async () => {
+        const returnOrders = await Order.find({ return: 'available' })
+            .populate({
+                path: 'returnItems.product',
+                select: 'name'
+            })
+            .populate('address');
+        return returnOrders;
+    },
+
+
+    findOrderWithReturnItemsPopulated: async (orderId) => {
+        const order = await Order.findById(orderId).populate('returnItems.product');
+        return order;
+    },
+
+
+    findOrders: async (query, sortCriteria, skip, limit) => {
+        const orders = await Order.find(query)
+            .populate({
+                path: 'user',
+                select: 'username'
+            })
+            .populate({
+                path: 'address',
+                select: 'firstName lastName street city state postCode'
+            })
+            .populate({
+                path: 'items.product',
+                select: 'name'
+            })
+            .sort(sortCriteria)
+            .skip(skip)
+            .limit(limit);
+
+        return orders;
+    },
+
+
+    findOrdersByPriceRange: async (Min, Max) => {
+        const orders = await Order.find({ totalPrice: { $gte: Min, $lte: Max } })
+            .populate({
+                path: 'user',
+                select: 'username'
+            })
+            .populate({
+                path: 'address',
+                select: 'firstName lastName street city state postCode'
+            })
+            .populate({
+                path: 'items.product',
+                select: 'name'
+            });
+        return orders;
+    },
+
+
+
+
+
+
+
 
 
 }

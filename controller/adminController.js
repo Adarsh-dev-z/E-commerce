@@ -460,7 +460,7 @@ const deleteBanners = async (req, res) => {
       return res.status(400).send('Invalid request body');
     }
 
-    const deletedBanners = await Banner.deleteMany({ _id: { $in: bannerIds } });
+    const deletedBanners = await adminHelper.deleteMultipleBanners(bannerIds);
 
     res.status(200).send({ message: 'Banners deleted successfully', deletedBanners });
   } catch (err) {
@@ -470,7 +470,8 @@ const deleteBanners = async (req, res) => {
 
 
 const adminProfile = async(req, res)=>{
-  const admin = await Users.findById(req.session.admin._id)
+  const admin = await adminHelper.findUserById(req.session.admin._id);
+
   res.render('admin/profile', {admin})
 }
 
@@ -483,7 +484,8 @@ const updateAdminProfile = async (req, res) => {
     }
 
     const adminId = req.session.admin._id;
-    const admin = await Users.findById(adminId);
+    const admin = await adminHelper.findUserById(adminId);
+
     if (!admin) {
       return res.render('admin/profile', { admin: null, error: 'Admin not found' });
     }
@@ -492,6 +494,7 @@ const updateAdminProfile = async (req, res) => {
     admin.email = email;
     if (password === confirmpassword) {
       const hashedPassword = await bcrypt.hash(password, 10);
+      
       admin.password = hashedPassword;
     } else {
       return res.render('admin/profile', { admin, error: 'Passwords do not match' });
@@ -513,12 +516,7 @@ const adminLogout = (req, res) => {
 
 const adminReturn = async (req, res) => {
   try {
-    const returnOrders = await Order.find({ return: 'available' })
-      .populate({
-        path: 'returnItems.product',
-        select: 'name'
-      })
-      .populate('address');
+    const returnOrders = await adminHelper.getAllReturnOrders();
       
     returnOrders.forEach(order => {
       order.returnItems.forEach(item => {
@@ -540,7 +538,8 @@ const updateReturnStatus = async (req, res) => {
   // }
 
   try {
-    const order = await Order.findById(orderId).populate('returnItems.product');
+    const order = await adminHelper.findOrderWithReturnItemsPopulated(orderId);
+
     if (!order) {
       return res.status(404).json({ error: 'Order not found' });
     }
@@ -560,7 +559,8 @@ const updateReturnStatus = async (req, res) => {
     }
     returnItem.status = status;
     if (status === 'refunded') {
-      const user = await Users.findById(order.user);
+      const user = await adminHelper.findUserById(order.user);
+
       if (user) {
         user.walletAmount += returnItem.returnAmount;
         await user.save();
@@ -583,7 +583,6 @@ const adminOrders = async (req, res) => {
     const sortOption = req.query.sort || 'date_desc';
     const amountFilter = parseInt(req.query.amountFilter) || 100000;
 
-    console.log('Received amountFilter:', amountFilter); // Debug log
 
     let sortCriteria;
     if (sortOption === 'date_asc') {
@@ -596,32 +595,13 @@ const adminOrders = async (req, res) => {
       totalPrice: { $lte: amountFilter }
     };
 
-    console.log('Query:', JSON.stringify(query)); // Debug log
 
     const totalOrders = await Order.countDocuments(query);
-    console.log('Total orders matching query:', totalOrders); // Debug log
 
     const totalPages = Math.ceil(totalOrders / limit);
     const skip = (page - 1) * limit;
 
-    const orders = await Order.find(query)
-      .populate({
-        path: 'user',
-        select: 'username'
-      })
-      .populate({
-        path: 'address',
-        select: 'firstName lastName street city state postCode'
-      })
-      .populate({
-        path: 'items.product',
-        select: 'name'
-      })
-      .sort(sortCriteria)
-      .skip(skip)
-      .limit(limit);
-
-    console.log('Filtered orders:', orders.length); // Debug log
+    const orders = await adminHelper.findOrders(query, sortCriteria, skip, limit);
 
     res.render('admin/admin-orders', {
       orders,
@@ -639,12 +619,10 @@ const adminOrders = async (req, res) => {
 
 const adminFilterOrders = async(req, res)=>{
   const {Min, Max} = req.query;
-  const orders= await Order.find({totalPrice:{$gte:Min, $lte:Max}})
-      .populate({
-    path: 'user',
-    select: 'username'}).populate({path: 'address',
-    select: 'firstName lastName street city state postCode'}).populate({path: 'items.product',
-    select: 'name'});
+
+  const orders = await adminHelper.findOrdersByPriceRange(Min, Max);
+
+
   res.render('admin/admin-orders',{orders})
 }
 
