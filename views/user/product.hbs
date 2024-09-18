@@ -720,14 +720,12 @@
             event.preventDefault();
             var productId = $(this).closest('form').find('input[name="id"]').val();
             var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
-            console.log('productId: ' + productId);
 
             if (isLoggedIn) {
                 $.ajax({
                     url: `/add-to-cart?productId=${productId}`,
                     type: 'POST',
                     success: function(response) {
-                        console.log(response);
                         if (response.success) {
                                   document.dispatchEvent(new Event('productAdded'));
                                 updateMinicart()
@@ -735,9 +733,9 @@
                             setTimeout(function() {
                                 $('#cart-popup').fadeOut();
                             }, 2000);
-                            console.log('added to cart successfully');
+
                         } else {
-                            console.log('error adding to cart');
+
                         }
                     },
                     error: function() {
@@ -761,7 +759,6 @@
                 localStorage.setItem('guestCart', JSON.stringify(guestCart));
                 guestCart = JSON.parse(localStorage.getItem('guestCart'));
 
-                console.log(guestCart,'guestcart');
 
                 $.ajax({
                     url: '/add-to-cart',
@@ -769,7 +766,7 @@
                     contentType: 'application/json',
                     data: JSON.stringify({ guestCart: guestCart }),
                     success: function(response) {
-                        console.log(response);
+
                         if (response.success) {
                                   document.dispatchEvent(new Event('productAdded'));
                                 updateMinicart()
@@ -779,10 +776,10 @@
                             setTimeout(function() {
                                 $('#cart-popup').fadeOut();
                             }, 2000);
-                            console.log('added to guest cart successfully');
+
                             }
                         } else {
-                            console.log('error adding to guest cart');
+
                         }
                     },
                     error: function() {
@@ -830,7 +827,7 @@
                   setTimeout(()=>{
                     $('#wishlist-popup').fadeOut();
                   },2000)
-                   console.log('added to wishlist successfully')
+
                 } else {
 swal.fire({
   title: "Error",
@@ -869,7 +866,7 @@ swal.fire({
             const rating = document.querySelector('input[name="rating"]:checked').value.trim();
             const title = document.getElementById('review_title').value.trim();
             const body = document.getElementById('review_body').value.trim();
-            console.log(productId, author, email, rating, title, body,'datasss');
+
             if(!author || !email || !rating || !title || !body) {
 swal.fire({
   title: "Missing Information",
@@ -906,11 +903,11 @@ swal.fire({
         });
 
         async function loadReviews(productId) {
-            console.log(productId,'productId');
+
             const response = await fetch(`/reviews/product/${productId}`);
             const reviews = await response.json();
             const reviewsList = document.getElementById('reviews-list');
-            console.log(reviews,'reviews', response, 'response', reviewsList, 'response',);
+
             reviewsList.innerHTML = '';
 
             reviews.forEach(review => {
