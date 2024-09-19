@@ -713,9 +713,7 @@
     
     <!-- Including jQuery -->
  <script src="assets/js/vendor/jquery-3.6.0.min.js"></script>
-    <script>
-        console.log("jQuery version:", jQuery.fn.jquery); // Verify jQuery is loaded
-    </script>
+    
     <!-- Include Modernizr -->
     <script src="assets/js/vendor/modernizr-3.6.0.min.js"></script>
     <!-- Include the jQuery Cookie plugin -->
@@ -771,7 +769,6 @@ $(document).ready(function() {
     $('.add-to-wishlist').on('click', function(event) {
         event.preventDefault();
         var productId = $(this).closest('.wishlist-btn').data('id');
-    console.log(productId)
         $.ajax({
             url: '/add-to-wishlist',
             type: 'POST',
@@ -826,14 +823,12 @@ $(document).ready(function() {
         event.preventDefault();
         var productId = $(this).closest('form').find('input[name="id"]').val();
         var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
-        console.log('productId: ' + productId);
 
         if (isLoggedIn) {
             $.ajax({
                 url: `/add-to-cart?productId=${productId}`,
                 type: 'POST',
                 success: function(response) {
-                    console.log(response);
                     if (response.success) {
                         document.dispatchEvent(new Event('productAdded'));
                         updateMinicart();
@@ -843,9 +838,8 @@ $(document).ready(function() {
                         setTimeout(function() {
                             $('#cart-popup').fadeOut();
                         }, 2000);
-                        console.log('added to cart successfully');
                     } else {
-                        console.log('error adding to cart');
+
                     }
                 },
                 error: function() {
@@ -869,7 +863,6 @@ $(document).ready(function() {
             localStorage.setItem('guestCart', JSON.stringify(guestCart));
             guestCart = JSON.parse(localStorage.getItem('guestCart'));
 
-            console.log(guestCart,'guestcart');
 
             $.ajax({
                 url: '/add-to-cart',
@@ -877,7 +870,6 @@ $(document).ready(function() {
                 contentType: 'application/json',
                 data: JSON.stringify({ guestCart: guestCart }),
                 success: function(response) {
-                    console.log(response);
                     if (response.success) {
                         document.dispatchEvent(new Event('productAdded'));
                         updateMinicart();
@@ -890,9 +882,9 @@ $(document).ready(function() {
                         setTimeout(function() {
                             $('#cart-popup').fadeOut();
                         }, 2000);
-                        console.log('added to guest cart successfully');
+
                     } else {
-                        console.log('error adding to guest cart');
+
                     }
                 },
                 error: function() {
@@ -918,9 +910,8 @@ $(document).ready(function() {
                 if (response.success) {
                     updateMinicart();
                     updateCartCount(response.itemCount);
-                    console.log('removed from cart successfully');
                 } else {
-                    console.log('error removing from cart');
+
                 }
             },
             error: function() {

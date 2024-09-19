@@ -435,7 +435,6 @@
         currentProductId = productId;
         currentQuantity = quantity;
         currentOrderId = orderId;
-        console.log('orderid', currentOrderId);
         document.getElementById('popupOverlay').style.display = 'block';
 
         const quantitySelect = document.getElementById('returnQuantity');
@@ -477,7 +476,6 @@ Swal.fire({
 
     function showPopupReturn(orderId) {
         currentOrderId = orderId;
-        console.log('orderid', currentOrderId);
         document.getElementById('returnPopup').style.display = 'block';
     }
 

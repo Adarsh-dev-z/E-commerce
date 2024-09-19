@@ -1479,13 +1479,13 @@ Swal.fire({
                         setTimeout(() => {
                             $('#cart-popup').fadeOut();
                         }, 2000)
-                        console.log('product added to cart successfullly');
+
                     } else {
-                        console.log('failed to add product to cart');
+
                     }
                 },
                 error: (err) => {
-                    console.log('error:', err)
+
                 }
             })
         })
@@ -1523,7 +1523,7 @@ Swal.fire({
                         icon: 'error',
                         confirmButtonText: 'Ok'
                     });                    
-                    console.log(textStatus, errorThrown);
+
                 }
 
             });
@@ -1770,7 +1770,7 @@ swal.fire({
             body: new URLSearchParams({ amount: amount })
         });
         const data = await response.json();
-console.log(data);
+
         const options = {
             key: '{{razorpayKeyId}}',
             amount: data.amount,

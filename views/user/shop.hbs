@@ -664,7 +664,7 @@ $(document).ready(function() {
     $('.add-to-wishlist').on('click', function(event) {
         event.preventDefault();
         var productId = $(this).closest('.wishlist-btn').data('id');
-    console.log(productId)
+
         $.ajax({
             url: '/add-to-wishlist',
             type: 'POST',
@@ -695,37 +695,6 @@ swal.fire({
     });
 });
 </script>
-{{!-- -----------------------------------COMMENTED FOR GUEST Wishlist----------------------------------- --}}
-
-{{!-- 
-<script>
-    $(document).ready(function(){
-        $('.btn-addto-cart').on('click', function(event){
-            event.preventDefault();
-            var productId = $(this).closest('form').find('input[name="id"]').val();
-            $.ajax({
-                url:'/add-to-cart/' + productId,
-                type:'POST',
-                success:function(response){
-                    if(response.success){
-                        $('#cart-popup').fadeIn();
-                        setTimeout(function() {
-                            $('#cart-popup').fadeOut();
-                        },2000)
-                        console.log('added to cart successfully')
-                    }else{
-                        console.log('error adding to cart')
-                    }
-                    
-                },
-                error:function(){
-                    alert('internal server error');
-                }
-            })
-        })
-    })
-</script> --}}
-
 
 
 
@@ -738,7 +707,6 @@ swal.fire({
             event.preventDefault();
             var productId = $(this).closest('form').find('input[name="id"]').val();
             var isLoggedIn = {{#if user}}true{{else}}false{{/if}};
-            console.log('productId: ' + productId);
 
             if (isLoggedIn) {
                 $.ajax({
@@ -752,9 +720,9 @@ swal.fire({
                             setTimeout(function() {
                                 $('#cart-popup').fadeOut();
                             }, 2000);
-                            console.log('added to cart successfully');
+
                         } else {
-                            console.log('error adding to cart');
+
                         }
                     },
                     error: function() {
@@ -778,7 +746,6 @@ swal.fire({
                 localStorage.setItem('guestCart', JSON.stringify(guestCart));
                 guestCart = JSON.parse(localStorage.getItem('guestCart'));
 
-                console.log(guestCart,'guestcart');
 
                 $.ajax({
                     url: '/add-to-cart',
@@ -795,10 +762,10 @@ swal.fire({
                             setTimeout(function() {
                                 $('#cart-popup').fadeOut();
                             }, 2000);
-                            console.log('added to guest cart successfully');
+
                             }
                         } else {
-                            console.log('error adding to guest cart');
+
                         }
                     },
                     error: function() {
